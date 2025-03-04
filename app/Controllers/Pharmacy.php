@@ -183,20 +183,20 @@ class Pharmacy extends BaseController
     public function search_filter()
     {
         $session = session();
-//        $Key = $this->request->getVar( 'Key' );
-//        $city = $this->request->getVar( 'city' );
+;
         $MACAddress = $this->request->getVar( 'MACAddress' );
-
-
+        $FullName = $this->request->getVar( 'FullName' );
+        $City = $this->request->getVar( 'City' );
+        $DeploymentDate = $this->request->getVar( 'DeploymentDate' );
         $AllFilter = array (
-//            'Key' => $Key,
-//            'city' => $city,
             'MACAddress' => $MACAddress,
+            'FullName' => $FullName,
+            'City' => $City,
+            'DeploymentDate' => $DeploymentDate,
 
         );
 
 
-//        print_r($AllFilter);exit();
         $session->set( 'PharmacyFilters', $AllFilter );
 
         $response[ 'status' ] = "success";

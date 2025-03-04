@@ -41,7 +41,19 @@ class PharmacyModal extends Model
 //        $Admin = $Crud->ExecuteSQL($SQL);
         if (isset($SessionFilters['MACAddress']) && $SessionFilters['MACAddress'] != '') {
             $Categories = $SessionFilters['MACAddress'];
-            $SQL .= ' AND  "MAC" LIKE \'%' . $Categories . '%\'';
+            $SQL .= ' AND  `MAC` LIKE \'%' . $Categories . '%\'';
+        }
+        if (isset($SessionFilters['FullName']) && $SessionFilters['FullName'] != '') {
+            $FullName = $SessionFilters['FullName'];
+            $SQL .= ' AND  `FullName` ILIKE \'%' . $FullName . '%\'';
+        }
+        if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
+            $City = $SessionFilters['City'];
+            $SQL .= ' AND  `City` =' . $City . ' ';
+        }
+        if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'] != '') {
+            $DeploymentDate = $SessionFilters['DeploymentDate'];
+            $SQL .= ' AND  `DeploymentDate` <=' . $DeploymentDate . ' ';
         }
         if($keyword!=''){
 //            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';

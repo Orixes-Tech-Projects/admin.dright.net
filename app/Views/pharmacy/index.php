@@ -4,8 +4,18 @@
 $session = session();
 $SessionFilters = $session->get('PharmacyFilters');
 $MACAddress='';
+$FullName='';
 if (isset($SessionFilters['MACAddress']) && $SessionFilters['MACAddress'] != '') {
     $MACAddress = $SessionFilters['MACAddress'];
+}
+if (isset($SessionFilters['FullName']) && $SessionFilters['FullName'] != '') {
+    $FullName = $SessionFilters['FullName'];
+}
+if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
+    $City = $SessionFilters['City'];
+}
+if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'] != '') {
+    $DeploymentDate = $SessionFilters['DeploymentDate'];
 }
 ?>
 <div class="card">
@@ -28,10 +38,37 @@ if (isset($SessionFilters['MACAddress']) && $SessionFilters['MACAddress'] != '')
                     <div class="form-group">
                         <div class="row">
                             <div class="form-group col-md-3">
+                                <label class="form-control-label no-padding-right">FullName:</label>
+                                <input type="text" id="FullName"   value="<?=$FullName;?>" name="FullName" placeholder="FullName"
+                                       class="form-control " data-validation-engine="validate[required]"
+                                      />
+                            </div>
+                            <div class="form-group col-md-3">
+
+                            <label class="col-sm-12">City:</label>
+                                    <div class="col-sm-12">
+                                        <select id="City" name="City" class="form-control" data-validation-engine="validate[required]">
+                                            <option value="">Please Select</option>
+                                            <?php  foreach ($cities as $record) { ?>
+                                                <option value="<?= $record['UID'] ?>"
+                                                ><?= ucwords($record['FullName']); ?></option>
+                                            <?php } ?>                                </select>
+                                    </div>
+                                </div>
+
+                            <div class="form-group col-md-3">
                                 <label class="form-control-label no-padding-right">MAC Address:</label>
                                 <input type="text" id="MACAddress"   value="<?=$MACAddress;?>" name="MACAddress" placeholder="MAC Address"
                                        class="form-control " data-validation-engine="validate[required]"
                                        data-errormessage="MAC Address is required"/>
+                            </div>
+                            <div class="form-group col-md-3">
+
+                            <label class="col-sm-12">Deployment Date *</label>
+                                    <div class="col-sm-12">
+                                        <input type="date"  id="DeploymentDate" name="DeploymentDate" placeholder="Deployment Date" data-validation-engine="validate[required]" class="form-control"/>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group col-md-12" style="float: right">
                                  <span style="float: right;">
