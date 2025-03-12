@@ -71,6 +71,7 @@ class SupportTickets extends BaseController
             $UID = getSegment(3);
             $data['TicketID'] = $UID;
             $Crud = new Crud();
+            $data['last_reply']=$SupportTicketModel->GetTicketAllCommentsLastReply($UID);
             $TicketData = $Crud->SingleeRecord('builder_support_ticket', array("UID" => $UID));
             $data['TicketData'] = $TicketData;
 
@@ -297,6 +298,8 @@ class SupportTickets extends BaseController
           $record['User'] = $UserID;
           $record['Message'] = $message;
           $record['File'] = $fileID ;
+          $record['To'] = 1 ;
+          $record['From'] = 0 ;
           $RecordId = $Crud->AddRecordPG("builder_task_attachments", $record);
           if (isset($RecordId) && $RecordId > 0) {
               $response['status'] = 'success';
@@ -431,21 +434,19 @@ class SupportTickets extends BaseController
 
     public function load_builder_tickets_comments(){
         $SupportTicketModel = new SupportTicketModel();
-        $html = ''; // Initialize $html only once.
+        $html = '';
         $TicketID = $_POST['TicketID'];
 
         $Data = $SupportTicketModel->GetTicketAllCommentsDataBuilder($TicketID);
-        $TicketData = $SupportTicketModel->GetBuilderTicketDataByID($TicketID);
+//        $TicketData = $SupportTicketModel->GetBuilderTicketDataByID($TicketID);
 //        print_r($TicketData);exit();
         if (count($Data) > 0) {
-            $html .= '<div class="card">
-                    <div class="card-header">
-                        <h4>Comments</h4>
-                    </div>
-                    <div class="card-body">';
+
 
             foreach ($Data as $D) {
-                 // Make sure to define or get the user if needed
+                $to = !empty($D['From']) && $D['From'] != 0 ? 'left' : 'right';
+                $html .= '<div class="col-lg-12" style="text-align: ' . $to . '">
+                    ';
                 $html .= '<div class="ks-comment">
                         <div class="ks-body">
                             <div class="ks-comment-box">
@@ -466,10 +467,9 @@ class SupportTickets extends BaseController
                 $html .= '<footer class="blockquote-footer">' . $D['User'] . '
                         <cite title="Source Title">' . date("d M, Y h:i A", strtotime($D['SystemDate'])) . '</cite>
                       </footer>
-                    </div><hr>';
+                    </div><hr></div>';
             }
 
-            $html .= '</div></div>'; // Closing card-body and card divs
         } else {
             $html .= '<p>No comments available.</p>'; // Message for no comments
         }

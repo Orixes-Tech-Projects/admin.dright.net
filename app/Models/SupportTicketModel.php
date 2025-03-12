@@ -243,6 +243,17 @@ class SupportTicketModel extends Model
         $Admin = $Crud->ExecutePgSQL($SQL);
         return $Admin;
     }
+    public function GetTicketAllCommentsLastReply($key)
+    {
+        $Crud = new Crud();
+        $SQL = 'SELECT "public"."builder_task_attachments"."SystemDate" FROM "public"."builder_task_attachments" 
+            WHERE "builder_task_attachments"."TaskID" = \'' . $key . '\' 
+            ORDER BY "builder_task_attachments"."SystemDate" DESC Limit 1';
+
+        $Admin = $Crud->ExecutePgSQL($SQL);
+        $Admin=$Admin[0]['SystemDate'];
+        return isset($Admin)?$Admin:'';
+    }
 
     public
     function get_builder_task_datatables($keyword)

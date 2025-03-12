@@ -12,126 +12,86 @@
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12" id="ListSection">
-                        <div class="card panel panel-primary block-default">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <i class="fa fa-ticket"> Ticket Information</i>
-                                        </div>
-                                        <div class="card-body">
-                                            <table id="frutis" class="table table-striped table-bordered">
-                                                <tbody>
-                                                <tr class="ks-first-place">
-                                                    <td class="ks-info" style="padding-bottom: 5px !important; ">
-                                                        <p style="margin-left: 100px;">
-                                                            <strong>#<?= $TicketData['UID'] ?></strong>
-                                                            -
-                                                            <?php
-                                                            if ($TicketData['Status'] == 'Open') {
-                                                                echo '<span  class="ks-ticket-status badge badge-info float-right">Open</span>';
-                                                            } else {
-                                                                echo '<span class="ks-ticket-status badge badge-danger float-right">Closed</span>';
-                                                            } ?>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="ks-second-place">
-                                                    <td class="ks-info" style="padding-bottom: 5px !important; ">
-                                                        <p style="margin-left: 100px;"><strong>Submitted By</strong>
-                                                            <br> <?= isset($TicketData['ProfileName']) ? $TicketData['ProfileName'] : '' ?>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="ks-second-place">
-                                                    <td class="ks-info" style="padding-bottom: 5px !important; ">
-                                                        <p style="margin-left: 100px;"><strong>Submitted</strong>
-                                                            <br> <?= date("d M, Y h:i A", strtotime($TicketData['SystemDate'])) ?>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="ks-second-place">
-                                                    <td class="ks-info" style="padding-bottom: 5px !important;">
-                                                        <p style="margin-bottom: 0.2rem; margin-left: 100px;"><strong>DeadLine</strong>
-                                                            <br>
-                                                        <div class="row" id="MessageRow">
-                                                            <div class="col-md-8" style=" margin-left: 100px;">
-                                                                <?= (($TicketData['DeadLine'] != '') ? date("d M, Y", strtotime($TicketData['DeadLine'])) : 'In Review') ?>
-                                                                <a href="javascript:void(0);"
-                                                                   onclick="ShowInput('input');"
-                                                                   class="ks-ticket-status badge badge-info float-right">Edit</a>
-                                                            </div>
-                                                        </div>
-                                                        <form class="validate" name="UpdateDeadLineForm"
-                                                              id="UpdateDeadLineForm">
-                                                            <div class="row d-none" id="InputRow"
-                                                                 style="margin-top: 0px;">
 
-                                                                <input type="hidden" name="TaskID" id="TaskID"
-                                                                       value="<?= $TicketID ?>">
-                                                                <div class="col-md-6">
-                                                                    <input data-validation-engine="validate[required]"
-                                                                           type="date" name="edit_deadline"
-                                                                           id="edit_deadline" class="form-control">
-                                                                </div>
-                                                                <div class="col-md-6" style="margin-top: 8px;">
-                                                                    <a style="margin-left: 5px;"
-                                                                       onclick="ShowInput('deadline');"
-                                                                       href="javascript:void( 0 );"
-                                                                       class="ks-ticket-status badge badge-danger float-right">Hide</a>
-                                                                    <a onclick="UpdateBuilderDeadLineFormSubmit();"
-                                                                       href="javascript:void( 0 );"
-                                                                       class="ks-ticket-status badge badge-success float-right">Update</a>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="ks-second-place">
-                                                    <td class="ks-info"
-                                                        style="padding-bottom: 5px !important; margin-left: 100px;">
-                                                        <p style="margin-left: 100px;"><strong>Module</strong>
-                                                            <br> <?= $TicketData['Module'] ?></p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="ks-second-place">
-                                                    <td class="ks-info"
-                                                        style="padding-bottom: 5px !important; margin-left: 100px;">
-                                                        <p style="margin-left: 100px;"><strong>Priority</strong>
-                                                            <br> <?= $TicketData['Priority'] ?></p>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fa fa-ticket"> Ticket Information</i>
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="frutis" class="table table-striped table-bordered">
+                                            <tbody>
+                                            <tr class="ks-first-place">
+                                                <td class="ks-info" style="padding-bottom: 5px !important; ">
+                                                    <p style="margin-left: 100px;">
+                                                        <strong>#<?= $TicketData['UID'] ?></strong>
+                                                        -
+                                                        <?php
+                                                        if ($TicketData['Status'] == 'Open') {
+                                                            echo '<span  class="ks-ticket-status badge badge-info float-right">Open</span>';
+                                                        } else {
+                                                            echo '<span class="ks-ticket-status badge badge-danger float-right">Closed</span>';
+                                                        } ?>
+                                                    </p>
+                                                </td>
+                                            </tr>
+
+                                            <tr class="ks-second-place">
+                                                <td class="ks-info" style="padding-bottom: 5px !important; ">
+                                                    <p style="margin-left: 100px;"><strong>Submitted</strong>
+                                                        <br> <?= date("d M, Y h:i A", strtotime($TicketData['SystemDate'])) ?>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr class="ks-second-place">
+                                                <td class="ks-info" style="padding-bottom: 5px !important; ">
+                                                    <p style="margin-left: 100px;"><strong>Last Reply</strong>
+                                                        <br> <?= date("d M, Y h:i A", strtotime($last_reply)) ?>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr class="ks-second-place">
+                                                <td class="ks-info"
+                                                    style="padding-bottom: 5px !important; margin-left: 100px;">
+                                                    <p style="margin-left: 100px;"><strong>Priority</strong>
+                                                        <br> <?= $TicketData['Priority'] ?></p>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                <div class="col-md-8">
-                                    <div class="card">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        Replies
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row" id="CommentsDiv" style=";max-height: 400px; overflow-y: auto;">
+
+                                        </div>
+                                    <div class="card-footer">
                                         <form enctype="multipart/form-data" class="needs-validation" novalidate=""
                                               name="BuilderTicketReplyForm" id="BuilderTicketReplyForm"
                                               onsubmit="BuilderTicketReplyFormSubmit( 'BuilderTicketReplyForm' ); return false;">
                                             <input type="hidden" name="TaskID" id="TaskID" value="<?= $TicketID ?>">
-                                            <div class="card-header">
-                                                <h3><i class="fa fa-pencil"> Reply</i></h3>
-                                            </div>
-                                            <div class="card-body">
+
+
                                                 <div class="form-row">
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-6">
                                                         <label for="validationCustom04">Message</label>
                                                         <textarea id="summernote" class="form-control"
                                                                   name="message"></textarea>
                                                     </div>
-                                                    <div class="col-md-8 col-lg-12">
-                                                        <div class="row">
-                                                            <div class="col-md-10 col-lg-10">
+
+                                                            <div class="col-md-6 col-lg-6">
                                                                 <label class="control-label">Attachments</label>
                                                                 <input style="height: auto !important;" type="file"
                                                                        class="form-control" name="Image" id="files">
                                                             </div>
-                                                        </div>
-                                                    </div>
+
                                                     <div class="col-md-12" id="ImageFiles"></div>
                                                 </div>
                                                 <div class="row" style="margin-top: 0px !important;">
@@ -139,34 +99,30 @@
                                                 </div>
                                                 <div class="row" style="margin-top: 0px !important;">
                                                     <div class="col-md-12">
-                                                        <button style="float: right;" onclick="BuilderTicketReplyFormSubmit();"
+                                                        <button style="float: right;"
+                                                                onclick="BuilderTicketReplyFormSubmit();"
                                                                 class="btn btn-success btn-sm" type="button">Submit
                                                         </button>
                                                     </div>
                                                 </div>
-                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
                             </div>
-                            
-
-
-                                <div class="clearfix"><br></div>
-
-                            </div>
                         </div>
+                    </div>
+
                 </div>
             </div>
-                <div class="clearfix"><br/>
-                </div>
-            </div>
+
         </div>
-    <div class="row" id="CommentsDiv">
+    </div>
 
     </div>
 
     <script>
+
         $(document).ready(function () {
             $('#myTable').DataTable({
                 "scrollY": "200px",
@@ -201,12 +157,13 @@
 
             }
         }
+
         function LoadTicketsComments() {
 
             var TicketID = "<?=$TicketData['UID']?>";
             // alert( TicketID );
 
-            AjaxRequest( "support-ticket/load_builder_tickets_comments", "TicketID=" + TicketID, "CommentsDiv" );
+            AjaxRequest("support-ticket/load_builder_tickets_comments", "TicketID=" + TicketID, "CommentsDiv");
         }
 
         function BuilderTicketReplyFormSubmit() {
@@ -214,13 +171,14 @@
             // console.log( data );
             // alert( data );
             rslt = AjaxUploadResponse("support-ticket/BuilderTicketReplyFormSubmit", data);
-            if (rslt.status == 'success') {
-
-                setTimeout(function () {
-                    window.location.href = location.href;
-                }, 2000);
-
-            }
+            LoadTicketsComments();
+            // if (rslt.status == 'success') {
+            //
+            //     setTimeout(function () {
+            //         window.location.href = location.href;
+            //     }, 2000);
+            //
+            // }
         }
     </script>
     <script src="<?= $template ?>vendors/dataTable/datatables.min.js"></script>
