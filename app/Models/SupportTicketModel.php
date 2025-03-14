@@ -215,13 +215,27 @@ class SupportTicketModel extends Model
     public function AllQueriesFromBuilder($keyword)
     {
         $Crud = new Crud();
-
+        $session = session();
+        $SessionFilters = $session->get('SupportTicketFilters');
         $SQL = 'SELECT "public"."builder_support_ticket".*
         FROM "public"."builder_support_ticket"  
         WHERE 1=1
       ';
         if($keyword!=''){
             $SQL .= ' AND "public"."builder_support_ticket"."Title"  LIKE \'%' . $keyword . '%\'   ';
+        }
+        if (isset($SessionFilters['Status']) && $SessionFilters['Status'] != '') {
+            $Status = $SessionFilters['Status'];
+            $SQL .= ' AND  "public"."builder_support_ticket"."Status" ILIKE \'%' . $Status . '%\'';
+        }
+        if (isset($SessionFilters['CreatedDate']) && $SessionFilters['CreatedDate'] != '') {
+            $CreatedDate = $SessionFilters['CreatedDate'];
+
+            // Convert 'm d y' format to 'Y-m-d' (compatible with the timestamp field)
+            $ConvertedDate = date('Y-m-d', strtotime($CreatedDate));
+
+            // Use a proper date format in SQL and enclose it in single quotes
+            $SQL .= ' AND "public"."builder_support_ticket"."SystemDate"::DATE <= \'' . $ConvertedDate . '\'';
         }
         $SQL .=' Order By "public"."builder_support_ticket"."SystemDate"  Desc';
         return $SQL;

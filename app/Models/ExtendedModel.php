@@ -16,8 +16,25 @@ class ExtendedModel extends Model
 
     public function extended_profiles()
     {
+        $session = session();
+        $SessionFilters = $session->get('ExtendedProfileFilters');
         $Crud = new Crud();
-        $SQL = "SELECT * FROM  `extended_profiles` ORDER BY `extended_profiles`.`FullName` ASC";
+        $SQL = "SELECT * FROM  `extended_profiles` where 1=1";
+
+        if (isset($SessionFilters['URL']) && $SessionFilters['URL'] != '') {
+            $URL = $SessionFilters['URL'];
+            $SQL .= ' AND  `SubDomainUrl` LIKE \'%' . $URL . '%\'';
+        }
+        if (isset($SessionFilters['FullName']) && $SessionFilters['FullName'] != '') {
+            $FullName = $SessionFilters['FullName'];
+            $SQL .= ' AND  `FullName` LIKE \'%' . $FullName . '%\'';
+        }
+        if (isset($SessionFilters['Status']) && $SessionFilters['Status'] != '') {
+            $Status = $SessionFilters['Status'];
+            $SQL .= ' AND  `Status` LIKE \'%' . $Status . '%\'';
+        }
+        $SQL .= '  ORDER BY `extended_profiles`.`FullName` ASC';
+//        print_r($SQL);exit;
         return $SQL;
     }
     public function GetExtendedProfielDataByID($ID)

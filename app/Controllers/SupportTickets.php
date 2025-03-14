@@ -162,6 +162,7 @@ class SupportTickets extends BaseController
                 : '';
             $data[] = isset($record['SystemDate']) ? date("d M, Y h:i A", strtotime( $record['SystemDate'] )) : '';
             $data[] = isset($record['Priority']) ? htmlspecialchars($record['Priority']) : '';
+            $data[] = isset($record['Status']) ? htmlspecialchars($record['Status']) : '';
             $data[] = '
     <td class="text-end">
         <div class="dropdown">
@@ -494,6 +495,28 @@ class SupportTickets extends BaseController
 
 //        print_r($AllFilter);exit();
         $session->set('ExtendedFilters', $AllFilter);
+
+        $response['status'] = "success";
+        $response['message'] = "Filters Updated Successfully";
+
+        echo json_encode($response);
+    }
+    public
+    function builder_support_search_filter()
+    {
+        $session = session();
+        $CreatedDate = $this->request->getVar( 'CreatedDate' );
+        $Status = $this->request->getVar('Status');
+
+
+        $AllFilter = array(
+            'CreatedDate' => $CreatedDate,
+            'Status' => $Status,
+
+        );
+
+
+        $session->set('SupportTicketFilters', $AllFilter);
 
         $response['status'] = "success";
         $response['message'] = "Filters Updated Successfully";

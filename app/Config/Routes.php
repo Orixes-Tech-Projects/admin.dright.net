@@ -41,6 +41,7 @@ $routes->group('support-ticket', static function ($routes) {
     $routes->post('submit', 'SupportTickets::ticket_form_submit');
     $routes->post('submit-item', 'SupportTickets::item_form_submit');
     $routes->post('search_filter', 'SupportTickets::search_filter');
+    $routes->post('builder_support_search_filter', 'SupportTickets::builder_support_search_filter');
     $routes->post('load_tickets_comments', 'SupportTickets::load_tickets_comments');
     $routes->post('load_builder_tickets_comments', 'SupportTickets::load_builder_tickets_comments');
     $routes->post('delete', 'SupportTickets::delete_ticket');

@@ -50,6 +50,7 @@ class Extended extends BaseController
             $data['UID'] = $UID;
             $Crud = new Crud();
             $data['HospitalData'] = $ExtendedModel->GetExtendedProfielDataByID($UID);
+//            print_r(  $data['HospitalData'] );exit;
             $data['HospitalAdminUsers'] = $ExtendedModel->GetAdminUsersByHospitalDB($data['HospitalData'][0]['DatabaseName']);
 
 
@@ -120,8 +121,8 @@ class Extended extends BaseController
 //            $data[] = isset($InvoiceDateTime) ? date("d M, Y h:i A", strtotime($InvoiceDateTime)) : '';
 //            $data[] = isset($PharmacyInvoiceDateTime) ? date("d M, Y h:i A", strtotime($PharmacyInvoiceDateTime)) : '';
             $data[] = isset($record['SubDomainUrl']) ? htmlspecialchars($record['SubDomainUrl']) : '';
-            $data[] = isset($record['Status']) ? htmlspecialchars($record['Status']) : '';
             $data[] = isset($record['ExpireDate']) ? htmlspecialchars($record['ExpireDate']) : '';
+            $data[] = isset($record['Status']) ? htmlspecialchars($record['Status']) : '';
 
             $smsCredits = isset($record['SMSCredits']) && $record['SMSCredits'] != ''
                 ? '<strong>' . $record['SMSCredits'] . '</strong> SMS Credits<br>
@@ -718,5 +719,22 @@ class Extended extends BaseController
 
         return true;
     }
+    public function search_filter()
+    {
+        $session = session();
+        $URL = $this->request->getVar('URL');
+        $FullName = $this->request->getVar('FullName');
+        $Status = $this->request->getVar('Status');
+        $AllFilter = array(
+            'URL' => $URL,
+            'FullName' => $FullName,
+            'Status' => $Status,
 
+        );
+        $session->set('ExtendedProfileFilters', $AllFilter);
+        $response['status'] = "success";
+        $response['message'] = "Filters Updated Successfully";
+
+        echo json_encode($response);
+    }
 }

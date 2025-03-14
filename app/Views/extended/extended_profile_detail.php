@@ -81,7 +81,7 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                                         </div>
                                                                   </div>';
                                                             break;
-                                                        case 'lab_services':
+                                                        case 'lab_services': if($HospitalData[0]['DatabaseName'] !=''){
                                                             $serviceGroup = $ExtendedModel->GetExtendedLookupsDataByDBOrID( $HospitalData[0]['DatabaseName'], 'service_group');
                                                             echo '<div class="form-group row">
                                                                     <label class="col-sm-3 col-md-4 col-lg-2 col-xs-3 form-control-label">' . $record['Name'] . ':</label>
@@ -94,8 +94,8 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                             echo '</select>
                                                                      </div>
                                                                 </div>';
-                                                            break;
-                                                        case 'radiology_service':
+                                                           } break;
+                                                        case 'radiology_service': if($HospitalData[0]['DatabaseName'] !=''){
                                                             $serviceGroup = $ExtendedModel->GetExtendedLookupsDataByDBOrID($HospitalData[0]['DatabaseName'], 'service_group');
                                                             echo '<div class="form-group row">
                                                                         <label class="col-sm-3 col-md-4 col-lg-2 col-xs-3 form-control-label">' . $record['Name'] . ':</label>
@@ -108,8 +108,8 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                             echo '</select>
                                                                       </div>
                                                                   </div>';
-                                                            break;
-                                                        case 'ot_services':
+                                                           } break;
+                                                        case 'ot_services': if($HospitalData[0]['DatabaseName'] !=''){
 
                                                             $serviceGroup = $ExtendedModel->GetExtendedLookupsDataByDBOrID($HospitalData[0]['DatabaseName'], 'service_group');
                                                             echo '<div class="form-group row">
@@ -123,7 +123,7 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                             echo '</select>
                                                                       </div>
                                                                    </div>';
-                                                            break;
+                                                           } break;
                                                         case'pharma_prescription';
                                                             echo '<div class="form-group row">
                                                                         <label class="col-sm-3 col-md-4 col-lg-2 col-xs-3 form-control-label">' . $record['Name'] . ':</label>
@@ -200,8 +200,8 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                                       </div>
                                                                   </div>';
                                                             break;
-                                                        case 'drug_category':
-                                                            $Category = $ExtendedModel->GetExtendedProductCategoriesByDBName( $HospitalData[0]['DatabaseName'] );
+                                                        case 'drug_category': if($HospitalData[0]['DatabaseName'] !='') {
+                                                            $Category = $ExtendedModel->GetExtendedProductCategoriesByDBName($HospitalData[0]['DatabaseName']);
                                                             echo '<div class="form-group row">
                                                                 <label class="col-sm-3 col-md-4 col-lg-2 col-xs-3 form-control-label">' . $record['Name'] . ':</label>
                                                                 <div class="col-sm-9 col-md-8 col-lg-6 col-xs-9">
@@ -213,7 +213,7 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                             echo '</select>
                                                                  </div>
                                                               </div>';
-                                                            break;
+                                                        } break;
                                                         case 'specialized_mode':
                                                             //$specialized_mode = config_item('specialized_mode');
                                                             echo '<div class="form-group row">

@@ -43,6 +43,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-group row">
+                        <label class="col-sm-4">Status<span class="text-danger">*</span></label>
+                        <div class="col-sm-12">
+                            <select id="Status" name="Profile[Status]" class="form-control"
+                                    data-validation-engine="validate[required]">
+                                <option value="">Please Select</option>
+
+                                    <option value="active" <?= (isset($PAGE['Status']) && $PAGE['Status'] == 'active') ? 'selected' : '' ?>
+                                    >Active</option>
+                                <option value="block" <?= (isset($PAGE['Status']) && $PAGE['Status'] == 'block') ? 'selected' : '' ?>
+                                    >Block</option>
+                                                           </select>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-md-3">
                     <div class="form-group row">
