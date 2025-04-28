@@ -1763,7 +1763,7 @@ class Builder extends BaseController
 //print_r($Lookup);exit();
         if ($id == 0) {
             foreach ($option as $key => $value) {
-                $Crud->DeleteRecordPG("public.options", array('Name' => $key));
+                $Crud->DeleteRecordPG("public.options", array('Name' => $key , 'ProfileUID' => $ProfileUID));
 
                 $record['Name'] = $key;
                 $record['Description'] = ((isset($value)) ? $value : '');

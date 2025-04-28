@@ -156,9 +156,9 @@ $OptionExtra = $content->OptionExtra($UID);
                                 <select id="theme_header" name="option[theme_header]"
                                         class="form-control validate[required]">
                                     <option value=""<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == '') ? 'selected' : '' ?>>Please Select</option>
-                                    <option value="version_1"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'version_1') ? 'selected' : '' ?>>1</option>
-                                    <option value="version_2"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'version_2') ? 'selected' : '' ?>>2</option>
-                                    <option value="version_3"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'version_3') ? 'selected' : '' ?>>3</option>
+                                    <option value="simple_header"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'simple_header') ? 'selected' : '' ?>>Simple Header</option>
+                                    <option value="center_header"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'center_header') ? 'selected' : '' ?>>Center Header</option>
+                                    <option value="dark_header"<?= (isset($OptionExtra['theme_header']) && $OptionExtra['theme_header'] == 'dark_header') ? 'selected' : '' ?>>Dark Header</option>
 
                                 </select>
                             </div>
@@ -167,10 +167,10 @@ $OptionExtra = $content->OptionExtra($UID);
                                 <select id="theme_footer" name="option[theme_footer]"
                                         class="form-control validate[required]">
                                     <option value=""<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == '') ? 'selected' : '' ?>>Please Select</option>
-                                    <option value="version_1"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'version_1') ? 'selected' : '' ?>>1</option>
-                                    <option value="version_2"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'version_2') ? 'selected' : '' ?>>2</option>
-                                    <option value="version_3"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'version_3') ? 'selected' : '' ?>>3</option>
-                                    <option value="version_4"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'version_4') ? 'selected' : '' ?>>3</option>
+                                    <option value="smart_footer"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'smart_footer') ? 'selected' : '' ?>>Smart Footer</option>
+                                    <option value="versatile_footer"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'versatile_footer') ? 'selected' : '' ?>>Versatile Footer</option>
+                                    <option value="sticky_footer"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'sticky_footer') ? 'selected' : '' ?>>Sticky footer</option>
+                                    <option value="display_footer"<?= (isset($OptionExtra['theme_footer']) && $OptionExtra['theme_footer'] == 'display_footer') ? 'selected' : '' ?>>Display footer</option>
 
                                 </select>
                             </div>
