@@ -306,6 +306,7 @@ class Builder extends BaseController
 //            $data[] = '<img src="' . load_image('sponsors_' . $Sponsor) . '" height="45">';
             $data[] = $record['Email'];
             $data[] = isset($city[0]['FullName'])?$city[0]['FullName']:'';
+            $data[] = !empty($record['SubDomain']) ? '<a href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
 
             // TeleMedicine Credits Column
             $telemedicineCredits = isset($TeleMedicineCredits[0]['Description']) && $TeleMedicineCredits[0]['Description'] != ''
@@ -359,7 +360,7 @@ class Builder extends BaseController
         $Data = $BuilderModel->get_doct_datatables($type, $keyword);
         $totalfilterrecords = $BuilderModel->count_doct_datatables($type, $keyword);
         $Users = new SystemUser();
-        print_r($Data);exit;
+//        print_r($Data);exit;
         $dataarr = array();
         $cnt = $_POST['start'];
         foreach ($Data as $record) {
@@ -377,6 +378,7 @@ class Builder extends BaseController
             $cnt++;
             $SmsCredits = $BuilderModel->get_profile_options_data_by_id_option($record['UID'], 'sms_credits');
             $city = $PharmacyModal->getcitybyid($record['City']);
+            $lastVisit = !empty($record['LastVisitDateTime']) ? date("d M, Y", strtotime($record['LastVisitDateTime'])) : "N/A";
 
             $data = [];
             $data[] = $cnt;
@@ -384,7 +386,8 @@ class Builder extends BaseController
 //            $data[] = '<img src="' . load_image('sponsors_' . $Sponsor) . '" height="45">';
             $data[] = $record['Email'];
             $data[] = $city[0]['FullName'];
-            $data[] = $record['SubDomain'];
+            $data[] = !empty($record['SubDomain']) ? '<a href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
+            $data[] =$lastVisit;
 
 
             // SMS Credits Column

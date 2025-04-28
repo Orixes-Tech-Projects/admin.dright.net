@@ -85,6 +85,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                     <th>Email</th>
                     <th>City</th>
                     <th>SubDomain</th>
+                    <th>Last Visit</th>
                     <th>SMS Credits</th>
 
                     <th>Actions</th>
@@ -101,6 +102,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                     <th>Email</th>
                     <th>City</th>
                     <th>SubDomain</th>
+                    <th>Last Visit</th>
 
                     <th>SMS Credits</th>
 
