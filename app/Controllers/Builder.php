@@ -940,8 +940,35 @@ class Builder extends BaseController
 
                 }
                 $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
-
                 if ($website_profile_id) {
+                    $themeOptions = array(
+                        'banner_style' => 'basic',
+                        'home_ceo_message' => 1,
+                        'home_facilities' => 1,
+                        'home_news' => 1,
+                        'home_reviews' => 1,
+                        'theme' => 'mist',
+                        'theme_primary_color' => '#F08080' ,
+                        'theme_secondary_color' => '#CCCCFF' ,
+                        'theme_header' => 'simple_header' ,
+                        'theme_footer' => 'smart_footer' ,
+                        'theme_service' => 'version_1' ,
+                        'theme_facilities' => 'version_1' ,
+                    );
+                    foreach ($themeOptions as $key => $value) {
+
+                        if ($value != '') {
+                            $themerecord['ProfileUID'] = $website_profile_id;
+                            $themerecord['Name'] = $key;
+                            $themerecord['Description'] = $value;
+
+                            $id = $Crud->AddRecordPG("public.options", $themerecord);
+                        }
+                    }
+
+
+
+
                     $theme = $this->request->getVar('theme');
                     $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1);
                     foreach ($Options as $key => $value) {
@@ -965,6 +992,7 @@ class Builder extends BaseController
                         $id = $Crud->AddRecordPG("public.profile_metas", $record_meta);
 
                     }
+
 
 //
 //                    $message = 'Dear Clinta Support,
@@ -1176,7 +1204,30 @@ class Builder extends BaseController
 
                 if ($website_profile_id) {
 
+                    $themeOptions = array(
+                        'banner_style' => 'basic',
+                        'home_ceo_message' => 1,
+                        'home_facilities' => 1,
+                        'home_news' => 1,
+                        'home_reviews' => 1,
+                        'theme' => 'mist',
+                        'theme_primary_color' => '#F08080' ,
+                        'theme_secondary_color' => '#CCCCFF' ,
+                        'theme_header' => 'simple_header' ,
+                        'theme_footer' => 'smart_footer' ,
+                        'theme_service' => 'version_1' ,
+                        'theme_facilities' => 'version_1' ,
+                    );
+                    foreach ($themeOptions as $key => $value) {
 
+                        if ($value != '') {
+                            $themerecord['ProfileUID'] = $website_profile_id;
+                            $themerecord['Name'] = $key;
+                            $themerecord['Description'] = $value;
+
+                            $id = $Crud->AddRecordPG("public.options", $themerecord);
+                        }
+                    }
                     $logos = array();
 
 
