@@ -93,7 +93,9 @@ class Crud extends Model
             echo $pgsql->getLastQuery() . "<hr>";
         $pgsql->close();
         return $records;
-    }    public
+    }
+
+    public
     function ExecutePgSQLClinta($Query, $view = false)
     {
         $pgsql = \Config\Database::connect('clinta_extended');

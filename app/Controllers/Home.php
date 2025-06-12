@@ -323,7 +323,7 @@ class Home extends BaseController
 
 
         $record= $BuilderModel->get_website_profile_meta_data_by_id_option($uid,'initatived_logo');
-//        print_r($record);exit;
+        //print_r($record);exit;
         if ($driver == 'pgsql') {
             if ($table == '') {
                 $column = '';
@@ -332,7 +332,7 @@ class Home extends BaseController
                 $column = 'Value';
 
             }
-            $image = base64_decode($record[$column]);
+            $image = base64_decode($record[0][$column]);
             echo $image;
         }
 

@@ -35,18 +35,20 @@ if ($page == 'add-doctor') {
     $theme = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'theme');
 }
 
-//print_r($patient_portal);exit();
+//print_r($sponsor);exit();
 ?>
 <div class="card">
     <div class="card-body">
-        <h6 class="card-title"><?= ((isset($PAGE['UID'])) ? 'Update' : 'Add New') ?> Doctor</h6>
+        <h4 style="margin-bottom: 1rem;" class="card-title"><?= ((isset($PAGE['UID'])) ? 'Update' : 'Add New') ?>
+            Doctor</h4>
+        <hr>
         <form method="post" action="" name="AddDoctorForm" id="AddDoctorForm" class="needs-validation" novalidate=""
               enctype="multipart/form-data">
             <input type="hidden" name="UID" id="UID" value="<?= ((isset($PAGE['UID'])) ? $PAGE['UID'] : '0') ?>">
             <div class="form-row">
                 <div class="col-md-3 mb-3">
                     <label for="validationCustom04">FullName</label>
-                    <input type="text" class="form-control" name="name" id="validationCustom04"
+                    <input type="text" class="form-control" name="name" id="name"
                            placeholder="Full Name" value="<?= ((isset($PAGE['Name'])) ? $PAGE['Name'] : '') ?>"
                            required="">
                     <div class="invalid-feedback">
@@ -55,7 +57,7 @@ if ($page == 'add-doctor') {
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="validationCustom04">Email</label>
-                    <input type="text" class="form-control" name="email" id="validationCustom04"
+                    <input type="text" class="form-control" name="email" id="email"
                            placeholder="Email" value="<?= ((isset($PAGE['Email'])) ? $PAGE['Email'] : '') ?>"
                            required="">
                     <div class="invalid-feedback">
@@ -64,7 +66,7 @@ if ($page == 'add-doctor') {
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="validationCustom04">Password</label>
-                    <input type="text" class="form-control" name="password" id="validationCustom04"
+                    <input type="text" class="form-control" name="password" id="password"
                            placeholder="Password" value="<?= ((isset($PAGE['Password'])) ? $PAGE['Password'] : '') ?>"
                            required="">
                     <div class="invalid-feedback">
@@ -73,7 +75,7 @@ if ($page == 'add-doctor') {
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="validationCustom04">Contact No</label>
-                    <input type="text" class="form-control" name="ContactNo" id="validationCustom04"
+                    <input type="text" class="form-control" name="ContactNo" id="ContactNo"
                            placeholder="Contact No"
                            value="<?= ((isset($PAGE['ContactNo'])) ? $PAGE['ContactNo'] : '') ?>"
                            required="">
@@ -102,7 +104,7 @@ if ($page == 'add-doctor') {
                                 data-validation-engine="validate[required]">
                             <option value="">Please Select</option>
                             <?php foreach ($specialities as $record) { ?>
-                                <option value="<?= $record['UID'] ?>" <?= (isset($PAGE['City']) && $PAGE['City'] == $record['UID']) ? 'selected' : '' ?>
+                                <option value="<?= $record['UID'] ?>" <?= (isset($speciality[0]['Value']) && $speciality[0]['Value'] == $record['UID']) ? 'selected' : '' ?>
                                 ><?= ucwords($record['Name']); ?></option>
                             <?php } ?>
                         </select>
@@ -115,8 +117,8 @@ if ($page == 'add-doctor') {
                                 data-validation-engine="validate[required]">
                             <option value="">Please Select</option>
                             <?php foreach ($Sponsors as $record) { ?>
-                                <option value="<?= $record['UID'] ?>" <?= (isset($PAGE['City']) && $PAGE['City'] == $record['UID']) ? 'selected' : '' ?>
-                                ><?= ucwords($record['Name']); ?></option>
+                                <option <?= ((isset($sponsor[0]['Description']) && $sponsor[0]['Description'] == $record['UID']) ? 'selected' : '') ?>
+                                        value="<?= $record['UID'] ?>"><?= ucwords($record['Name']); ?></option>
                             <?php } ?>                                </select>
                     </div>
                 </div>
@@ -140,8 +142,6 @@ if ($page == 'add-doctor') {
                         </div>
                     </div>
                 </div>
-
-
                 <div class="col-md-3">
                     <div class="form-group row">
                         <label class="col-sm-12">Department</label>
@@ -199,7 +199,6 @@ if ($page == 'add-doctor') {
                         <img src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>" height="70">
                     </div>
                 <?php } ?>
-
                 <div class="col-md-4 mb-3">
 
                     <label for="validationCustom05">Initatived LOGO</label>
@@ -219,9 +218,7 @@ if ($page == 'add-doctor') {
                         <label class="col-sm-12">Short Description</label>
                         <div class="col-sm-12">
                             <textarea class="form-control" name="short_description" id="short_description"
-                                      rows="6"><?php if (is_array($short_desc) && !empty($short_desc)) { ?>
-                                    <?= isset($short_desc[0]['Value']) ? $short_desc[0]['Value'] : ''; ?>
-                                <?php } ?></textarea>
+                                      rows="6"><?php if (is_array($short_desc) && !empty($short_desc)) { ?> <?= isset($short_desc[0]['Value']) ? trim($short_desc[0]['Value']) : ''; ?><?php } ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -230,17 +227,16 @@ if ($page == 'add-doctor') {
                         <label class="col-sm-12">Initatived Text</label>
                         <div class="col-sm-12">
                             <textarea class="form-control" name="initatived_text" id="initatived_text"
-                                      rows="6"><?php if (is_array($initatived_text) && !empty($initatived_text)) { ?>
-                                    <?= isset($initatived_text[0]['Value']) ? $initatived_text[0]['Value'] : ''; ?>
-                                <?php } ?></textarea>
+                                      rows="6"><?php if (is_array($initatived_text) && !empty($initatived_text)) { ?><?= isset($initatived_text[0]['Value']) ? trim($initatived_text[0]['Value']) : ''; ?><?php } ?></textarea>
                         </div>
                     </div>
                 </div>
             </div>
-            <hr>
-            <div class="form-row">
+            <div class="form-row mt-2">
                 <div class="col-md-12">
-                    <h4>Clinta HealthCare</h4></div>
+                    <h4>Clinta HealthCare</h4>
+                    <hr>
+                </div>
                 <div class="col-md-4">
                     <label class="col-sm-12">Add-ons</label>
                     <div class="col-sm-12">
@@ -271,7 +267,6 @@ if ($page == 'add-doctor') {
                         </select>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <label class="col-sm-12">Theme Setting</label>
                     <div class="col-sm-12">
@@ -288,7 +283,6 @@ if ($page == 'add-doctor') {
                         </select>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <label class="col-sm-12">Patient Portal</label>
                     <div class="col-sm-12">
@@ -305,29 +299,63 @@ if ($page == 'add-doctor') {
                         </select>
                     </div>
                 </div>
-
             </div>
             <div class="mt-4" id="ajaxResponse"></div>
-
-
+            <div class="form-row">
+                <div class="col-md-12">
+                    <button style="float: right; border-radius: 5px;" class="btn btn-primary btn-sm" type="button"
+                            onclick="AddDoctorFormFunction()">Update Profile
+                    </button>
+                </div>
         </form>
 
     </div>
-    <div class="mb-2">
-    <span style="float: right">
-                <button class="btn btn-primary" type="button" onclick="AddDoctorFormFunction()">Submit form</button>
-
-</span>
-    </div>
+</div>
 
 </div>
 
 <script>
 
     function AddDoctorFormFunction() {
-        var formdata = new window.FormData($("form#AddDoctorForm")[0]);
 
-        response = AjaxUploadResponse("builder/submit-doctor", formdata);
+        setTimeout(function () {
+            $("#ajaxResponse").html('');
+        }, 2000);
+
+        var FullName = $("form#AddDoctorForm input#name").val();
+        var Email = $("form#AddDoctorForm input#email").val();
+        var Password = $("form#AddDoctorForm input#password").val();
+        var ContactNo = $("form#AddDoctorForm input#ContactNo").val();
+        var City = $("form#AddDoctorForm select#city").val();
+        var SubDomain = $("form#AddDoctorForm input#sub_domain").val();
+
+        if (FullName == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Full Name Required </div>');
+            return false;
+        }
+        if (Email == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Email Required </div>');
+            return false;
+        }
+        if (Password == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Password Required </div>');
+            return false;
+        }
+        if (ContactNo == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Contact No Required </div>');
+            return false;
+        }
+        if (City == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> City Required </div>');
+            return false;
+        }
+        if (SubDomain == '') {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> SubDomain Required </div>');
+            return false;
+        }
+
+        var formdata = new window.FormData($("form#AddDoctorForm")[0]);
+        var response = AjaxUploadResponse("builder/submit-doctor", formdata);
         if (response.status === 'success') {
             $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
             setTimeout(function () {

@@ -212,15 +212,24 @@ class SupportTicketModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
+
     public function AllQueriesFromBuilder($keyword)
     {
+
         $Crud = new Crud();
         $session = session();
         $SessionFilters = $session->get('SupportTicketFilters');
+
+        $SessionLogin = $session->get();
+        $LoginUserRole = $SessionLogin['AccessLevel'];
+        $LoginUserUID = $SessionLogin['UID'];
+
         $SQL = 'SELECT "public"."builder_support_ticket".*
-        FROM "public"."builder_support_ticket"  
-        WHERE 1=1
-      ';
+                FROM "public"."builder_support_ticket"  
+                WHERE 1=1 ';
+        if(isset($LoginUserRole) && $LoginUserRole == 'support_department'){
+            $SQL.=' AND "builder_support_ticket"."AssignedUserUID" = '.$LoginUserUID.' ';
+        }
         if($keyword!=''){
             $SQL .= ' AND "public"."builder_support_ticket"."Title"  LIKE \'%' . $keyword . '%\'   ';
         }
@@ -230,16 +239,13 @@ class SupportTicketModel extends Model
         }
         if (isset($SessionFilters['CreatedDate']) && $SessionFilters['CreatedDate'] != '') {
             $CreatedDate = $SessionFilters['CreatedDate'];
-
-            // Convert 'm d y' format to 'Y-m-d' (compatible with the timestamp field)
             $ConvertedDate = date('Y-m-d', strtotime($CreatedDate));
-
-            // Use a proper date format in SQL and enclose it in single quotes
             $SQL .= ' AND "public"."builder_support_ticket"."SystemDate"::DATE <= \'' . $ConvertedDate . '\'';
         }
         $SQL .=' Order By "public"."builder_support_ticket"."SystemDate"  Desc';
         return $SQL;
     }
+
     public function GetBuilderTicketDataByID($key)
     {
         $Crud = new Crud();
@@ -277,9 +283,7 @@ class SupportTicketModel extends Model
         $SQL = $this->AllQueriesFromBuilder($keyword);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
-//        echo nl2br($SQL); exit;
         $records = $Crud->ExecutePgSQL($SQL);
-//        print_r($records);exit();
 
         return $records;
     }

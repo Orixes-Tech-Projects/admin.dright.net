@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use PhpParser\Node\Expr\Exit_;
 
 class BuilderModel extends Model
 {
@@ -23,6 +22,7 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin;
     }
+
     public function GetThemeSettingsDataByID($id)
     {
         $Crud = new Crud();
@@ -32,22 +32,24 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecutePgSQL($SQL);
         return $Admin;
     }
+
     public
-    function OptionExtra( $id, $options = array () )
+    function OptionExtra($id, $options = array())
     {
         $db = \Config\Database::connect('website_db');
         $SQL = 'SELECT * FROM "public"."options" 
         where "public"."options"."ProfileUID" = \'' . $id . '\' ';
-        if ( count( $options ) > 0 ) {
-            $SQL .= ' AND "Name" IN (\'' . implode( "', '", $options ) . '\') ';
+        if (count($options) > 0) {
+            $SQL .= ' AND "Name" IN (\'' . implode("', '", $options) . '\') ';
         }
-        $rslt = $db->query( $SQL )->getResult( 'array' );
-        $records = array ();
-        foreach ( $rslt as $row ) {
-            $records[ $row[ 'Name' ] ] = $row[ 'Description' ];
+        $rslt = $db->query($SQL)->getResult('array');
+        $records = array();
+        foreach ($rslt as $row) {
+            $records[$row['Name']] = $row['Description'];
         }
-        return ((isset($records)) ? $records :'' );
+        return ((isset($records)) ? $records : '');
     }
+
     public function get_profile_options_data_by_id_option($id, $option)
     {
         $Crud = new Crud();
@@ -57,6 +59,7 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecutePgSQL($SQL);
         return $Admin;
     }
+
     public function get_website_profile_meta_data_by_id_option($id, $option)
     {
         $Crud = new Crud();
@@ -67,16 +70,7 @@ class BuilderModel extends Model
 //        print_r($Admin);exit();
         return $Admin;
     }
-    public function general_banners()
-    {
-        $Crud = new Crud();
-        $SQL = 'SELECT `general_banners`.*, `specialities`.`Name` AS Title FROM `general_banners` 
-    LEFT JOIN `specialities` ON `general_banners`.`Speciality` = `specialities`.`UID`
-       ORDER BY `general_banners`.`SystemDate` DESC
 
-';
-        return $SQL;
-    }
     public function specialities()
     {
         $Crud = new Crud();
@@ -84,6 +78,7 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin;
     }
+
     public function extended_profiles()
     {
         $Crud = new Crud();
@@ -91,6 +86,7 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin;
     }
+
     public function get_all_sponsors()
     {
         $Crud = new Crud();
@@ -98,6 +94,7 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin;
     }
+
     public function get_speciality_meta_data_by_id_option($id, $option)
     {
         $Crud = new Crud();
@@ -105,55 +102,6 @@ class BuilderModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
 //        print_r($SQL);exit();
         return $Admin;
-    }
-    public function specialitiess($keyword)
-    {
-        $Crud = new Crud();
-        $SQL   = "SELECT * FROM `specialities` WHERE `Archive` = '0' ";
-
-        if($keyword!=''){
-            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
-//            $SQL .= ' AND  ( `Name` LIKE \'%' . $keyword . '%\'  OR `Tag` LIKE \'%' . $keyword . '%\') ';
-        }
-        $SQL .= ' ORDER BY `Name` ASC';
-
-//        print_r($SQL);exit();
-        return $SQL;
-    }
-    public function Allprofiless($ID,$keyword)
-    {
-        $Crud = new Crud();
-        $session = session();
-        if($ID=='doctors'){
-            $SessionFilters = $session->get('DoctorFilters');
-
-        }else{
-            $SessionFilters = $session->get('HospitalFilters');
-
-        }
-        $SQL = 'SELECT "public"."profiles".*
-        FROM "public"."profiles"  
-        WHERE "public"."profiles"."Type" =\'' . $ID . '\' 
-      ';
-        if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
-            $Name = $SessionFilters['Name'];
-            $SQL .= ' AND  "public"."profiles"."Name"  ILIKE \'%' . $Name . '%\'';
-        } if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
-            $City= $SessionFilters['City'];
-            $SQL .= ' AND  "public"."profiles"."City"  =' . $City . ' ';
-        }
-        if($keyword!=''){
-            $SQL .= ' AND "public"."profiles"."Name"  ILIKE \'%' . $keyword . '%\'   ';
-        }
-        $SQL .=' Order By "public"."profiles"."Name"  ASC';
-        return $SQL;
-    }
-  
-    public function websites_images()
-    {
-        $Crud = new Crud();
-        $SQL = "SELECT * FROM `websites_images` ORDER BY `websites_images`.`SystemDate` DESC";
-        return $SQL;
     }
 
     public
@@ -164,11 +112,18 @@ class BuilderModel extends Model
         $SQL = $this->general_banners();
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
-//        echo nl2br($SQL); exit;
         $records = $Crud->ExecuteSQL($SQL);
-//        print_r($records);exit();
 
         return $records;
+    }
+
+    public function general_banners()
+    {
+        $Crud = new Crud();
+        $SQL = 'SELECT `general_banners`.*, `specialities`.`Name` AS Title FROM `general_banners` 
+                LEFT JOIN `specialities` ON `general_banners`.`Speciality` = `specialities`.`UID`
+                ORDER BY `general_banners`.`SystemDate` DESC';
+        return $SQL;
     }
 
     public
@@ -180,7 +135,8 @@ class BuilderModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
-  public
+
+    public
     function get_images_datatables()
     {
         $Crud = new Crud();
@@ -193,6 +149,13 @@ class BuilderModel extends Model
         return $records;
     }
 
+    public function websites_images()
+    {
+        $Crud = new Crud();
+        $SQL = "SELECT * FROM `websites_images` ORDER BY `websites_images`.`SystemDate` DESC";
+        return $SQL;
+    }
+
     public
     function count_image_datatables()
     {
@@ -201,12 +164,14 @@ class BuilderModel extends Model
         $SQL = $this->websites_images();
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
-    } public
-    function get_doct_datatables($type,$keyword)
+    }
+
+    public
+    function get_doct_datatables($type, $keyword)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type,$keyword);
+        $SQL = $this->Allprofiless($type, $keyword);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
         $records = $Crud->ExecutePgSQL($SQL);
@@ -214,15 +179,45 @@ class BuilderModel extends Model
         return $records;
     }
 
+    public function Allprofiless($ID, $keyword)
+    {
+        $Crud = new Crud();
+        $session = session();
+        if ($ID == 'doctors') {
+            $SessionFilters = $session->get('DoctorFilters');
+        } else {
+            $SessionFilters = $session->get('HospitalFilters');
+        }
+        $SQL = 'SELECT "profiles"."UID", "profiles"."SystemDate", "profiles"."Type", "profiles"."Name", "profiles"."Email", "profiles"."Password",
+                        "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime"
+                FROM public."profiles" 
+                WHERE public."profiles"."Type" = \'' . $ID . '\' ';
+        if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
+            $Name = $SessionFilters['Name'];
+            $SQL .= ' AND  public."profiles"."Name"  ILIKE \'%' . $Name . '%\'';
+        }
+        if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
+            $City = $SessionFilters['City'];
+            $SQL .= ' AND  public."profiles"."City"  =' . $City . ' ';
+        }
+        if ($keyword != '') {
+            $SQL .= ' AND public."profiles"."Name"  ILIKE \'%' . $keyword . '%\'   ';
+        }
+        $SQL .= ' Order By public."profiles"."Name"  ASC';
+
+        return $SQL;
+    }
+
     public
-    function count_doct_datatables($type,$keyword)
+    function count_doct_datatables($type, $keyword)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type,$keyword);
+        $SQL = $this->Allprofiless($type, $keyword);
         $records = $Crud->ExecutePgSQL($SQL);
         return count($records);
     }
+
     public
     function get_specialities_datatables($keyword)
     {
@@ -235,37 +230,33 @@ class BuilderModel extends Model
 
         return $records;
     }
- public
+
+    public function specialitiess($keyword)
+    {
+        $Crud = new Crud();
+        $SQL = "SELECT * FROM `specialities` WHERE `Archive` = '0' ";
+
+        if ($keyword != '') {
+            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
+//            $SQL .= ' AND  ( `Name` LIKE \'%' . $keyword . '%\'  OR `Tag` LIKE \'%' . $keyword . '%\') ';
+        }
+        $SQL .= ' ORDER BY `Name` ASC';
+
+//        print_r($SQL);exit();
+        return $SQL;
+    }
+
+    public
     function count_specialities_datatables($keyword)
     {
         $Crud = new Crud();
 
         $SQL = $this->specialitiess($keyword);
-        $SQL = 'select count(*) as `UID` from ( '.$SQL.' ) as `MASTERTABLE`';
+        $SQL = 'select count(*) as `UID` from ( ' . $SQL . ' ) as `MASTERTABLE`';
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin[0]['UID'];
     }
-    public function sponser($keyword)
-    {
-        $Crud = new Crud();
 
-        $SQL = "SELECT * FROM `sponsors` WHERE `Archive` = '0' ";
-        if($keyword!=''){
-            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
-        }
-        $SQL .= ' ORDER BY `Name` ASC';
-        return $SQL;
-    }  public function sponsor_product($id,$keyword)
-    {
-        $Crud = new Crud();
-
-        $SQL = "SELECT * FROM `sponsors_products` WHERE `Archive` = '0' AND `SponsorID` = $id";
-        if($keyword!=''){
-            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
-        }
-        $SQL .= ' ORDER BY `Name` ASC';
-        return $SQL;
-    }
     public
     function get_sponser_datatables($keyword)
     {
@@ -278,6 +269,18 @@ class BuilderModel extends Model
         return $records;
     }
 
+    public function sponser($keyword)
+    {
+        $Crud = new Crud();
+
+        $SQL = "SELECT * FROM `sponsors` WHERE `Archive` = '0' ";
+        if ($keyword != '') {
+            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
+        }
+        $SQL .= ' ORDER BY `Name` ASC';
+        return $SQL;
+    }
+
     public
     function count_sponser_datatables($keyword)
     {
@@ -285,23 +288,37 @@ class BuilderModel extends Model
         $SQL = $this->sponser($keyword);
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
-    } public
-    function get_sponsor_product_datatables($id,$keyword)
+    }
+
+    public
+    function get_sponsor_product_datatables($id, $keyword)
     {
         $Crud = new Crud();
 
-        $SQL = $this->sponsor_product($id,$keyword);
+        $SQL = $this->sponsor_product($id, $keyword);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
         $records = $Crud->ExecuteSQL($SQL);
         return $records;
     }
 
-    public
-    function count_sponsor_product_datatables($id,$keyword)
+    public function sponsor_product($id, $keyword)
     {
         $Crud = new Crud();
-        $SQL = $this->sponsor_product($id,$keyword);
+
+        $SQL = "SELECT * FROM `sponsors_products` WHERE `Archive` = '0' AND `SponsorID` = $id";
+        if ($keyword != '') {
+            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
+        }
+        $SQL .= ' ORDER BY `Name` ASC';
+        return $SQL;
+    }
+
+    public
+    function count_sponsor_product_datatables($id, $keyword)
+    {
+        $Crud = new Crud();
+        $SQL = $this->sponsor_product($id, $keyword);
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }

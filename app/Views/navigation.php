@@ -185,7 +185,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <?php
                 if ($checknav->checkAccessKey('extended')) {
                 ?>
-                <li>
+                <li class="d-none">
                     <a href="<?= $path ?>support-ticket/clinta_extended">
                         <span class="nav-link-icon" data-feather="file"></span>
                         <span>Clinta Extended</span>
@@ -708,7 +708,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <?php
                 if ($checknav->checkAccessKey('builder_images_list')) {
                 ?>
-                <li>
+                <li class="d-none">
                     <a href="<?= $path ?>builder/images">
                         <span class="nav-link-icon" data-feather="layout"></span>
                         <span>v1.0 Banners</span>
@@ -729,7 +729,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <?php
                 if ($checknav->checkAccessKey('builder_sponser_list')) {
                 ?>
-                <li>
+                <li class="d-none">
                     <a href="<?= $path ?>builder/sponser">
                         <span class="nav-link-icon" data-feather="frown"></span>
                         <span>Sponsor</span>

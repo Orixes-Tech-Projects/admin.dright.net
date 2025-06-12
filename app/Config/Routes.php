@@ -50,6 +50,7 @@ $routes->group('support-ticket', static function ($routes) {
     $routes->get('builder_tickets_reply/(:num)', 'SupportTickets::builder_support');
     $routes->get('builder_support_ticket', 'SupportTickets::builder_support');
     $routes->get('download/(:any)', 'SupportTickets::downloadFile');
+    $routes->post('submit-ticket-assignee', 'SupportTickets::ticket_assignee_form_submit');
 
 });
 $routes->group('builder', static function ($routes) {

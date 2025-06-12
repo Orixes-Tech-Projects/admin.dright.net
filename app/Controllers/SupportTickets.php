@@ -47,7 +47,7 @@ class SupportTickets extends BaseController
             }
             echo view('support_ticket/tickets_reply', $data);
 
-        }elseif ($data['page'] == 'update'){
+        } elseif ($data['page'] == 'update') {
             echo view('support_ticket/main_form', $data);
 
         } else {
@@ -55,13 +55,16 @@ class SupportTickets extends BaseController
 
         }
         echo view('footer', $data);
-    }  public function builder_support()
-    {        $Crud = new Crud();
+    }
+
+    public function builder_support()
+    {
+        $Crud = new Crud();
 
         $data = $this->data;
         $data['page'] = getSegment(2);
         $data['PAGE'] = array();
-        $SupportTicketModel= new SupportTicketModel();
+        $SupportTicketModel = new SupportTicketModel();
 
 
         echo view('header', $data);
@@ -91,6 +94,7 @@ class SupportTickets extends BaseController
         echo view('support_ticket/dashboard', $data);
         echo view('footer', $data);
     }
+
     public function items()
     {
         $data = $this->data;
@@ -98,6 +102,7 @@ class SupportTickets extends BaseController
         echo view('support_ticket/items', $data);
         echo view('footer', $data);
     }
+
     public function fetch_data()
     {
         $Users = new SupportTicketModel();
@@ -142,13 +147,18 @@ class SupportTickets extends BaseController
             "data" => $dataarr
         );
         echo json_encode($response);
-    }    public function fetch_builder_data()
+    }
+
+    public function fetch_builder_data()
     {
+        $session = session();
+        $SessionLogin = $session->get();
+        $LoginUserRole = $SessionLogin['AccessLevel'];
+
         $Users = new SupportTicketModel();
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
 
         $Data = $Users->get_builder_task_datatables($keyword);
-//        print_r($Data);exit();
         $totalfilterrecords = $Users->count_builder_task_datatables($keyword);
         $dataarr = array();
         $cnt = $_POST['start'];
@@ -158,23 +168,36 @@ class SupportTickets extends BaseController
             $data[] = $cnt;
             $data[] = isset($record['ProfileName']) ? htmlspecialchars($record['ProfileName']) : '';
             $data[] = isset($record['Module'])
-                ? '<a href="' . PATH . 'support-ticket/builder_tickets_reply/' . $record['UID'] . '">#' . $record['UID'] . ' - ' . $record['Module'] . '</a>'
+                ? '<a style="cursor:pointer; color:crimson;" title="Click To View Details" href="' . PATH . 'support-ticket/builder_tickets_reply/' . $record['UID'] . '">#' . $record['UID'] . ' - ' . ucwords($record['Module']) . '</a>'
                 : '';
-            $data[] = isset($record['SystemDate']) ? date("d M, Y h:i A", strtotime( $record['SystemDate'] )) : '';
-            $data[] = isset($record['Priority']) ? htmlspecialchars($record['Priority']) : '';
-            $data[] = isset($record['Status']) ? htmlspecialchars($record['Status']) : '';
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="ReplyTicket(' . htmlspecialchars($record['UID']) . ')">Ticket Reply</a>
+            $data[] = isset($record['SystemDate']) ? date("d M, Y h:i A", strtotime($record['SystemDate'])) : '';
+            $data[] = ((isset($record['AssignedUser']) && $record['AssignedUser'] != '' && $record['AssignedUser'] != 0) ? ucwords($record['AssignedUser']) : '-');
+            $data[] = isset($record['Priority']) ? '<b>' . ucwords(htmlspecialchars($record['Priority'])) . '</b>' : '';
+            $data[] = isset($record['Status']) ? '<badge class="badge badge-' . (($record['Status'] == 'Close') ? 'danger' : 'success') . '">' . $record['Status'] . '</badge>' : '';
 
-            </div>
-        </div>
-    </td>';
+            $ActionButton = '';
+            $TicketID = '#' . $record['UID'] . ' - ' . ucwords($record['Module']);
+            if ($record['Status'] == 'Open') {
+                $ActionButton = '<td class="text-end">
+                            <div class="dropdown">
+                                <button style="border-radius: 5px;" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a style="cursor: pointer;" class="dropdown-item" onclick="ReplyTicket(' . htmlspecialchars($record['UID']) . ')">Ticket Reply</a>';
+                if ($LoginUserRole != 'support_department') {
+                    $ActionButton .= '<a onclick="LoadTicketAssigneeModal(' . $record['UID'] . ', \'' . htmlspecialchars($TicketID) . '\', ' . $record['AssignedUserUID'] . ' );" style="cursor: pointer;" class="dropdown-item">Assign Ticket</a>';
+                }
+                $ActionButton .= '</div>
+                            </div>
+                        </td>';
+
+                $data[] = $ActionButton;
+            } else {
+
+                $data[] = '<badge style="padding: 10px 23px;" class="badge badge-danger">Closed</badge>';
+            }
+
             $dataarr[] = $data;
         }
 
@@ -439,20 +462,16 @@ class SupportTickets extends BaseController
         $TicketID = $_POST['TicketID'];
 
         $Data = $SupportTicketModel->GetTicketAllCommentsDataBuilder($TicketID);
-//        $TicketData = $SupportTicketModel->GetBuilderTicketDataByID($TicketID);
-//        print_r($TicketData);exit();
         if (count($Data) > 0) {
-
 
             foreach ($Data as $D) {
                 $to = !empty($D['From']) && $D['From'] != 0 ? 'left' : 'right';
-                $html .= '<div class="col-lg-12" style="text-align: ' . $to . '">
-                    ';
+                $html .= '<div class="col-lg-12" style="text-align: ' . $to . '">';
                 $html .= '<div class="ks-comment">
                         <div class="ks-body">
                             <div class="ks-comment-box">
                                 <div class="ks-name">
-                                    <a href="javascript:void(0);" style="color: green; font-weight: bold;">' . $D['User']  . '</a>
+                                    <a href="javascript:void(0);" style="color: green; font-weight: bold;">' . ucwords($D['User']) . '</a>
                                 </div>
                                 <div class="ks-message">' . $D['Message'] . '</div>
                             </div>
@@ -460,9 +479,7 @@ class SupportTickets extends BaseController
 
                 // Add download button if file exists
                 if (!empty($D['File'])) {
-                    $html .= '<button class="btn btn-sm btn-secondary" onclick="window.location.href=\'' . LoadFile($D['File']) . '\'">
-                            Download File
-                          </button>';
+                    $html .= '<a title="Click To View File" style="color:#fff; border-radius:5px; float:' . (($D['From'] != 0) ? 'right' : 'left') . ';" target="_blank" class="btn btn-sm btn-primary btn-sm" href="' . LoadFile($D['File']) . '"><i class="fa fa-download"> Download File</i></a>';
                 }
 
                 $html .= '<footer class="blockquote-footer">' . $D['User'] . '
@@ -593,5 +610,45 @@ class SupportTickets extends BaseController
             "data" => $dataarr
         );
         echo json_encode($response);
+    }
+
+
+    public
+    function ticket_assignee_form_submit()
+    {
+
+        $Crud = new Crud();
+        $session = session();
+        $session = $session->get();
+
+        $TicketID = $this->request->getVar('TicketUID');
+        $AssignTo = $this->request->getVar('assign_to');
+        $AssignBy = $session['FullName'];
+
+        $AssignToRecord = $Crud->SingleRecord('system_users', array('UID' => $AssignTo));
+        $AssignToName = ((isset($AssignToRecord['FullName']) && $AssignToRecord['FullName'] != '') ? $AssignToRecord['FullName'] : '');
+
+        $record = array();
+        $record['AssignedUser'] = $AssignToName;
+        $record['AssignedBy'] = $AssignBy;
+        $record['AssignedUserUID'] = $AssignTo;
+
+        $Status = $Crud->UpdateeRecord('public."builder_support_ticket"', $record, array('UID' => $TicketID));
+        if (isset($Status) && $Status == 1) {
+
+            $response = array();
+            $response['status'] = 'success';
+            $response['message'] = 'Ticket Assign Successfully...!';
+            echo json_encode($response);
+
+        } else {
+
+            $response = array();
+            $response['status'] = 'fail';
+            $response['message'] = 'Failed To Assign Ticket...!';
+            echo json_encode($response);
+
+        }
+
     }
 }

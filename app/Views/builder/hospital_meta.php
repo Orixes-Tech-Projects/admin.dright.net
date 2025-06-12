@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\DiscountModel;
 $config = array();
 $config['web_builder_themes'] = array("basic" => "Color dominant ", "deep-mind" => "Image dominant (2024)", "mist" => "Image dominant (2025)");
 //print_r($config['web_builder_themes']);exit();
@@ -17,8 +16,6 @@ $OptionExtra = $content->OptionExtra($UID);
 
 
 ?>
-<br>
-
 <div class="card">
     <div class="card-body">
         <h6 class="card-title">Add Theme</h6>
@@ -199,29 +196,17 @@ $OptionExtra = $content->OptionExtra($UID);
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-12">
                     <div id="AjaxResults"></div>
                 </div>
+                <div class="col-md-12">
+                    <button style="float: right; border-radius:5px;" class="btn btn-primary btn-sm" type="button" onclick="AddThemeSettingFunction()">Add Record
+                    </button>
+                </div>
             </div>
         </form>
-
     </div>
-    <div class="mb-2">
-    <span style="float: right">
-                <button class="btn btn-primary" type="button" onclick="AddThemeSettingFunction()">Submit form</button>
-
-</span>
-    </div>
-
 </div>
-<style>
-    .row.form-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-</style>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         $("#h-theme").hide();
@@ -289,9 +274,45 @@ $OptionExtra = $content->OptionExtra($UID);
     }
 
     function AddThemeSettingFunction() {
-        var formdata = new window.FormData($("form#AddthemeDoctors")[0]);
 
-        response = AjaxUploadResponse("builder/theme_form_submit", formdata);
+        setTimeout(function () {
+            $("#AjaxResults").html('');
+        }, 2000);
+
+        var BannerStyle = $("form#AddthemeDoctors select#banner_style").val();
+        var HomeCeoMessage = $("form#AddthemeDoctors select#home_ceo_message").val();
+        var HomeFacilities = $("form#AddthemeDoctors select#home_facilities").val();
+        var HomeNews = $("form#AddthemeDoctors select#home_news").val();
+        var HomeReviews = $("form#AddthemeDoctors select#home_reviews").val();
+        var Theme = $("form#AddthemeDoctors select#theme").val();
+
+        if(BannerStyle == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Banner Style Required! </div>');
+            return false;
+        }
+        if(HomeCeoMessage == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> CEO Message No Option Required! </div>');
+            return false;
+        }
+        if(HomeFacilities == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Our Facilities Required! </div>');
+            return false;
+        }
+        if(HomeNews == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Our Latest News Required! </div>');
+            return false;
+        }
+        if(HomeReviews == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Patient Reviews Required! </div>');
+            return false;
+        }
+        if(Theme == ''){
+            $("#AjaxResults").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Layout Option Required! </div>');
+            return false;
+        }
+
+        var formdata = new window.FormData($("form#AddthemeDoctors")[0]);
+        var response = AjaxUploadResponse("builder/theme_form_submit", formdata);
         if (response.status === 'success') {
             $("#AjaxResults").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
             setTimeout(function () {

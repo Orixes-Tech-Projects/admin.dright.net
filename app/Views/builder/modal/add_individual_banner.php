@@ -1,11 +1,12 @@
 <link rel="stylesheet" href="<?= $template ?>vendors/select2/css/select2.min.css" type="text/css">
-<div class="modal" id="AddBannerModal" tabindex="-1" role="dialog">
+<div class="modal" id="AddIndividualBannerModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document" style="min-width: 60% !important;">
         <div class="modal-content">
-            <form method="post" action="" name="AddBannerForm" id="AddBannerForm" class="needs-validation" novalidate=""
+            <form method="post" action="" name="AddIndividualBannerForm" id="AddIndividualBannerForm" class="needs-validation" novalidate=""
                   enctype="multipart/form-data">
+                <input type="hidden" name="ProfileUID" id="ProfileUID" value="0">
                 <div style="border-bottom: 1px solid #dee2e6;" class="modal-header">
-                    <h5 class="modal-title">Add General Banner</h5>
+                    <h5 class="modal-title">Add Individual Banner</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <i class="ti-close"></i>
                     </button>
@@ -41,8 +42,7 @@
                         <div class="col-md-12 mb-3">
                             <label for="validationCustom05">Profile</label>
                             <div class="custom-file">
-                                <input onchange="updateFileName(this)" type="file" class="custom-file-input"
-                                       id="profile" name="profile"
+                                <input onchange="updateFileName(this)" type="file" class="custom-file-input" id="profile" name="profile"
                                        accept=".gif,.jpg,.jpeg,.png,.webp">
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                             </div>
@@ -53,12 +53,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button style="border-radius: 5px;" type="button" class="btn btn-success btn-sm"
-                            onclick="AddBannerFormFunction()">Add Banner
-                    </button>
-                    <button style="border-radius: 5px;" type="button" class="btn btn-primary btn-sm"
-                            data-dismiss="modal">Close
-                    </button>
+                    <button style="border-radius: 5px;" type="button" class="btn btn-success btn-sm" onclick="AddIndividualBannerFormFunction()">Add Banner</button>
+                    <button style="border-radius: 5px;" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -66,6 +62,7 @@
 </div>
 <script src="<?= $template ?>vendors/select2/js/select2.min.js"></script>
 <script>
+
     function updateFileName(input) {
 
         if (input.files && input.files.length > 0) {
@@ -76,26 +73,32 @@
         }
     }
 
-    function AddBannerFormFunction() {
+    function LoadIndividualBannerModal(id) {
 
-        setTimeout(function () {
-            $("#AddBannerModal #ajaxResponse").html('');
+        $('#AddIndividualBannerModal form#AddIndividualBannerForm input#ProfileUID').val(id);
+        $('#AddIndividualBannerModal').modal('show');
+    }
+
+    function AddIndividualBannerFormFunction() {
+
+        setTimeout(function (){
+            $("#AddIndividualBannerModal #ajaxResponse").html('');
         }, 2000);
 
-        const Alignment = $("#AddBannerModal form#AddBannerForm select#alignment").val();
-        const Color = $("#AddBannerModal form#AddBannerForm select#color").val();
-        const Speciality = $("#AddBannerModal form#AddBannerForm select#speciality").val();
+        const Alignment = $("#AddIndividualBannerModal form#AddIndividualBannerForm select#alignment").val();
+        const Color = $("#AddIndividualBannerModal form#AddIndividualBannerForm select#color").val();
+        const Speciality = $("#AddIndividualBannerModal form#AddIndividualBannerForm select#speciality").val();
 
-        if (Alignment == '') {
-            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Alignment Required!</div>');
+        if(Alignment == ''){
+            $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Alignment Required!</div>');
             return false;
         }
-        if (Color == '') {
-            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Color Required!</div>');
+        if(Color == ''){
+            $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Color Required!</div>');
             return false;
         }
-        if (Speciality == '') {
-            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Speciality Required!</div>');
+        if(Speciality == ''){
+            $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Speciality Required!</div>');
             return false;
         }
 
@@ -106,28 +109,28 @@
         if (file) {
             const fileExt = file.name.split('.').pop().toLowerCase();
             if (!allowedExtensions.includes(fileExt)) {
-                $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Invalid file type. Allowed formats: ' + allowedExtensions.join(', ') + ' </div>');
+                $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Invalid file type. Allowed formats: '+ allowedExtensions.join(', ') +' </div>');
                 fileInput.classList.add('is-invalid');
                 return false;
             }
 
             const maxSize = 2 * 1024 * 1024; // 2MB
             if (file.size > maxSize) {
-                $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> File size exceeds 2MB limit</div>');
+                $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> File size exceeds 2MB limit</div>');
                 fileInput.classList.add('is-invalid');
                 return false;
             }
 
         } else {
 
-            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Plz Select a File!</div>');
+            $("#AddIndividualBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Plz Select a File!</div>');
             fileInput.classList.add('is-invalid');
             return false;
         }
 
         fileInput.classList.remove('is-invalid');
-        var formdata = new window.FormData($("form#AddBannerForm")[0]);
-        var response = AjaxUploadResponse("builder/submit_general_image", formdata);
+        var formdata = new window.FormData($("form#AddIndividualBannerForm")[0]);
+        var response = AjaxUploadResponse("builder/submit_individual_banners", formdata);
 
         if (response.status === 'success') {
             $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
@@ -138,24 +141,5 @@
             $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
         }
     }
-</script>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
 </script>
 <script src="<?=$template?>assets/js/examples/form-validation.js"></script>

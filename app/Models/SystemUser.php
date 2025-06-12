@@ -223,7 +223,7 @@ class SystemUser extends Model
 
     public function checkAccessKey($key)
     {
-        if ($_SESSION['Email'] == 'info@orixestech.com') {
+        if ($_SESSION['Email'] == 'info@orixestech.com' || $_SESSION['Email'] == 'jawad@holisticsolutions.com.pk') {
             return true;
         } else {
             $Crud = new Crud();
