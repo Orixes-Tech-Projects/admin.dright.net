@@ -89,11 +89,13 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                     <th data-priority="1">#</th>
                     <th data-priority="2">Name</th>
                     <th data-priority="3">Sub Domain</th>
-                    <th data-priority="5">Email</th>
-                    <th data-priority="6">City</th>
-                    <th data-priority="7">Telemedicine Credits</th>
-                    <th data-priority="8">SMS Credits</th>
-                    <th data-priority="9">Last Visit Date</th>
+                    <th data-priority="5">City</th>
+                    <th data-priority="6">Status</th>
+                    <th data-priority="7">Expire Date</th>
+                    <th data-priority="8">Email</th>
+                    <th data-priority="9">Telemedicine Credits</th>
+                    <th data-priority="10">SMS Credits</th>
+                    <th data-priority="11">Last Visit Date</th>
                     <th data-priority="4">Actions</th>
                 </tr>
                 </thead>

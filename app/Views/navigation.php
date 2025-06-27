@@ -220,8 +220,8 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <?php
                 if ($checknav->checkAccessKey('invoice_items_list')) {
                     ?>
-                <li>
-                    <a href="<?= $path ?>invoice/customer">
+                    <li class="d-none">
+                        <a href="<?= $path ?>invoice/customer">
                         <span class="nav-link-icon" data-feather="file"></span>
                         <span>Customer</span>
                     </a>
@@ -233,7 +233,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <li>
                     <a href="<?= $path ?>support-ticket/items">
                         <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Items</span>
+                        <span>Packages</span>
                     </a>
                 </li>
                 <?php } ?>

@@ -225,7 +225,6 @@ class SupportTickets extends BaseController
                 foreach ($Item as $key => $value) {
                     $record[$key] = ((isset($value)) ? $value : '');
                 }
-
                 $RecordId = $Crud->AddRecord("items", $record);
                 if (isset($RecordId) && $RecordId > 0) {
                     $response['status'] = 'success';
@@ -252,6 +251,7 @@ class SupportTickets extends BaseController
 
         echo json_encode($response);
     }
+
   public function TicketReplyFormSubmit()
     {
         $Crud = new Crud();
@@ -585,20 +585,24 @@ class SupportTickets extends BaseController
             $cnt++;
             $data = array();
             $data[] = $cnt;
-            $data[] = isset($record['Name']) ? htmlspecialchars($record['Name']) : '';
+            $data[] = isset($record['Name']) ? '<b>'.htmlspecialchars($record['Name']).'</b>' : '';
+            $data[] = isset($record['Code']) ? htmlspecialchars($record['Code']) : '';
+            $data[] = isset($record['OriginalPrice']) ? htmlspecialchars($record['OriginalPrice']) : '';
+            $data[] = isset($record['Discount']) ? $record['Discount'].'%' : '';
             $data[] = isset($record['Price']) ? htmlspecialchars($record['Price']) : '';
+            $data[] = ((isset($record['Type']) && $record['Type'] != '') ? (($record['Type'] == 'monthly') ? '<b> '.ucwords($record['Type']).'</b> (' . $record['NoOfMonths'] . ' months) ' : ucwords($record['Type']) ) : '');
             $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateItem(\'' . htmlspecialchars($record['UID']) . '\')">Update</a>
-                <a class="dropdown-item" onclick="DeleteItem(\'' . htmlspecialchars($record['UID']) . '\')">Delete</a>
-            </div>
-        </div>
-    </td>';
+                    <td class="text-end">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                Actions
+                            </button>
+                            <div class="dropdown-menu">
+                                <a style="cursor: pointer;" class="dropdown-item" onclick="LoadPackageUpdateModal(\'' . htmlspecialchars($record['UID']) . '\')">Update</a>
+                                <a class="dropdown-item d-none" onclick="DeleteItem(\'' . htmlspecialchars($record['UID']) . '\')">Delete</a>
+                            </div>
+                        </div>
+                    </td>';
 
             $dataarr[] = $data;
         }

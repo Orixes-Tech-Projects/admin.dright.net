@@ -2,24 +2,14 @@
 <?php
 
 use App\Models\BuilderModel;
+use App\Models\Crud;
 
-$speciality = '';
-$qualification = '';
-$department = '';
-$pmdcno = '';
-$patient_portal = '';
-$telemedicine_id = '';
-$short_desc = '';
-$initatived_text = '';
-$sponsor = '';
-$initatived_logo = '';
-$healthcarestatus = '';
-$patientportal = '';
-$theme = '';
 $BuilderModel = new BuilderModel();
-//print_r($page);exit();
-if ($page == 'add-doctor') {
+$Crud = new Crud();
+$speciality = $qualification = $department = $pmdcno = $patient_portal = $telemedicine_id = $short_desc = $initatived_text = $sponsor = $initatived_logo = $healthcarestatus = $patientportal = $theme = '';
 
+if ($page == 'add-doctor') {
+    $AllPackages = $Crud->ListRecords('items');
 } else {
     $speciality = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'speciality');
     $qualification = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'qualification');
@@ -47,7 +37,7 @@ if ($page == 'add-doctor') {
             <input type="hidden" name="UID" id="UID" value="<?= ((isset($PAGE['UID'])) ? $PAGE['UID'] : '0') ?>">
             <div class="form-row">
                 <div class="col-md-3 mb-3">
-                    <label for="validationCustom04">FullName</label>
+                    <label for="validationCustom04">FullName <span style="color: crimson;">*</span></label>
                     <input type="text" class="form-control" name="name" id="name"
                            placeholder="Full Name" value="<?= ((isset($PAGE['Name'])) ? $PAGE['Name'] : '') ?>"
                            required="">
@@ -56,8 +46,8 @@ if ($page == 'add-doctor') {
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="validationCustom04">Email</label>
-                    <input type="text" class="form-control" name="email" id="email"
+                    <label for="validationCustom04">Email <span style="color: crimson;">*</span></label>
+                    <input type="email" class="form-control" name="email" id="email"
                            placeholder="Email" value="<?= ((isset($PAGE['Email'])) ? $PAGE['Email'] : '') ?>"
                            required="">
                     <div class="invalid-feedback">
@@ -65,7 +55,7 @@ if ($page == 'add-doctor') {
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="validationCustom04">Password</label>
+                    <label for="validationCustom04">Password <span style="color: crimson;">*</span></label>
                     <input type="text" class="form-control" name="password" id="password"
                            placeholder="Password" value="<?= ((isset($PAGE['Password'])) ? $PAGE['Password'] : '') ?>"
                            required="">
@@ -74,8 +64,9 @@ if ($page == 'add-doctor') {
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="validationCustom04">Contact No</label>
-                    <input type="text" class="form-control" name="ContactNo" id="ContactNo"
+                    <label for="validationCustom04">Contact No <span style="color: crimson;">*</span></label>
+                    <input oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="text" class="form-control"
+                           name="ContactNo" id="ContactNo"
                            placeholder="Contact No"
                            value="<?= ((isset($PAGE['ContactNo'])) ? $PAGE['ContactNo'] : '') ?>"
                            required="">
@@ -85,7 +76,7 @@ if ($page == 'add-doctor') {
                 </div>
                 <div class="col-md-3">
                     <div class="form-group row">
-                        <label class="col-sm-4">City:</label>
+                        <label class="col-sm-4">City <span style="color: crimson;">*</span></label>
                         <div class="col-sm-12">
                             <select id="city" name="city" class="form-control"
                                     data-validation-engine="validate[required]">
@@ -155,7 +146,7 @@ if ($page == 'add-doctor') {
                 </div>
                 <div class="col-md-3">
                     <div class="form-group row">
-                        <label class="col-sm-12">Sub Domain</label>
+                        <label class="col-sm-12">Sub Domain <span style="color: crimson;">*</span></label>
                         <div class="col-sm-12">
                             <input type="text" id="sub_domain" name="sub_domain" placeholder="Sub Domain"
                                    value="<?= ((isset($PAGE['SubDomain'])) ? $PAGE['SubDomain'] : '') ?>"
@@ -232,7 +223,51 @@ if ($page == 'add-doctor') {
                     </div>
                 </div>
             </div>
-            <div class="form-row mt-2">
+            <?php
+            if ($page == 'add-doctor') { ?>
+                <div class="form-row mt-4">
+                    <div class="col-md-12">
+                        <h4>Subscription Details</h4>
+                        <hr>
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label>Package <span style="color: crimson;">*</span></label>
+                        <select name="Package"
+                                id="Package" class="form-control">
+                            <option value="">Select Package</option>
+                            <?php
+                            foreach ($AllPackages as $AP) {
+                                $String = $AP['Code'] . ' - ' . $AP['Name'];
+                                echo '<option value="' . $AP['UID'] . '">' . $String . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div id="OrgPriceDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Original Price <span style="color: crimson;">*</span></label>
+                        <input oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Enter Package Price" type="text" class="form-control"
+                               id="OriginalPrice"
+                               name="OriginalPrice">
+                    </div>
+                    <div id="DiscountDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Discount (%) <span
+                                    style="color: crimson;">*</span></label>
+                        <input value="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Enter Package Discount" type="text" class="form-control"
+                               id="Discount"
+                               name="Discount">
+                    </div>
+                    <div id="PriceDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Price After Discount <span
+                                    style="color: crimson;">*</span></label>
+                        <input readonly oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Price After Discount" type="text" class="form-control" id="Price"
+                               name="Price">
+                    </div>
+                </div>
+            <?php } ?>
+            <div class="form-row mt-4">
                 <div class="col-md-12">
                     <h4>Clinta HealthCare</h4>
                     <hr>
@@ -316,7 +351,55 @@ if ($page == 'add-doctor') {
 
 <script>
 
+    $(document).ready(function () {
+        var currentPage = '<?=$page?>';
+        if (currentPage === 'add-doctor') {
+            handlePackageChange();
+        }
+    });
+
+    function handlePackageChange() {
+
+        const $packageSelect = $(`#Package`);
+        const $originalPrice = $(`#OriginalPrice`);
+        const $discount = $(`#Discount`);
+        const $price = $(`#Price`);
+
+        $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).hide();
+
+        $packageSelect.change(function () {
+            if ($(this).val() !== "") {
+
+                $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).show();
+
+                const PackageID = $(this).val();
+                const PackageRecord = AjaxResponse("support-ticket/get-record-items", "id=" + PackageID);
+                if (PackageRecord.record != '') {
+                    $(`input#OriginalPrice`).val(PackageRecord.record.OriginalPrice);
+                    $(`input#Discount`).val(PackageRecord.record.Discount);
+                    $(`input#Price`).val(PackageRecord.record.Price);
+                }
+
+            } else {
+                // Hide and reset fields
+                $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).hide();
+                $originalPrice.val("");
+                $discount.val("0");
+                $price.val("");
+            }
+        });
+
+        $originalPrice.add($discount).on('input', function () {
+            const originalPrice = parseFloat($originalPrice.val()) || 0;
+            const discount = parseFloat($discount.val()) || 0;
+            const discountedPrice = originalPrice - (originalPrice * (discount / 100));
+            $price.val(Math.round(discountedPrice));
+        });
+    }
+
     function AddDoctorFormFunction() {
+
+        const CurrentPage = "<?=$page?>";
 
         setTimeout(function () {
             $("#ajaxResponse").html('');
@@ -349,9 +432,29 @@ if ($page == 'add-doctor') {
             $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> City Required </div>');
             return false;
         }
-        if (SubDomain == '') {
-            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> SubDomain Required </div>');
+        if (SubDomain === '' || !isValidUrl(SubDomain)) {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Valid SubDomain Required </div>');
             return false;
+        }
+
+        if (CurrentPage == 'add-doctor') {
+            var Package = $("form#AddDoctorForm select#Package").val();
+            var OriginalPrice = $("form#AddDoctorForm select#OriginalPrice").val();
+            var Discount = $("form#AddDoctorForm select#Discount").val();
+            if (Package == '') {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Subscription Package Required </div>');
+                return false;
+            }
+
+            if (OriginalPrice == '' || OriginalPrice <= 0) {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Package Price Required </div>');
+                return false;
+            }
+
+            if (Discount == '' || Discount < 0) {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Invalid discount </div>');
+                return false;
+            }
         }
 
         var formdata = new window.FormData($("form#AddDoctorForm")[0]);
@@ -365,24 +468,31 @@ if ($page == 'add-doctor') {
             $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
         }
     }
+
+    function isValidUrl(urlString, options = {}) {
+
+        if (!/^https?:\/\//i.test(urlString)) {
+            urlString = 'https://' + urlString;
+        }
+
+        try {
+            const url = new URL(urlString);
+
+            if (!/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(url.hostname)) {
+                return false;
+            }
+
+            if (options.allowedDomains) {
+                const allowed = options.allowedDomains.some(domain =>
+                    url.hostname === domain ||
+                    url.hostname.endsWith('.' + domain)
+                );
+                if (!allowed) return false;
+            }
+
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
 </script>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-</script>
-<script src="<?= $template ?>assets/js/examples/form-validation.js"></script>

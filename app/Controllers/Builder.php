@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Models\BuilderModel;
 use App\Models\Crud;
+use App\Models\Invoices;
 use App\Models\Main;
 use App\Models\PharmacyModal;
 use App\Models\SystemUser;
@@ -296,8 +297,10 @@ class Builder extends BaseController
             $data[] = $cnt;
             $data[] = $record['Name'];
             $data[] = !empty($record['SubDomain']) ? '<a style="color:crimson;" title="Click To View" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '-';
+            $data[] = isset($city[0]['FullName']) ? $city[0]['FullName'] : '';
+            $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
+            $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
             $data[] = $record['Email'];
-            $data[] = isset($city[0]['FullName'])?$city[0]['FullName']:'';
 
             $telemedicineCredits = isset($TeleMedicineCredits[0]['Description']) && $TeleMedicineCredits[0]['Description'] != ''
                 ? '<strong>' . $TeleMedicineCredits[0]['Description'] . '</strong> TeleMedicine Credits<br>
@@ -371,9 +374,11 @@ class Builder extends BaseController
             $data = [];
             $data[] = $cnt;
             $data[] = $record['Name'];
-            $data[] = $record['Email'];
-            $data[] = $city[0]['FullName'];
             $data[] = !empty($record['SubDomain']) ? '<a title="Click to View" style="color:crimson" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
+            $data[] = $city[0]['FullName'];
+            $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
+            $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
+            $data[] = $record['Email'];
             $data[] = $lastVisit;
 
             $smsCredits = isset($SmsCredits[0]['Description']) && $SmsCredits[0]['Description'] != ''
@@ -965,6 +970,26 @@ class Builder extends BaseController
                     $Crud->AddRecordPG("public.profile_metas", $record_meta);
                 }
 
+                $PackageUID = $this->request->getVar('Package');
+                if (isset($PackageUID) && $PackageUID > 0) {
+
+                    $Invoices = new Invoices();
+                    $OriginalPrice = $this->request->getVar('OriginalPrice');
+                    $Discount = $this->request->getVar('Discount');
+                    $Price = $this->request->getVar('Price');
+                    $InvoiceDetailsArray = array(
+                        'ProfileName' => $record['Name'],
+                        'ProductType' => 'builder',
+                        'Product' => 'hospitals',
+                        'ProfileUID' => $website_profile_id,
+                        'PackageUID' => $PackageUID,
+                        'OriginalPrice' => $OriginalPrice,
+                        'Discount' => $Discount,
+                        'Price' => $Price
+                    );
+                    $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
+                }
+
                 $msg = $_SESSION['FullName'] . ' Hospital Profile Submit Through Admin Dright';
                 $logesegment = 'Hospitals';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
@@ -1215,6 +1240,26 @@ class Builder extends BaseController
                     $record_option['Name'] = $key;
                     $record_option['Description'] = $value;
                     $Crud->AddRecordPG("public.options", $record_option);
+                }
+
+                $PackageUID = $this->request->getVar('Package');
+                if (isset($PackageUID) && $PackageUID > 0) {
+
+                    $Invoices = new Invoices();
+                    $OriginalPrice = $this->request->getVar('OriginalPrice');
+                    $Discount = $this->request->getVar('Discount');
+                    $Price = $this->request->getVar('Price');
+                    $InvoiceDetailsArray = array(
+                        'ProfileName' => $record['Name'],
+                        'ProductType' => 'builder',
+                        'Product' => 'doctors',
+                        'ProfileUID' => $website_profile_id,
+                        'PackageUID' => $PackageUID,
+                        'OriginalPrice' => $OriginalPrice,
+                        'Discount' => $Discount,
+                        'Price' => $Price
+                    );
+                    $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
                 }
 
                 $response = array();

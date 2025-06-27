@@ -365,3 +365,24 @@ if (!function_exists('ConditionSlug')) {
         return $Slug;
     }
 }
+
+
+if (!function_exists('money')) {
+    function money($data, bool $cur = true, bool $decimal = false): string
+    {
+        $data = (float)$data;
+        if ($data == 0) {
+            return '0';
+        }
+        $negative = $data < 0;
+        $absolute = abs($data);
+        $decimals = $decimal ? 2 : 0;
+        $formatted = number_format($absolute, $decimals);
+        if ($cur) {
+            $prefix = $negative ? '(PKR ' : 'PKR ';
+            $suffix = $negative ? ')' : '';
+            return $negative ? "{$prefix}{$formatted}{$suffix}" : "{$prefix}{$formatted}";
+        }
+        return $negative ? "({$formatted})" : $formatted;
+    }
+}

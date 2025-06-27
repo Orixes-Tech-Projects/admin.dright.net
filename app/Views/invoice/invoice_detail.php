@@ -1,171 +1,444 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $InvoiceDetail['InvoiceNo'] ?></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    body{margin-top:20px;
-        background-color:#eee;
-    }
+        /* Print-specific styles */
+        @page {
+            size: A4;
+            margin: 0;
+        }
 
-    .card {
-        box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
-    .card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        word-wrap: break-word;
-        background-color: #fff;
-        background-clip: border-box;
-        border: 0 solid rgba(0,0,0,.125);
-        border-radius: 1rem;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-shadow: none;
+            border-radius: 0;
+        }
 
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            background: linear-gradient(50deg, #667eeab5 0%, #764ba2 100%);
+            color: white;
+        }
 
-</style>
+        .logo {
+            max-width: 180px;
+            filter: brightness(100%) invert(0);
+        }
 
-            <div class="card">
-                <div class="card-body">
-                    <div class="invoice-title">
-                        <h4 class="float-end font-size-15">Invoice #<?php echo isset($InvoiceDetail['InvoiceID'])?$InvoiceDetail['InvoiceID']:'00';?> <span style="float: right;">
-                <button type="button" onclick="AddItemforInvoice('<?php echo $InvoiceDetail['InvoiceID']?>')"
-                        class="btn btn-primary "
-                        data-toggle="modal" data-target="#exampleModal">
-              Add Item
-            </button>
-           </span></h4>
-                        <div class="mb-4">
-                            <h2 class="mb-1 text-muted">Bootdey.com</h2>
-                        </div>
-                        <div class="text-muted">
-                            <p class="mb-1">3184 Spruce Drive Pittsburgh, PA 15201</p>
-                            <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> xyz@987.com</p>
-                            <p><i class="uil uil-phone me-1"></i> 012-345-6789</p>
-                        </div>
-                    </div>
+        .invoice-info {
+            text-align: right;
+        }
 
-                    <hr class="my-4">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="text-muted">
-                                <h5 class="font-size-16 mb-3">Billed To:</h5>
-                                <h5 class="font-size-15 mb-2"><?php echo isset($InvoiceDetail['Name'])?$InvoiceDetail['Name']:'';?></h5>
-                                <p class="mb-1"><?php echo isset($InvoiceDetail['Address'])?$InvoiceDetail['Address']:'';?></p>
-                                <p class="mb-1"><?php echo isset($InvoiceDetail['Email'])?$InvoiceDetail['Email']:'';?></p>
-                                <p><?php echo isset($InvoiceDetail['PhoneNumber'])?$InvoiceDetail['PhoneNumber']:'';?></p>
-                            </div>
-                        </div>
-                        <!-- end col -->
-                        <div class="col-sm-6">
-                            <div class="text-muted text-sm-end">
-                                <div>
-                                    <h5 class="font-size-15 mb-1">Invoice No:</h5>
-                                    <p><?php echo isset($InvoiceDetail['InvoiceID'])?$InvoiceDetail['InvoiceID']:'00';?></p>
-                                </div>
-                                <div class="mt-4">
-                                    <h5 class="font-size-15 mb-1">Invoice Date:</h5>
-                                    <p>12 Oct, 2020</p>
-                                </div>
+        /* Main Content */
+        .invoice-content {
+            flex: 1;
+            padding: 0 30px;
+        }
 
-                            </div>
-                        </div>
-                    </div>
+        /* Footer Section */
+        .footer {
+            padding: 10px 0px;
+            background: #f8f9fa;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            font-size: 11px;
+            color: #495057;
+            margin-top: auto;
+        }
 
-                    <div class="py-2">
-                        <h5 class="font-size-15">Summary</h5>
+        .invoice-number {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: bold;
+        }
 
-                        <div class="table-responsive">
-                            <table class="table align-middle table-nowrap table-centered mb-0">
-                                <thead>
-                                <tr>
-                                    <th style="width: 70px;">No.</th>
-                                    <th>Item</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th class="text-end" style="width: 120px;">Total</th>
-                                </tr>
-                                </thead><!-- end thead -->
-                                <tbody>
-                                <tr>
-                                    <th scope="row">01</th>
-                                    <td>
-                                        <div>
-                                            <h5 class="text-truncate font-size-14 mb-1">Black Strap A012</h5>
-                                            <p class="text-muted mb-0">Watch, Black</p>
-                                        </div>
-                                    </td>
-                                    <td>$ 245.50</td>
-                                    <td>1</td>
-                                    <td class="text-end">$ 245.50</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row">02</th>
-                                    <td>
-                                        <div>
-                                            <h5 class="text-truncate font-size-14 mb-1">Stainless Steel S010</h5>
-                                            <p class="text-muted mb-0">Watch, Gold</p>
-                                        </div>
-                                    </td>
-                                    <td>$ 245.50</td>
-                                    <td>2</td>
-                                    <td class="text-end">$491.00</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row" colspan="4" class="text-end">Sub Total</th>
-                                    <td class="text-end">$732.50</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row" colspan="4" class="border-0 text-end">
-                                        Discount :</th>
-                                    <td class="border-0 text-end">- $25.50</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row" colspan="4" class="border-0 text-end">
-                                        Shipping Charge :</th>
-                                    <td class="border-0 text-end">$20.00</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row" colspan="4" class="border-0 text-end">
-                                        Tax</th>
-                                    <td class="border-0 text-end">$12.00</td>
-                                </tr>
-                                <!-- end tr -->
-                                <tr>
-                                    <th scope="row" colspan="4" class="border-0 text-end">Total</th>
-                                    <td class="border-0 text-end"><h4 class="m-0 fw-semibold">$739.00</h4></td>
-                                </tr>
-                                <!-- end tr -->
-                                </tbody><!-- end tbody -->
-                            </table><!-- end table -->
-                        </div><!-- end table responsive -->
-                        <div class="d-print-none mt-4">
-                            <div class="float-end">
-                                <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i></a>
-                                <a href="#" class="btn btn-primary w-md">Send</a>
-                            </div>
-                        </div>
-                    </div>
+        .date {
+            font-size: 14px;
+            opacity: 0.8;
+        }
 
+        .customer-details {
+            padding: 30px 0px;
+            background: #fff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            margin-bottom: 5px;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background: #6877e1;
+            color: white !important;
+            padding: 10px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .total-row {
+            font-weight: 600;
+            background-color: #f8fafcc2 !important;
+        }
+
+        .total-row td {
+            border-top: 2px solid #e2e8f0;
+            border-bottom: none;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .grand-total {
+            background-color: #f1f5f9 !important;
+            font-size: 15px;
+        }
+
+        .grand-total td {
+            border-top: 2px solid #cbd5e0;
+        }
+
+        .payment-details {
+            padding: 20px 30px;
+            background: #fff;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .company-address {
+            line-height: 1.6;
+            margin-bottom: 0px;
+        }
+
+        @media print {
+            body {
+                height: auto;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                border-radius: 0;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            .footer {
+                position: fixed;
+                bottom: 40px;
+                width: 100%;
+            }
+            .footer-contact {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+            }
+
+            /* Ensure tables don't break across pages */
+            table {
+                page-break-inside: avoid;
+            }
+
+            /* Remove URL for printed documents */
+            a[href]:after {
+                content: none !important;
+            }
+        }
+
+        .invoice-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invoice-status:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+        }
+
+        .status-paid {
+            color: #166534;
+            background-color: #dcfce7;
+        }
+
+        .status-paid:after {
+            background: linear-gradient(45deg, #22c55e, #86efac);
+        }
+
+        .status-partiallypaid {
+            color: #854d0e;
+            background-color: #fef9c3;
+        }
+
+        .status-partiallypaid:after {
+            background: linear-gradient(45deg, #f59e0b, #fcd34d);
+        }
+
+        .status-unpaid {
+            color: #991b1b;
+            background-color: #fee2e2;
+        }
+
+        .status-unpaid:after {
+            background: linear-gradient(45deg, #ef4444, #fca5a5);
+        }
+
+        .footer-contact {
+            background: linear-gradient(50deg, #667eeab5 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .contact-item i {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+<div class="invoice-container">
+    <!-- Header Section -->
+    <div class="header">
+        <div class="logo-container">
+            <img src="<?= $template ?>assets/logo.png" alt="Company Logo" class="logo">
+        </div>
+        <div class="invoice-info">
+            <div class="invoice-number"><?= $InvoiceDetail['InvoiceNo'] ?></div>
+            <div class="date">Issued: <?= date("d M, Y", strtotime($InvoiceDetail['SystemDate'])) ?></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="invoice-content">
+        <!-- Customer Details -->
+        <div class="customer-details">
+            <h3 class="section-title">Bill To</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Customer Name</div>
+                    <div><?= (($InvoiceDetail['ProductType'] == 'builder') ? $ClientDetails['Name'] : $ClientDetails['FullName']) ?></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div><?= ((isset($ClientDetails['Email']) && $ClientDetails['Email'] != '') ? $ClientDetails['Email'] : '-') ?></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Phone</div>
+                    <div><?= ((isset($ClientDetails['ContactNo']) && $ClientDetails['ContactNo'] != '') ? $ClientDetails['ContactNo'] : '-') ?></div>
                 </div>
             </div>
-<script src="<?= $template ?>vendors/select2/js/select2.min.js"></script>
-<script src="<?= $template ?>vendors/dataTable/datatables.min.js"></script>
-<script src="<?= $template ?>assets/js/examples/datatable.js"></script>
-<script src="<?= $template ?>vendors/prism/prism.js"></script>
-<?php echo view('invoice/modal/invoice_detail_items'); ?>
+        </div>
+
+        <!-- Package Details Table -->
+        <table>
+            <thead>
+            <tr>
+                <th>Package</th>
+                <th>Org.Price</th>
+                <th>Discount</th>
+                <th class="text-right">Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><?= $PackageDetail['Name'] ?></td>
+                <td><?= money($InvoiceDetail['OriginalPrice'], false) ?></td>
+                <td><?= $InvoiceDetail['Discount'] ?>%</td>
+                <td class="text-right"><?= money($InvoiceDetail['Price'], false) ?></td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3" class="text-right">Subtotal:</td>
+                <td class="text-right"><?= money($InvoiceDetail['Price'], false) ?></td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3" class="text-right">Tax:</td>
+                <td class="text-right">0</td>
+            </tr>
+            <tr class="total-row grand-total">
+                <td colspan="3" class="text-right">Total Amount:</td>
+                <td class="text-right">
+                    <?= money($InvoiceDetail['Price']) ?>
+                </td>
+            </tr>
+            <tr class="total-row grand-total">
+                <td colspan="3" class="text-right">Payment Status:</td>
+                <td class="text-right">
+                    <span class="invoice-status <?= 'status-' . str_replace('-', '', strtolower($InvoiceDetail['Status'])) ?>">
+                        <?= ucwords(str_replace('-', ' ', $InvoiceDetail['Status'])) ?>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <?php
+    if (count($PaymentDetails) > 0) {
+        ?>
+        <div class="payment-details">
+            <h3 class="section-title">Payment Information</h3>
+            <?php
+            foreach ($PaymentDetails as $PD) {
+                ?>
+                <div class="payment-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Date</div>
+                        <div><?= date("d M, Y", strtotime($PD['Date'])) ?></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Mode</div>
+                        <div><?= ucwords(str_replace('-', ' ', $PD['PaymentMode'])) ?></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Amount</div>
+                        <div><?= money($PD['Amount'], false) ?></div>
+                        <!--                        <div><span class="status status-paid">Paid</span></div>-->
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    <?php } ?>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="company-address">
+            <i class="fas fa-map-marker-alt fa-lg" style="font-size: 1rem; margin-right: 5px;" title="Address"></i>
+            Basement 132, Block C, Civic Center Phase 4 Bahria Town, Islamabad
+        </div>
+    </div>
+    <div class="footer-contact" style="background: linear-gradient(50deg, #667eeab5 0%, #764ba2 100%);color: white;border-radius:0px !important;padding: 10px 0px;text-align: center;">
+        <div style="display: flex;justify-content: center;gap: 25px;flex-wrap: wrap;">
+            <a href="tel:+0518484883" target="_blank" style="color: white; text-decoration: none;">
+                <i class="fas fa-phone fa-lg" style="font-size: 1rem;" title="Call"> 051-8484883</i>
+            </a>
+            <a href="tel:+923033330023" style="color: white; text-decoration: none;">
+                <i class="fas fa-mobile fa-lg" style="font-size: 1rem;" title="Call Us"> 0303-3330023</i>
+            </a>
+            <a href="mailto:info@dright.net" style="color: white; text-decoration: none;">
+                <i class="fas fa-envelope fa-lg" style="font-size: 1rem;" title="Email Us"> info@dright.net</i>
+            </a>
+            <a href="https://www.dright.net" target="_blank" style="color: white; text-decoration: none;">
+                <i class="fas fa-globe fa-lg" style="font-size: 1rem;" title="Visit Website"> www.dright.net</i>
+            </a>
+        </div>
+    </div>
+</div>
 
 <script>
-    function AddItemforInvoice(id) {
-        // Set the value of the input field with id InvoiceID
-        $('#ItemInvoiceDetailModal form#AddItemInvoiceDetail input#InvoiceID').val(id);
+    // Automatically trigger print when page loads
+    window.onload = function () {
+        setTimeout(function () {
+            window.print();
+        }, 500);
 
-        // Show the modal
-        $('#ItemInvoiceDetailModal').modal('show');
-    }
-
+        // For better UX - close the window after printing (optional)
+        window.onafterprint = function () {
+            window.close();
+        };
+    };
 </script>
+</body>
+</html>

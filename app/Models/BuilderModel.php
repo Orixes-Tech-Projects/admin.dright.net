@@ -189,7 +189,8 @@ class BuilderModel extends Model
             $SessionFilters = $session->get('HospitalFilters');
         }
         $SQL = 'SELECT "profiles"."UID", "profiles"."SystemDate", "profiles"."Type", "profiles"."Name", "profiles"."Email", "profiles"."Password",
-                        "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime"
+                        "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime",
+                "profiles"."Status", "profiles"."ExpireDate"
                 FROM public."profiles" 
                 WHERE public."profiles"."Type" = \'' . $ID . '\' ';
         if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {

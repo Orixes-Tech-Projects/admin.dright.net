@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
-
+use App\Models\BuilderModel;
 use App\Models\Crud;
+use App\Models\Invoices;
 use App\Models\Main;
 use App\Models\SystemUser;
+use DateTime;
 
 class Invoice extends BaseController
 {
@@ -30,6 +32,7 @@ class Invoice extends BaseController
 
         echo view('footer', $data);
     }
+
     public function customer()
     {
         $data = $this->data;
@@ -48,63 +51,96 @@ class Invoice extends BaseController
     public function invoice_detail()
     {
         $data = $this->data;
-        $data['UID'] = getSegment(3);
         $Crud = new Crud();
-        $Invoice = new SystemUser();
+        $data['UID'] = $UID = getSegment(3);
 
-        $data['AllItems'] = $Invoice->items();
-        $data['InvoiceDetail'] = $Crud->SingleRecord("invoices", array("UID" => $data['UID']));
+        if (empty($UID) || !is_numeric($UID) || $UID <= 0) {
+            return redirect()->to($data['path'] . 'invoice');
+        }
 
-        echo view('header', $data);
+        $data['InvoiceDetail'] = $InvoiceDetail = $Crud->SingleRecord("invoices", ["UID" => $UID]);
+        if (empty($InvoiceDetail['UID'])) {
+            return redirect()->to($data['path'] . 'invoice');
+        }
+        $data['PackageDetail'] = $Crud->SingleRecord("items", ["UID" => $InvoiceDetail['PackageUID']]);
+        $data['PaymentDetails'] = $Crud->ListRecords("invoices_payments", ["InvoiceUID" => $UID], ['Date' => 'DESC']);
+        $data['ClientDetails'] = $this->GetClientDetails($Crud, $InvoiceDetail);
 
-        echo view('invoice/invoice_detail', $data);
+        return view('invoice/invoice_detail', $data);
+    }
 
-        echo view('footer', $data);
+    protected function GetClientDetails($Crud, $invoiceDetail)
+    {
+        if (empty($invoiceDetail['ProfileUID'])) {
+            return [];
+        }
+
+        switch (true) {
+            case ($invoiceDetail['ProductType'] == 'builder'):
+                return $Crud->SingleeRecord('public."profiles"', ['UID' => $invoiceDetail['ProfileUID']]);
+
+            case ($invoiceDetail['Product'] == 'hospitals'):
+                return $Crud->SingleRecord('extended_profiles', ['UID' => $invoiceDetail['ProfileUID']]);
+
+            default:
+                return $Crud->SingleRecord('pharmacy_profiles', ['UID' => $invoiceDetail['ProfileUID']]);
+        }
     }
 
 
     public function fetch_invoice()
     {
-        $Users = new SystemUser();
+        $MainData = $this->data;
+        $DataArray = array();
+        $Invoices = new Invoices();
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
+        $length = $_POST['length'];
+        $start = $_POST['start'];
 
-        $Data = $Users->get_invoice_datatables($keyword);
-        $totalfilterrecords = $Users->count_invoice_datatables($keyword);
-        $dataarr = array();
+        $Data = $Invoices->GetAllInvoicesRecord($keyword, $length, $start);
+        $totalfilterrecords = $Invoices->GetAllInvoicesRecord($keyword);
         $cnt = $_POST['start'];
         foreach ($Data as $record) {
+
             $cnt++;
             $data = array();
             $data[] = $cnt;
-            $data[] = isset($record['Name']) ? htmlspecialchars($record['Name']) : '';
-            $data[] = isset($record['Email']) ? htmlspecialchars($record['Email']) : '';
-            $data[] = isset($record['PhoneNumber']) ? htmlspecialchars($record['PhoneNumber']) : '';
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="Invoice(' . htmlspecialchars($record['UID']) . ')">Invoice</a>
-                <a class="dropdown-item" onclick="UpdateInvoice(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteInvoice(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+            $data[] = ((isset($record['InvoiceNo']) && $record['InvoiceNo'] != '') ? '<b>' . $record['InvoiceNo'] . '</b>' : '-');
+            $data[] = date('d M, Y', strtotime($record['SystemDate']));
+            $data[] = isset($record['ProductType']) ? '<b>ClinTa ' . ucwords($record['ProductType']) . ' / ' . ucwords($record['Product']) . '</b>' : '';
+            $data[] = isset($record['ProfileName']) ? $record['ProfileName'] : '';
+            $data[] = isset($record['PackageName']) ? $record['PackageName'] : '';
+            $data[] = isset($record['Status']) ? '<badge style="color:white !important;" class="badge badge-' . (($record['Status'] == 'un-paid') ? 'danger' : (($record['Status'] == 'paid')? 'success' : 'warning') ) . '">' . ucwords(str_replace('-', ' ', $record['Status'])) . '</badge>' : '';
+            $action = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">';
+            if ($record['Status'] == 'un-paid') {
+                $action .= ' <a style="cursor: pointer;" class="dropdown-item" onclick="LoadUpdateInvoiceModal(' . htmlspecialchars($record['UID']) . ')">Update</a>';
+            }
+            $action .= ' <a style="cursor: pointer;" class="dropdown-item" onclick="LoadInvoicePaymentModal(' . htmlspecialchars($record['UID']) . ', \'' . htmlspecialchars($record['InvoiceNo']) . '\', \'' . htmlspecialchars($record['Price']) . '\', \'' . htmlspecialchars($record['ReceivedAmount']) . '\', \'' . htmlspecialchars($record['Status']) . '\')">Payments</a>';
+            $action .= '<a target="_blank" style="cursor: pointer;" href="' . $MainData['path'] . 'invoice/invoice_detail/' . $record['UID'] . '" class="dropdown-item">View Invoice</a>
+                                    <a class="dropdown-item d-none" onclick="DeleteInvoice(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                                </div>
+                            </div>
+                        </td>';
+            $data[] = $action;
 
-            </div>
-        </div>
-    </td>';
-            $dataarr[] = $data;
+            $DataArray[] = $data;
         }
 
         $response = array(
             "draw" => intval($this->request->getPost('draw')),
             "recordsTotal" => count($Data),
-            "recordsFiltered" => $totalfilterrecords,
-            "data" => $dataarr
+            "recordsFiltered" => count($totalfilterrecords),
+            "data" => $DataArray
         );
         echo json_encode($response);
     }
-  public function fetch_invoice_customer()
+
+    public function fetch_invoice_customer()
     {
         $Users = new SystemUser();
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
@@ -121,18 +157,18 @@ class Invoice extends BaseController
             $data[] = isset($record['Email']) ? htmlspecialchars($record['Email']) : '';
             $data[] = isset($record['PhoneNumber']) ? htmlspecialchars($record['PhoneNumber']) : '';
             $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateCustomer(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteCustomer(' . htmlspecialchars($record['UID']) . ')">Delete</a>
-
-            </div>
-        </div>
-    </td>';
+                    <td class="text-end">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                Actions
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" onclick="UpdateCustomer(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                <a class="dropdown-item" onclick="DeleteCustomer(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                
+                            </div>
+                        </div>
+                    </td>';
             $dataarr[] = $data;
         }
 
@@ -145,62 +181,194 @@ class Invoice extends BaseController
         echo json_encode($response);
     }
 
+    protected function HasProfilesUnPaidInvoices($profileUID, $productType, $product)
+    {
+        $Crud = new Crud();
+        $TotalRecords = $Crud->ListRecords("invoices", [
+            'ProfileUID' => $profileUID,
+            'ProductType' => $productType,
+            'Product' => $product,
+            'Status' => 'un-paid'
+        ]);
+
+        return count($TotalRecords) > 0;
+    }
+
+    protected function CheckExtendedProfilesEligibility($profileUID, $product)
+    {
+        $Crud = new Crud();
+        $table = ($product == 'hospitals') ? 'extended_profiles' : 'pharmacy_profiles';
+        $profile = $Crud->SingleRecord($table, ['UID' => $profileUID]);
+
+        if (empty($profile) || is_null($profile['ExpireDate'])) {
+            return true;
+        }
+
+        try {
+
+            $expiryDate = new DateTime($profile['ExpireDate']);
+            $today = new DateTime();
+
+            if ($today > $expiryDate) {
+                return true;
+            }
+
+            $interval = $today->diff($expiryDate);
+            $daysRemaining = $interval->days;
+
+            return $daysRemaining <= 15;
+
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    protected function CheckBuilderProfilesEligibility($profileUID)
+    {
+        $Crud = new Crud();
+        $table = 'public."profiles"';
+        $profile = $Crud->SingleeRecord($table, ['UID' => $profileUID]);
+        if (empty($profile) || is_null($profile['ExpireDate'])) {
+            return true;
+        }
+
+        try {
+
+            $expiryDate = new DateTime($profile['ExpireDate']);
+            $today = new DateTime();
+
+            if ($today > $expiryDate) {
+                return true;
+            }
+
+            $interval = $today->diff($expiryDate);
+            $daysRemaining = $interval->days;
+
+            return $daysRemaining <= 15;
+
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     public function invoice_detail_form_submit()
     {
         $Crud = new Crud();
         $Main = new Main();
+        $Invoices = new Invoices();
         $response = array();
         $record = array();
 
-        $id = $this->request->getVar('UID');
-        $customerID = $this->request->getVar('Name');
+        $ID = $this->request->getVar('UID');
+        $ProductType = $this->request->getVar('ProductType');
+        $BuilderProduct = $this->request->getVar('BuilderProducts');
+        $ExtendedProduct = $this->request->getVar('ExtendedProducts');
+        $Profile = $this->request->getVar('Profile');
+        $Package = $this->request->getVar('Package');
+        $OriginalPrice = $this->request->getVar('OriginalPrice');
+        $Discount = $this->request->getVar('Discount');
+        $Price = $this->request->getVar('Price');
+
+        $ProfileName = $this->request->getVar('ProfileName');
+        $ProfileName = ((isset($ProfileName) && $ProfileName != '') ? $ProfileName : 'Demo');
+
+        $Product = (($ProductType == 'builder') ? $BuilderProduct : $ExtendedProduct);
+
+        if ($ID == 0) {
+
+            // Check for unpaid invoices first
+            if ($this->HasProfilesUnPaidInvoices($Profile, $ProductType, $Product)) {
+                $response['status'] = 'fail';
+                $response['message'] = 'Cannot create invoice - client has unpaid invoices';
+                echo json_encode($response);
+                return;
+            }
+
+            // For extended products, check expiry conditions
+            if ($ProductType == 'extended' && !$this->CheckExtendedProfilesEligibility($Profile, $Product)) {
+                $response['status'] = 'fail';
+                $response['message'] = 'You can only create new invoices when your current subscription is within 15 days of expiry.';
+                echo json_encode($response);
+                return;
+            }
+
+            // For builder products, check expiry conditions
+            if ($ProductType == 'builder' && !$this->CheckBuilderProfilesEligibility($Profile)) {
+                $response['status'] = 'fail';
+                $response['message'] = 'You can only create new invoices when your current subscription is within 15 days of expiry.';
+                echo json_encode($response);
+                return;
+            }
 
 
-        if ($id == 0) {
-//            foreach ($User as $key => $value) {
-//                $record[$key] = ((isset($value)) ? $value : '');
-//            }
-            $customer = $Crud->SingleRecord("invoice_customers", array("UID" => $customerID));
-            $record['Name']=$customer['Name'];
-            $record['PhoneNumber']=$customer['PhoneNumber'];
-            $record['Address']=$customer['Address'];
-            $record['Email']=$customer['Email'];
-            $record['CustomerID']=$customer['UID'];
 
+            $InvoiceNo = generate_invoice_number(
+                $ProfileName,
+                $ProductType,
+                $Product
+            );
+
+            $record['InvoiceNo'] = $InvoiceNo;
+            $record['ProductType'] = $ProductType;
+            $record['Product'] = $Product;
+            $record['ProfileUID'] = $Profile;
+            $record['PackageUID'] = $Package;
+            $record['OriginalPrice'] = $OriginalPrice;
+            $record['Discount'] = $Discount;
+            $record['Price'] = $Price;
+            $record['Status'] = 'un-paid';
             $RecordId = $Crud->AddRecord("invoices", $record);
             if (isset($RecordId) && $RecordId > 0) {
-                $record2['InvoiceID'] = Code($RecordId, 'INV-');
 
-                $Crud->UpdateRecord('invoices', $record2, array("UID" => $RecordId));
+                if ($ProductType == 'extended') {
+                    $Invoices->UpdateExtendedProfilesExpiryDate($Profile, $Product, $RecordId);
+                } else {
+                    $Invoices->UpdateBuilderProfilesExpiryDate($Profile, $RecordId);
+                }
+
                 $Main = new Main();
-
-                $msg = $_SESSION['FullName'] . ' Add Invoice Detail Through Admin Dright';
+                $msg = $_SESSION['FullName'] . ' Add Invoice Details Through Admin DRight';
                 $logesegment = 'Users';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
                 $response['status'] = 'success';
                 $response['message'] = 'Invoice Added Successfully...!';
             } else {
                 $response['status'] = 'fail';
                 $response['message'] = 'Data Didnt Submitted Successfully...!';
             }
-        } else {
-            $customer = $Crud->SingleRecord("invoice_customers", array("UID" => $customerID));
-            $record['Name']=$customer['Name'];
-            $record['PhoneNumber']=$customer['PhoneNumber'];
-            $record['Address']=$customer['Address'];
-            $record['Email']=$customer['Email'];
 
-            $msg = $_SESSION['FullName'] . ' Update Invoice Detail Through Admin Dright';
+        } else {
+
+            $record['ProductType'] = $ProductType;
+            $record['Product'] = $Product;
+            $record['ProfileUID'] = $Profile;
+            $record['PackageUID'] = $Package;
+            $record['OriginalPrice'] = $OriginalPrice;
+            $record['Discount'] = $Discount;
+            $record['Price'] = $Price;
+
+            $UpdateRecord = $Crud->UpdateRecord("invoices", $record, array("UID" => $ID));
+            if (isset($UpdateRecord) && $UpdateRecord > 0) {
+
+                if ($ProductType == 'extended') {
+                    $Invoices->UpdateExtendedProfilesExpiryDate($Profile, $Product, $ID);
+                } else {
+                    $Invoices->UpdateBuilderProfilesExpiryDate($Profile, $ID);
+                }
+            }
+
+            $msg = $_SESSION['FullName'] . ' Update Invoice Detail Through Admin DRight';
             $logesegment = 'Users';
             $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
-            $Crud->UpdateRecord("invoices", $record, array("UID" => $id));
             $response['status'] = 'success';
             $response['message'] = 'User Updated Successfully...!';
         }
 
         echo json_encode($response);
     }
-   public function customer_detail_form_submit()
+
+    public function customer_detail_form_submit()
     {
         $Crud = new Crud();
         $Main = new Main();
@@ -260,6 +428,7 @@ class Invoice extends BaseController
         echo json_encode($response);
 
     }
+
     public function delete_invoice_customers()
     {
         $data = $this->data;
@@ -286,7 +455,9 @@ class Invoice extends BaseController
         $response['record'] = $record;
         $response['message'] = 'Record Get Successfully...!';
         echo json_encode($response);
-    }  public function get_record_invoice_customers()
+    }
+
+    public function get_record_invoice_customers()
     {
         $Crud = new Crud();
         $id = $_POST['id'];
@@ -322,6 +493,97 @@ class Invoice extends BaseController
 
 
         echo json_encode($response);
+    }
+
+
+    public
+    function load_invoice_product_customer_view()
+    {
+        $Crud = new Crud();
+        $BuilderModel = new BuilderModel();
+        $data = $this->data;
+        $ProductType = $this->request->getVar('ProductType');
+        $Product = $this->request->getVar('Product');
+
+        $data['ProductType'] = $ProductType;
+        $data['Product'] = $Product;
+
+        if ($ProductType == 'builder') {
+            $SQL = $BuilderModel->Allprofiless($Product, '');
+            $data['Records'] = $Crud->ExecutePgSQL($SQL);
+        } else {
+            if ($Product == 'hospitals') {
+                $data['Records'] = $Crud->ListRecords('extended_profiles', array(), array('FullName' => 'ASC'));
+            } else {
+                $data['Records'] = $Crud->ListRecords('pharmacy_profiles', array(), array('FullName' => 'ASC'));
+            }
+        }
+
+        $page = view('invoice/modal/_ProductCustomersDropDown', $data);
+        echo json_encode(array('status' => 'success', 'page' => $page));
+    }
+
+    public
+    function invoice_payments_form_submit()
+    {
+
+        $Crud = new Crud(); $Invoices = new Invoices();
+        $InvoiceUID = $this->request->getVar('InvoiceID');
+        $InvoiceAmount = $this->request->getVar('InvoiceAmount');
+        $ReceivedAmount = $this->request->getVar('ReceivedAmount');
+        $PaymentMode = $this->request->getVar('PaymentMode');
+        $Date = $this->request->getVar('Date');
+        $Amount = $this->request->getVar('Amount');
+
+        $PaymentRecord = array();
+        $PaymentRecord['InvoiceUID'] = $InvoiceUID;
+        $PaymentRecord['PaymentMode'] = $PaymentMode;
+        $PaymentRecord['Date'] = date("Y-m-d", strtotime($Date));
+        $PaymentRecord['Amount'] = $Amount;
+
+        $PaymentRecordID = $Crud->AddRecord('invoices_payments', $PaymentRecord);
+        if (isset($PaymentRecordID) && $PaymentRecordID > 0) {
+
+            $ActualReceivedAmount = $ReceivedAmount + $Amount;
+            $InvoiceStatus = (($InvoiceAmount == $ActualReceivedAmount) ? 'paid' : (($ActualReceivedAmount < $InvoiceAmount) ? 'partially-paid' : 'un-paid'));
+            $Crud->UpdateRecord('invoices', array('ReceivedAmount' => $ActualReceivedAmount, 'Status' => $InvoiceStatus), array('UID' => $InvoiceUID));
+            if($InvoiceStatus == 'paid'){
+                $Invoices->UpdateProductsProfileStatusToActive($InvoiceUID);
+            }
+
+            $response = array();
+            $response['status'] = 'success';
+            $response['message'] = 'Payment Added Successfully...!';
+            echo json_encode($response);
+
+        } else {
+
+            $response = array();
+            $response['status'] = 'fail';
+            $response['message'] = 'Failed to create payment record...!';
+            echo json_encode($response);
+        }
+    }
+
+    public
+    function get_invoice_payments_record(){
+
+        $Crud = new Crud(); $formattedRecords = array();
+        $InvoiceID = $this->request->getVar('InvoiceID');
+
+        $PaymentsRecord = $Crud->ListRecords('invoices_payments', array('InvoiceUID' => $InvoiceID), array('Date' => 'DESC'));
+        if(count($PaymentsRecord) > 0){
+            $formattedRecords = array_map(function($record) {
+                return [
+                    'UID' => $record['UID'] ?? null,
+                    'Date' => date("d M, Y", strtotime($record['Date'])) ?? null,
+                    'PaymentMode' => ucwords(str_replace('-', ' ', $record['PaymentMode'])) ?? null,
+                    'Amount' => money($record['Amount'], false) ?? null
+                ];
+            }, $PaymentsRecord);
+        }
+
+        echo json_encode($formattedRecords);
     }
 
 }

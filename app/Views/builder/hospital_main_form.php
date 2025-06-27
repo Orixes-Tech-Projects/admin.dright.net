@@ -2,25 +2,22 @@
 <?php
 
 use App\Models\BuilderModel;
+use App\Models\Crud;
 
-$short_desc='';
-$clinta_extended_profiles='';
-$healthcarestatus='';
-$theme='';
-$patient_portal='';
+$Crud = new Crud();
 $BuilderModel = new BuilderModel();
-//print_r($page);exit();
-if($page=='add-hospital'){
 
-}else{
-    $short_desc =$BuilderModel->get_website_profile_meta_data_by_id_option( $PAGE['UID'], 'short_description' );
+$short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_portal = '';
+if ($page == 'add-hospital') {
+    $AllPackages = $Crud->ListRecords('items');
+} else {
+    $short_desc = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'short_description');
     $clinta_extended_profiles = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'clinta_extended_profiles');
     $healthcarestatus = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'healthcare_status');
     $theme = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'theme');
     $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
 }
 
-//print_r($patient_portal);exit();
 ?>
 <div class="card">
     <div class="card-body">
@@ -109,11 +106,56 @@ if($page=='add-hospital'){
                     <div class="form-group row">
                         <label class="col-sm-12">Short Description</label>
                         <div class="col-sm-12">
-                            <textarea class="form-control" name="short_description" id="short_description" rows="6"><?php if (is_array($short_desc) && !empty($short_desc)) { ?><?= isset($short_desc[0]['Value']) ? $short_desc[0]['Value'] : ''; ?><?php } ?></textarea>
+                            <textarea class="form-control" name="short_description" id="short_description"
+                                      rows="6"><?php if (is_array($short_desc) && !empty($short_desc)) { ?><?= isset($short_desc[0]['Value']) ? $short_desc[0]['Value'] : ''; ?><?php } ?></textarea>
                         </div>
                     </div>
                 </div>
             </div>
+            <?php
+            if ($page == 'add-hospital') { ?>
+                <div class="form-row mt-4">
+                    <div class="col-md-12">
+                        <h4>Subscription Details</h4>
+                        <hr>
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label>Package <span style="color: crimson;">*</span></label>
+                        <select name="Package"
+                                id="Package" class="form-control">
+                            <option value="">Select Package</option>
+                            <?php
+                            foreach ($AllPackages as $AP) {
+                                $String = $AP['Code'] . ' - ' . $AP['Name'];
+                                echo '<option value="' . $AP['UID'] . '">' . $String . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div id="OrgPriceDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Original Price <span style="color: crimson;">*</span></label>
+                        <input oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Enter Package Price" type="text" class="form-control"
+                               id="OriginalPrice"
+                               name="OriginalPrice">
+                    </div>
+                    <div id="DiscountDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Discount (%) <span
+                                    style="color: crimson;">*</span></label>
+                        <input value="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Enter Package Discount" type="text" class="form-control"
+                               id="Discount"
+                               name="Discount">
+                    </div>
+                    <div id="PriceDiv" class="col-md-4 mb-3">
+                        <label for="validationCustom01">Price After Discount <span
+                                    style="color: crimson;">*</span></label>
+                        <input readonly oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               placeholder="Price After Discount" type="text" class="form-control" id="Price"
+                               name="Price">
+                    </div>
+                </div>
+            <?php } ?>
             <div class="form-row">
                 <div class="col-md-12">
                     <h3>ClinTa Extended</h3>
@@ -208,7 +250,9 @@ if($page=='add-hospital'){
                 <div class="col-md-12 mt-4" id="ajaxResponse"></div>
                 <div class="col-md-12">
                     <button style="float: right; border-radius: 5px !important;" class="btn btn-primary btn-sm"
-                            type="button" onclick="AddHospitalFormFunction()"><?=((isset($PAGE['UID']) && $PAGE['UID'] != '' && $PAGE['UID'] > 0)? 'Update' : 'Add')?> Hospital
+                            type="button"
+                            onclick="AddHospitalFormFunction()"><?= ((isset($PAGE['UID']) && $PAGE['UID'] != '' && $PAGE['UID'] > 0) ? 'Update' : 'Add') ?>
+                        Hospital
                     </button>
                 </div>
             </div>
@@ -217,11 +261,60 @@ if($page=='add-hospital'){
 </div>
 
 <script>
+
+    $(document).ready(function () {
+        var currentPage = '<?=$page?>';
+        if (currentPage === 'add-hospital') {
+            handlePackageChange();
+        }
+    });
+
+    function handlePackageChange() {
+
+        const $packageSelect = $(`#Package`);
+        const $originalPrice = $(`#OriginalPrice`);
+        const $discount = $(`#Discount`);
+        const $price = $(`#Price`);
+
+        $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).hide();
+
+        $packageSelect.change(function () {
+            if ($(this).val() !== "") {
+
+                $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).show();
+
+                const PackageID = $(this).val();
+                const PackageRecord = AjaxResponse("support-ticket/get-record-items", "id=" + PackageID);
+                if (PackageRecord.record != '') {
+                    $(`input#OriginalPrice`).val(PackageRecord.record.OriginalPrice);
+                    $(`input#Discount`).val(PackageRecord.record.Discount);
+                    $(`input#Price`).val(PackageRecord.record.Price);
+                }
+
+            } else {
+                // Hide and reset fields
+                $(`#OrgPriceDiv, #DiscountDiv, #PriceDiv`).hide();
+                $originalPrice.val("");
+                $discount.val("0");
+                $price.val("");
+            }
+        });
+
+        $originalPrice.add($discount).on('input', function () {
+            const originalPrice = parseFloat($originalPrice.val()) || 0;
+            const discount = parseFloat($discount.val()) || 0;
+            const discountedPrice = originalPrice - (originalPrice * (discount / 100));
+            $price.val(Math.round(discountedPrice));
+        });
+    }
+
     function AddHospitalFormFunction() {
+
+        const CurrentPage = "<?=$page?>";
 
         setTimeout(function () {
             $("#ajaxResponse").html('');
-        }, 2000);
+        }, 2500);
 
         var FullName = $("form#AddHospitalForm input#name").val();
         var Email = $("form#AddHospitalForm input#email").val();
@@ -250,9 +343,29 @@ if($page=='add-hospital'){
             $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> City Required </div>');
             return false;
         }
-        if (SubDomain == '') {
-            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> SubDomain Required </div>');
+        if (SubDomain == '' || !isValidUrl(SubDomain)) {
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Valid SubDomain Required </div>');
             return false;
+        }
+
+        if (CurrentPage == 'add-hospital') {
+            var Package = $("form#AddHospitalForm select#Package").val();
+            var OriginalPrice = $("form#AddHospitalForm select#OriginalPrice").val();
+            var Discount = $("form#AddHospitalForm select#Discount").val();
+            if (Package == '') {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Subscription Package Required </div>');
+                return false;
+            }
+
+            if (OriginalPrice == '' || OriginalPrice <= 0) {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Package Price Required </div>');
+                return false;
+            }
+
+            if (Discount == '' || Discount < 0) {
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Invalid discount </div>');
+                return false;
+            }
         }
 
         var formdata = new window.FormData($("form#AddHospitalForm")[0]);
@@ -266,24 +379,31 @@ if($page=='add-hospital'){
             $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
         }
     }
+
+    function isValidUrl(urlString, options = {}) {
+
+        if (!/^https?:\/\//i.test(urlString)) {
+            urlString = 'https://' + urlString;
+        }
+
+        try {
+            const url = new URL(urlString);
+
+            if (!/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(url.hostname)) {
+                return false;
+            }
+
+            if (options.allowedDomains) {
+                const allowed = options.allowedDomains.some(domain =>
+                    url.hostname === domain ||
+                    url.hostname.endsWith('.' + domain)
+                );
+                if (!allowed) return false;
+            }
+
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
 </script>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-</script>
-<script src="<?= $template ?>assets/js/examples/form-validation.js"></script>

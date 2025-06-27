@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +15,6 @@
     </script>
     <script type="text/javascript" src="<?= $template ?>custom.js"></script>
 </head>
-
 <body class="form-membership"
       style="background: url(<?= $template ?>login-bg.png);background-repeat: no-repeat;background-position: top left;background-size: cover;">
 
@@ -28,7 +26,6 @@
         D-Right Admin Panel
     </div>
     <!-- ./ logo -->
-
 
     <h4>Master Control Panel </h4>
 
@@ -46,90 +43,76 @@
 
         <hr>
 
-        <a href="javascript:void(0);" type="submit"
-
-           class="btn btn-primary btn-block" style="color: white;">
-
+        <button type="submit" class="btn btn-primary btn-block" style="color: white;">
             Login
-
-        </a>
+        </button>
 
     </form>
     <div class="text-center mt-5">
-        <div class="ajaxResponse" id="ajaxResponse">
-
-        </div>
+        <div class="ajaxResponse" id="ajaxResponse"></div>
     </div>
     <!-- ./ form -->
 </div>
-<script>
 
+<script>
+    // Handle form submission
     document.getElementById('UserForm').addEventListener('submit', function (event) {
         event.preventDefault();
-        LoginSubmit();
+        handleLogin();
     });
 
-    // Detect Enter key inside input fields and trigger form submission
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Prevent default form submission
-            LoginSubmit(); // Call your submit function
-        }
+    // Handle button click (though the form submit will handle this automatically)
+    document.querySelector('#UserForm button[type="submit"]').addEventListener('click', function (event) {
+        event.preventDefault();
+        handleLogin();
     });
 
-    function LoginSubmit() {
-        var Email = document.getElementById('UserName').value; // Use 'inputEmail' here
-        var Password = document.getElementById('Password').value; // Use 'inputPassword' here
+    function handleLogin() {
+        var Email = document.getElementById('UserName').value;
+        var Password = document.getElementById('Password').value;
 
-        if (Email == '') {
+        if (!Email) {
             document.getElementById('UserName').focus();
-        } else if (Password == '') {
-            document.getElementById('Password').focus();
-        } else {
-
-            var formdata = new window.FormData($("form#UserForm")[0]);
-            response = AjaxUploadResponse("use-login-submit", formdata);
-
-            if (response.status === 'success') {
-                $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
-                setTimeout(function () {
-                    // location.reload();
-                    location.href = '<?= $path ?>';
-                }, 500);
-            } else {
-                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
-            }
-
+            return;
         }
-    }
 
-    function SubmitLogin() {
+        if (!Password) {
+            document.getElementById('Password').focus();
+            return;
+        }
 
-        var formdata = new window.FormData($("form#UserForm")[0]);
+        var formdata = new FormData(document.getElementById('UserForm'));
 
+        // Assuming AjaxUploadResponse is defined in your custom.js
         var response = AjaxUploadResponse("use-login-submit", formdata);
 
-        if (response.status == 'success') {
-
+        if (response.status === 'success') {
+            $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
             setTimeout(function () {
-
-                $("#Status").html('<div class="text-center alert alert-success mb-4 mt-4" role="alert">  <strong>' + response.message + '</strong> </div>');
-
                 window.location.href = '<?= $path ?>';
-
-            }, 1000);
-
+            }, 500);
         } else {
-
-            $("#Status").html('<div class="text-center alert alert-danger mb-4 mt-4" role="alert">  <strong>' + response.message + '</strong> </div>');
-
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
         }
-
     }
 
+    // Optional: Add keypress listener for Enter key in input fields
+    document.getElementById('UserName').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleLogin();
+        }
+    });
+
+    document.getElementById('Password').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleLogin();
+        }
+    });
 </script>
+
 <!-- App scripts -->
 <script src="<?= $template ?>assets/js/app.min.js"></script>
 </body>
-
 </html>

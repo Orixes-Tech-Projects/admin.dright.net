@@ -81,3 +81,16 @@ CREATE TABLE IF NOT EXISTS `files` (
   `DBRef` text NOT NULL,
   PRIMARY KEY (`UID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+ALTER TABLE `pharmacy_profiles` ADD `Status` VARCHAR(55) NOT NULL DEFAULT 'block' AFTER `ExpireDate`;
+
+CREATE TABLE IF NOT EXISTS `invoices_payments` (
+   `UID` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+   `SystemDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `InvoiceUID` int NOT NULL,
+   `PaymentMode` varchar(55) DEFAULT NULL,
+    `Date` date DEFAULT NULL,
+    `Amount` varchar(55) NOT NULL DEFAULT '0',
+    PRIMARY KEY (`UID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
