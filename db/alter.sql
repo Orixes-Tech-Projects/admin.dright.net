@@ -94,3 +94,16 @@ CREATE TABLE IF NOT EXISTS `invoices_payments` (
     `Amount` varchar(55) NOT NULL DEFAULT '0',
     PRIMARY KEY (`UID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE IF NOT EXISTS `profiles_auto_domains_status` (
+      `UID` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+      `SystemDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `ProfileID` int NOT NULL DEFAULT '0',
+      `ProductType` varchar(55) DEFAULT NULL,
+    `Product` varchar(55) DEFAULT NULL,
+    `Domain` varchar(55) DEFAULT NULL,
+    `Status` varchar(55) DEFAULT NULL,
+    `Message` text,
+    PRIMARY KEY (`UID`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 
 use App\Models\BuilderModel;
+use App\Models\CpanelDomains;
 use App\Models\Crud;
 use App\Models\Invoices;
 use App\Models\Main;
@@ -22,6 +23,7 @@ class Builder extends BaseController
 //        $ipAddress = $this->request->getIPAddress();
 
     }
+
 
     public function index()
     {
@@ -926,6 +928,8 @@ class Builder extends BaseController
             }
             $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
             if ($website_profile_id) {
+
+
                 $themeOptions = array(
                     'banner_style' => 'basic',
                     'home_ceo_message' => 1,
@@ -989,6 +993,18 @@ class Builder extends BaseController
                     );
                     $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
                 }
+
+                /** Auto Creating Domain Code */
+                $CreateDomainArray = array(
+                    'ProfileID' => $website_profile_id,
+                    'ProductType' => 'builder',
+                    'Product' => 'hospitals',
+                    'RootDomain' => 'clinta.biz',
+                    'SubDomain' => trim($subdomain),
+                    'Directory' => 'reactjs.webbuilder'
+                );
+                $CpanelDomains = new CpanelDomains();
+                $CpanelDomains->CreateSubDomain($CreateDomainArray);
 
                 $msg = $_SESSION['FullName'] . ' Hospital Profile Submit Through Admin Dright';
                 $logesegment = 'Hospitals';
@@ -1262,10 +1278,23 @@ class Builder extends BaseController
                     $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
                 }
 
-                $response = array();
+                /** Auto Creating Domain Code */
+                $CreateDomainArray = array(
+                    'ProfileID' => $website_profile_id,
+                    'ProductType' => 'builder',
+                    'Product' => 'doctors',
+                    'RootDomain' => 'clinta.biz',
+                    'SubDomain' => trim($subdomain),
+                    'Directory' => 'reactjs.webbuilder'
+                );
+                $CpanelDomains = new CpanelDomains();
+                $CpanelDomains->CreateSubDomain($CreateDomainArray);
+
                 $msg = $_SESSION['FullName'] . ' Doctor Profile Submit Through Admin DRight';
                 $logesegment = 'Doctor';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
+                $response = array();
                 $response['status'] = "success";
                 $response['id'] = $website_profile_id;
                 $response['message'] = "Doctor Profile Added Successfully.....!";
