@@ -615,6 +615,11 @@ if ($page == 'add-doctor') {
                 $('.progress-percentage').text('100%');
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
+                /** Send Requet TO CPanel For Creating SubDomains */
+                if (CurrentPage == 'add-doctor') {
+                    AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                }
+
                 setTimeout(function () {
                     $('.progress-modal').hide();
                     location.href = "<?=$path?>builder/";

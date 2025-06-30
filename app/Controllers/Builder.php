@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 
 use App\Models\BuilderModel;
-use App\Models\CpanelDomains;
 use App\Models\Crud;
 use App\Models\Invoices;
 use App\Models\Main;
@@ -20,8 +19,7 @@ class Builder extends BaseController
 
         $this->MainModel = new Main();
         $this->data = $this->MainModel->DefaultVariable();
-//        $ipAddress = $this->request->getIPAddress();
-
+        helper('cpanel');
     }
 
 
@@ -994,32 +992,25 @@ class Builder extends BaseController
                     $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
                 }
 
-                /** Auto Creating Domain Code */
-                $CreateDomainArray = array(
-                    'ProfileID' => $website_profile_id,
-                    'ProductType' => 'builder',
-                    'Product' => 'hospitals',
-                    'RootDomain' => 'clinta.biz',
-                    'SubDomain' => trim($subdomain),
-                    'Directory' => 'reactjs.webbuilder'
-                );
-                $CpanelDomains = new CpanelDomains();
-                $CpanelDomains->CreateSubDomain($CreateDomainArray);
-
                 $msg = $_SESSION['FullName'] . ' Hospital Profile Submit Through Admin Dright';
                 $logesegment = 'Hospitals';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
 
-                $responce = array();
-                $responce['status'] = "success";
-                $responce['id'] = $website_profile_id;
-                $responce['message'] = "Hospitals Profile Added Successfully.....!";
+                $response = array();
+                $response['status'] = "success";
+                $response['id'] = $website_profile_id;
+                $response['message'] = "Hospitals Profile Added Successfully.....!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
 
             } else {
 
-                $responce = array();
-                $responce['status'] = "fail";
-                $responce['message'] = "Error in Adding Hospitals Profile...!";
+                $response = array();
+                $response['status'] = "fail";
+                $response['message'] = "Error in Adding Hospitals Profile...!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+                return;
             }
         }
         else {
@@ -1104,17 +1095,16 @@ class Builder extends BaseController
                 }
             }
 
-            $msg=$_SESSION['FullName'].' Hospital Profile Update Through Admin Dright';
-            $logesegment='Hospitals';
-            $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+            $msg = $_SESSION['FullName'] . ' Hospital Profile Update Through Admin Dright';
+            $logesegment = 'Hospitals';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
 
-            $responce = array();
-            $responce['status'] = "success";
-            $responce['id'] = $id;
-            $responce['message'] = "Hospitals Profile Updated Successfully.....!";
+            $response = array();
+            $response['status'] = "success";
+            $response['id'] = $id;
+            $response['message'] = "Hospitals Profile Updated Successfully.....!";
+            echo json_encode($response);
         }
-
-        echo json_encode($responce);
 
     }
 
@@ -1278,18 +1268,6 @@ class Builder extends BaseController
                     $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
                 }
 
-                /** Auto Creating Domain Code */
-                $CreateDomainArray = array(
-                    'ProfileID' => $website_profile_id,
-                    'ProductType' => 'builder',
-                    'Product' => 'doctors',
-                    'RootDomain' => 'clinta.biz',
-                    'SubDomain' => trim($subdomain),
-                    'Directory' => 'reactjs.webbuilder'
-                );
-                $CpanelDomains = new CpanelDomains();
-                $CpanelDomains->CreateSubDomain($CreateDomainArray);
-
                 $msg = $_SESSION['FullName'] . ' Doctor Profile Submit Through Admin DRight';
                 $logesegment = 'Doctor';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
@@ -1298,10 +1276,18 @@ class Builder extends BaseController
                 $response['status'] = "success";
                 $response['id'] = $website_profile_id;
                 $response['message'] = "Doctor Profile Added Successfully.....!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+
+                return;
+
             } else {
                 $response = array();
                 $response['status'] = "fail";
                 $response['message'] = "Error in Adding Doctors Profile...!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+                return;
             }
 
         }
@@ -1446,24 +1432,27 @@ class Builder extends BaseController
                     }
                 }
 
-                $msg=$_SESSION['FullName'].' Doctor Profile Update Through Admin Dright';
-                $logesegment='Doctor';
-                $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+                $msg = $_SESSION['FullName'] . ' Doctor Profile Update Through Admin Dright';
+                $logesegment = 'Doctor';
+                $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
                 $response = array();
                 $response['status'] = "success";
                 $response['id'] = $id;
                 $response['message'] = "Doctors Profile Updated Successfully.....!";
-
+                echo json_encode($response);
+                return;
             } else {
 
                 $response = array();
                 $response['status'] = "fail";
                 $response['message'] = "Error in Updating Doctors Profile...!";
+                echo json_encode($response);
+                return;
             }
 
         }
 
-        echo json_encode($response);
     }
 
     public
@@ -1947,6 +1936,40 @@ class Builder extends BaseController
         }
         echo json_encode($response);
 
+    }
+
+    public function CreateSubdomainsWorker()
+    {
+        header('Content-Type: application/json');
+
+        $subdomain = $this->request->getVar('subdomain');
+
+        if (!empty($subdomain)) {
+            $this->CreateSubDomains($subdomain);
+            $this->CreateAdminSubDomains($subdomain);
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Sub Domains Created Successfully.'
+        ]);
+        return;
+    }
+
+    private function CreateSubDomains($subdomain = '')
+    {
+        /** Auto Creating Domain Code */
+        $parts = explode('.', $subdomain);
+        $cpanel_domain = $parts[0];
+        create_subdomain_cpanel(trim($cpanel_domain), 'clinta.biz', 'reactjs.webbuilder');
+    }
+
+    private function CreateAdminSubDomains($subdomain = '')
+    {
+        /** Auto Creating Domain Code */
+        $parts = explode('.', $subdomain);
+        $admin_cpanel_domain = 'admin.' . $parts[0];
+        create_subdomain_cpanel(trim($admin_cpanel_domain), 'clinta.biz', 'admin.webbuilder');
     }
 
 
