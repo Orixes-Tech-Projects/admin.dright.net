@@ -7,17 +7,18 @@ use CodeIgniter\Model;
 class Invoices extends Model
 {
     public
-    function UpdateProductsProfileStatusToActive($InvoiceUID){
+    function UpdateProductsProfileStatusToActive($InvoiceUID)
+    {
 
         $Crud = new Crud();
         $InvoiceRecord = $Crud->SingleRecord('invoices', array('UID' => $InvoiceUID));
-        if(isset($InvoiceRecord['UID']) && $InvoiceRecord['UID'] > 0){
-            if($InvoiceRecord['ProductType'] == 'builder'){
+        if (isset($InvoiceRecord['UID']) && $InvoiceRecord['UID'] > 0) {
+            if ($InvoiceRecord['ProductType'] == 'builder') {
                 $Crud->UpdateeRecord('public."profiles"', ['Status' => 'active'], ['UID' => $InvoiceRecord['ProfileUID']]);
-            }else{
-                if($InvoiceRecord['Product'] == 'hospitals'){
+            } else {
+                if ($InvoiceRecord['Product'] == 'hospitals') {
                     $Crud->UpdateRecord('extended_profiles', ['Status' => 'active'], ['UID' => $InvoiceRecord['ProfileUID']]);
-                }else{
+                } else {
                     $Crud->UpdateRecord('pharmacy_profiles', ['Status' => 'active'], ['UID' => $InvoiceRecord['ProfileUID']]);
                 }
             }
@@ -73,7 +74,24 @@ class Invoices extends Model
                 $newExpiry = date('Y-m-d', strtotime("+1 year", strtotime($startDate)));
             }
 
-            $Crud->UpdateRecord($table, ['ExpireDate' => $newExpiry, 'Status' => 'block'], ['UID' => $profileUID]);
+            if ($table == 'extended_profiles') {
+                $Crud->UpdateRecord($table, ['ExpireDate' => $newExpiry, 'Status' => 'block'], ['UID' => $profileUID]);
+            } else {
+
+                $LicenseCode = '';
+                $PharmacyProfileData = $Crud->SingleRecord("pharmacy_profiles", ['UID' => $profileUID]);
+                if (isset($PharmacyProfileData['MAC']) && $PharmacyProfileData['MAC'] != '') {
+                    $MAC = $PharmacyProfileData['MAC'];
+                    $license = array();
+                    $license['RAND'] = rand(1000000000, 9999999999);
+                    $license['ExpireDate'] = $newExpiry;
+                    $license['CODE'] = md5($MAC);
+                    $license['MAC'] = $MAC;
+                    $LicenseCode = base64_encode(json_encode($license));
+                }
+
+                $Crud->UpdateRecord($table, ['ExpireDate' => $newExpiry, 'Status' => 'block', 'LicenseCode' => $LicenseCode], ['UID' => $profileUID]);
+            }
         }
     }
 
@@ -136,7 +154,7 @@ class Invoices extends Model
             }
 
             if (!empty($mysqlHospitalProfiles)) {
-                $mysqlProfiles = $this->fetchMysqlHospitalProfiles($mysqlHospitalProfiles);
+                $mysqlHospitalProfiles = $this->fetchMysqlHospitalProfiles($mysqlHospitalProfiles);
             }
 
             if (!empty($mysqlPharmacyProfiles)) {
@@ -147,7 +165,12 @@ class Invoices extends Model
                 if ($invoice['ProductType'] == 'builder') {
                     $invoice['ProfileName'] = $pgProfiles[$invoice['ProfileUID']] ?? 'Unknown';
                 } else {
-                    $invoice['ProfileName'] = $mysqlProfiles[$invoice['ProfileUID']] ?? 'Unknown';
+
+                    if($invoice['Product'] == 'hospitals'){
+                        $invoice['ProfileName'] = $mysqlHospitalProfiles[$invoice['ProfileUID']] ?? 'Unknown';
+                    }else{
+                        $invoice['ProfileName'] = $mysqlProfiles[$invoice['ProfileUID']] ?? 'Unknown';
+                    }
                 }
             }
         }

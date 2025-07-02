@@ -580,8 +580,8 @@ if ($page == 'add-doctor') {
             }
             if (CurrentPage == 'add-doctor') {
                 var Package = $("form#AddDoctorForm select#Package").val();
-                var OriginalPrice = $("form#AddDoctorForm select#OriginalPrice").val();
-                var Discount = $("form#AddDoctorForm select#Discount").val();
+                var OriginalPrice = $("form#AddDoctorForm input#OriginalPrice").val();
+                var Discount = $("form#AddDoctorForm input#Discount").val();
                 if (Package == '') {
                     clearInterval(progressInterval);
                     $('.progress-modal').hide();

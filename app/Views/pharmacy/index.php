@@ -3,8 +3,8 @@
 
 $session = session();
 $SessionFilters = $session->get('PharmacyFilters');
-$MACAddress='';
-$FullName='';
+$MACAddress = '';
+$FullName = '';
 if (isset($SessionFilters['MACAddress']) && $SessionFilters['MACAddress'] != '') {
     $MACAddress = $SessionFilters['MACAddress'];
 }
@@ -18,117 +18,93 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
     $DeploymentDate = $SessionFilters['DeploymentDate'];
 }
 ?>
-<div class="card">
-    <div class="card-body">
-        <h3>Pharmacy
-            <span style="float: right;">
-                <button type="button" onclick="AddPharmacy()"
-                        class="btn btn-primary "
-                        data-toggle="modal" data-target="#exampleModal">
-              Add
-            </button>
-           </span></h3>
-        <hr>
-        <div class="row">
-            <div class="col-md-12">
-                <h5>Search Filters</h5>
-                <hr>
-                <form method="post" name="AllFilterForm" id="AllFilterForm"
-                      onsubmit="SearchFilterFormSubmit('AllFilterForm');">
-                    <div class="form-group">
-                        <div class="row">
+<div class="row">
+    <div class="col-md-12">
+        <div class="accordion accordion-primary custom-accordion">
+            <div class="accordion-row <?= ((isset($SessionFilters) && $SessionFilters != '' && count($SessionFilters) > 0) ? 'open' : '') ?>">
+                <a href="#" class="accordion-header">
+                    <span>Search Filters <small>( Click to Search Records From Filter )</small></span>
+                    <i class="accordion-status-icon close fa fa-chevron-up"></i>
+                    <i class="accordion-status-icon open fa fa-chevron-down"></i>
+                </a>
+                <div class="accordion-body">
+                    <form method="post" name="AllFilterForm" id="AllFilterForm"
+                          onsubmit="SearchFilterFormSubmit('AllFilterForm');">
+                        <div class="row mt-2">
                             <div class="form-group col-md-3">
                                 <label class="form-control-label no-padding-right">FullName:</label>
-                                <input type="text" id="FullName"   value="<?=$FullName;?>" name="FullName" placeholder="FullName"
+                                <input type="text" id="FullName" value="<?= $FullName; ?>" name="FullName"
+                                       placeholder="FullName"
                                        class="form-control " data-validation-engine="validate[required]"
-                                      />
+                                />
                             </div>
                             <div class="form-group col-md-3">
-
-                            <label class="col-sm-12">City:</label>
-                                    <div class="col-sm-12">
-                                        <select id="City" name="City" class="form-control" data-validation-engine="validate[required]">
-                                            <option value="">Please Select</option>
-                                            <?php  foreach ($cities as $record) { ?>
-                                                <option value="<?= $record['UID'] ?>"
-                                                ><?= ucwords($record['FullName']); ?></option>
-                                            <?php } ?>                                </select>
-                                    </div>
-                                </div>
-
-                            <div class="form-group col-md-3">
-                                <label class="form-control-label no-padding-right">MAC Address:</label>
-                                <input type="text" id="MACAddress"   value="<?=$MACAddress;?>" name="MACAddress" placeholder="MAC Address"
-                                       class="form-control " data-validation-engine="validate[required]"
-                                       data-errormessage="MAC Address is required"/>
-                            </div>
-                            <div class="form-group col-md-3">
-
-                            <label class="col-sm-12">Deployment Date *</label>
-                                    <div class="col-sm-12">
-                                        <input type="date"  id="DeploymentDate" name="DeploymentDate" placeholder="Deployment Date" data-validation-engine="validate[required]" class="form-control"/>
-                                    </div>
+                                <label class="col-sm-12">City:</label>
+                                <div class="col-sm-12">
+                                    <select id="City" name="City" class="form-control"
+                                            data-validation-engine="validate[required]">
+                                        <option value="">Please Select</option>
+                                        <?php foreach ($cities as $record) { ?>
+                                            <option value="<?= $record['UID'] ?>"
+                                            ><?= ucwords($record['FullName']); ?></option>
+                                        <?php } ?>                                </select>
                                 </div>
                             </div>
-                            <div class="form-group col-md-12" style="float: right">
-                                 <span style="float: right;">
-                                    <button class="btn btn-outline-primary" onclick="ClearAllFilter('PharmacyFilters');"
-                                            type="button">Clear</button>
-
+                            <div class="form-group col-md-3">
+                                <label class="col-sm-12">Deployment Date *</label>
+                                <div class="col-sm-12">
+                                    <input type="date" id="DeploymentDate" name="DeploymentDate"
+                                           placeholder="Deployment Date" data-validation-engine="validate[required]"
+                                           class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3" style="text-align: right; margin-top: 28px;">
                                 <button class="btn btn-outline-success"
                                         onclick="SearchFilterFormSubmit('AllFilterForm');"
-                                        type="button">Search!</button>
-                                 </span>
+                                        type="button">Search!
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="ClearAllFilter('PharmacyFilters');"
+                                        type="button">Clear
+                                </button>
                             </div>
                             <div class="mt-4" id="FilterResponse"></div>
-
                         </div>
-                    </div>
-
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-
     </div>
-
-
-    <div class="table-responsive">
-        <table id="frutis" class="table table-striped table-bordered">
-            <thead>
-            <tr>
-                <th>Sr No</th>
-                <th>Name</th>
-                <th>City</th>
-                <th>Contact Number</th>
-                <th>Address</th>
-                <th>Sale Agent</th>
-                <th>Mac Address</th>
-                <th>Expire Date</th>
-                <th>Deployment Date</th>
-
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-            <tr>
-                <th>Sr No</th>
-                <th>Name</th>
-                <th>City</th>
-                <th>Contact Number</th>
-                <th>Address</th>
-                <th>Sale Agent</th>
-                <th>Mac Address</th>
-                <th>Expire Date</th>
-                <th>Deployment Date</th>
-
-                <th>Actions</th>
-            </tr>
-            <div class="mt-4" id="Response"></div>
-
-            </tfoot>
-        </table>
+</div>
+<div class="card mt-3">
+    <div class="card-header">
+        <h3>List Of All Offline Pharmacy Profiles
+            <button style="float: right;" type="button" onclick="AddPharmacy()"
+                    class="btn btn-primary "
+                    data-toggle="modal" data-target="#exampleModal">
+                Add Profile
+            </button>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="frutis" class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th data-priority="1">#</th>
+                    <th data-priority="2">Name</th>
+                    <th data-priority="8">City</th>
+                    <th data-priority="3">Contact</th>
+                    <th>Mac Address</th>
+                    <th data-priority="7">Deployment Date</th>
+                    <th data-priority="4">Expire Date</th>
+                    <th data-priority="5">Status</th>
+                    <th data-priority="6">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
     <?php echo view('pharmacy/modal/add'); ?>
     <?php echo view('pharmacy/modal/update'); ?>
@@ -136,14 +112,12 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
     <script>
         $(document).ready(function () {
             $('#frutis').DataTable({
-                "scrollY": "800px",
-                "scrollCollapse": true,
                 "searching": true,
                 "processing": true,
                 "serverSide": true,
                 "responsive": true,
-                "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, 'All']],
-                "pageLength": 100,
+                "lengthMenu": [[25, 50, 100, 500, 1000, -1], [25, 50, 100, 500, 1000, 'All']],
+                "pageLength": 25,
                 "autoWidth": true,
                 "ajax": {
                     "url": "<?= $path ?>pharmacy/pharmacy-data",
@@ -157,31 +131,6 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
         function AddPharmacy() {
             $('#AddPharmacyModal').modal('show');
 
-        }
-
-        function LoadLicense(id) {
-            var Items = AjaxResponse("pharmacy/get-record", "id=" + id);
-            $('#LicenseFormModal form#LicenseForm input#MAC').val(Items.record.MAC);
-            $('#LicenseFormModal form#LicenseForm input#ExpireDate').val(Items.record.ExpireDate);
-            $('#LicenseFormModal form#LicenseForm textarea#LicenseCode').val(Items.record.LicenseCode);
-            $('#LicenseFormModal').modal('show');
-
-        }
-
-        function UpdatePharmacy(id) {
-            var Items = AjaxResponse("pharmacy/get-record", "id=" + id);
-
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#UID').val(Items.record.UID);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#FullName').val(Items.record.FullName);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#Email').val(Items.record.Email);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#ContactNo').val(Items.record.ContactNo);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#Address').val(Items.record.Address);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#SaleAgent').val(Items.record.SaleAgent);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#DeploymentDate').val(Items.record.DeploymentDate);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#MAC').val(Items.record.MAC);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm input#ExpireDate').val(Items.record.ExpireDate);
-            $('#UpdatePharmacyModal form#UpdatePharmacyForm select#City').val(Items.record.City);
-            $('#UpdatePharmacyModal').modal('show');
         }
 
         function DeletePharmacy(id) {

@@ -300,7 +300,7 @@ if ($page == 'add-hospital') {
                                         <?= (isset($healthcarestatus[0]['Value']) && $healthcarestatus[0]['Value'] == '1') ? 'selected' : ''; ?>
                                     <?php } ?>>Show
                                 </option>
-                                  <option value="0"
+                                <option value="0"
                                     <?php if (is_array($healthcarestatus) && !empty($healthcarestatus)) { ?>
                                         <?= (isset($healthcarestatus[0]['Value']) && $healthcarestatus[0]['Value'] == '0') ? 'selected' : ''; ?>
                                     <?php } ?>>Hide
@@ -497,8 +497,8 @@ if ($page == 'add-hospital') {
 
             if (CurrentPage == 'add-hospital') {
                 const Package = $("form#AddHospitalForm select#Package").val();
-                const OriginalPrice = $("form#AddHospitalForm select#OriginalPrice").val();
-                const Discount = $("form#AddHospitalForm select#Discount").val();
+                const OriginalPrice = $("form#AddHospitalForm input#OriginalPrice").val();
+                const Discount = $("form#AddHospitalForm input#Discount").val();
                 if (Package == '') {
                     clearInterval(progressInterval);
                     $('.progress-modal').hide();

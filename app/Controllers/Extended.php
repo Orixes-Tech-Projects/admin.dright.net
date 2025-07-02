@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\SystemUser;
-use CodeIgniter\Database\Config;
 
 use App\Models\Crud;
 use App\Models\ExtendedModel;
+use App\Models\Invoices;
 use App\Models\Main;
 use App\Models\PharmacyModal;
+use App\Models\SystemUser;
+use CodeIgniter\Database\Config;
 
 
 class Extended extends BaseController
@@ -19,6 +20,7 @@ class Extended extends BaseController
 
         $this->MainModel = new Main();
         $this->data = $this->MainModel->DefaultVariable();
+        helper('cpanel');
     }
 
     public function index()
@@ -54,13 +56,12 @@ class Extended extends BaseController
             $data['HospitalAdminUsers'] = $ExtendedModel->GetAdminUsersByHospitalDB($data['HospitalData'][0]['DatabaseName']);
 
 
-
             $data['HospitalAdminSettings'] = $ExtendedModel->GetAdminSettingsByHospitalDB($data['HospitalData'][0]['DatabaseName']);
 //            echo '<pre>'; print_r($data['HospitalAdminSettings']);exit();
 
             echo view('extended/extended_profile_detail', $data);
 
-        }  elseif ($data['page'] == 'extended_default_config') {
+        } elseif ($data['page'] == 'extended_default_config') {
             echo view('extended/extended_default_config', $data);
 
         } else {
@@ -84,62 +85,46 @@ class Extended extends BaseController
         $PharmacyModal = new PharmacyModal();
         $Data = $Users->get_datatables();
         $totalfilterrecords = $Users->count_datatables();
-//        print_r($totalfilterrecords);exit();
-//      echo '<pre>';
-//      print_r($Data);exit();
 
         $dataarr = array();
         $cnt = $_POST['start'];
         foreach ($Data as $record) {
             $city = $PharmacyModal->getcitybyid($record['City']);
-//            $StatusUrl = SeoUrl('module/extended_profiles/status/'.$record['UID']);
-            if ($_SERVER['HTTP_HOST'] != 'localhost') {
-//                $InvoiceDateTime = $this->Modules->GetExtendedLastInvoiceDateTime( $EP['DatabaseName'] );
-//                $PharmacyInvoiceDateTime = $this->Modules->GetExtendedLastPharmacyInvoiceDateTime( $EP['DatabaseName'] );
+            $Users = new SystemUser();
+            $Actions = array();
+            if ($Users->checkAccessKey('extended_profiles_update'))
+                $Actions[] = '<a class="dropdown-item" onclick="UpdateProfile(' . $record['UID'] . ');">Update</a>';
+            $Actions[] = '   <a class="dropdown-item" onclick="ProfileDetail(' . $record['UID'] . ');">Detail</a>';
 
-//                $PharmacyInvoiceDateTime = '';
-//                $InvoiceDateTime = '';
-            }
-        $Users = new SystemUser();
-            $Actions = [];
-            if( $Users->checkAccessKey('extended_profiles_update') )
-                $Actions[] = '<a class="dropdown-item" onclick="UpdateProfile(' . $record['UID'] . ');">Edit</a>
-';
-
-                $Actions[] = '   <a class="dropdown-item" onclick="ProfileDetail(' . $record['UID'] . ');">Detail</a>';
-
-            if( $Users->checkAccessKey('extended_profiles_delete') )
+            if ($Users->checkAccessKey('extended_profiles_delete'))
                 $Actions[] = '<a class="dropdown-item" onclick="DeleteProfile(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
 
             $cnt++;
             $data = array();
             $data[] = $cnt;
 
-            $data[] = isset($record['FullName']) ? htmlspecialchars($record['FullName']) : '';
+            $data[] = isset($record['FullName']) ? '<b>' . htmlspecialchars($record['FullName']) . '</b>' : '';
             $data[] = isset($city[0]['FullName']) ? htmlspecialchars($city[0]['FullName']) : '';
             $data[] = isset($record['DatabaseName']) ? htmlspecialchars($record['DatabaseName']) : '';
-//            $data[] = isset($InvoiceDateTime) ? date("d M, Y h:i A", strtotime($InvoiceDateTime)) : '';
-//            $data[] = isset($PharmacyInvoiceDateTime) ? date("d M, Y h:i A", strtotime($PharmacyInvoiceDateTime)) : '';
-            $data[] = isset($record['SubDomainUrl']) ? htmlspecialchars($record['SubDomainUrl']) : '';
-            $data[] = isset($record['ExpireDate']) ? htmlspecialchars($record['ExpireDate']) : '';
-            $data[] = isset($record['Status']) ? htmlspecialchars($record['Status']) : '';
+            $data[] = isset($record['SubDomainUrl']) ? '<b>' . htmlspecialchars($record['SubDomainUrl']) . '</b>' : '';
+            $data[] = isset($record['ExpireDate']) ? '<b>' . date("d M, Y", strtotime(htmlspecialchars($record['ExpireDate']))) . '</b>' : '';
+            $data[] = isset($record['Status']) ? '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords(htmlspecialchars($record['Status'])) . '</badge>' : '';
 
             $smsCredits = isset($record['SMSCredits']) && $record['SMSCredits'] != ''
-                ? '<strong>' . $record['SMSCredits'] . '</strong> SMS Credits<br>
-                <button  class="btn btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 250);"><strong>250</strong></button>
-                <button  class="btn btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 500);"><strong>500</strong></button>'
-                : '<button  class="btn btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 100);"><strong>Free Credits</strong></button>';
+                ? '<strong>' . $record['SMSCredits'] . '</strong> SMS<br>
+                <button style="border-radius: 5px;" class="btn btn-sm btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 250);"><strong>250</strong></button>
+                <button style="border-radius: 5px;" class="btn btn-sm btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 500);"><strong>500</strong></button>'
+                : '<button style="border-radius: 5px;" class="btn btn-sm btn-gradient-warning" onclick="AddSmsCredits(' . $record['UID'] . ', 100);"><strong>Free Credits</strong></button>';
             $data[] = $smsCredits;
 
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">' . implode(" ", $Actions) . '</div>
-        </div>
-    </td>';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button style="border-radius: 5px;" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">' . implode(" ", $Actions) . '</div>
+                            </div>
+                        </td>';
             $dataarr[] = $data;
         }
 
@@ -165,12 +150,12 @@ class Extended extends BaseController
         foreach ($Data as $record) {
             $Users = new SystemUser();
             $Actions = [];
-            if( $Users->checkAccessKey('extended_default_lookup_update') )
+            if ($Users->checkAccessKey('extended_default_lookup_update'))
                 $Actions[] = '<a class="dropdown-item" onclick="UpdateDefaultLookup(' . $record['UID'] . ');">Edit</a>
 ';
 
 
-            if( $Users->checkAccessKey('extended_default_lookup_delete') )
+            if ($Users->checkAccessKey('extended_default_lookup_delete'))
                 $Actions[] = '<a class="dropdown-item" onclick="DeleteDefaultLookup(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
 
             $cnt++;
@@ -215,12 +200,12 @@ class Extended extends BaseController
         foreach ($Data as $record) {
             $Users = new SystemUser();
             $Actions = [];
-            if( $Users->checkAccessKey('extended_default_configration_update') )
+            if ($Users->checkAccessKey('extended_default_configration_update'))
                 $Actions[] = '<a class="dropdown-item" onclick="UpdateDefaultConfig(' . $record['UID'] . ');">Edit</a>
 ';
 
 
-            if( $Users->checkAccessKey('extended_default_configration_delete') )
+            if ($Users->checkAccessKey('extended_default_configration_delete'))
                 $Actions[] = '<a class="dropdown-item" onclick="DeleteDefaultconfig(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
 
             $cnt++;
@@ -327,6 +312,7 @@ class Extended extends BaseController
 
         echo json_encode($response);
     }
+
     public function submit_profile()
     {
         $Crud = new Crud();
@@ -339,32 +325,152 @@ class Extended extends BaseController
 
         if (!empty($Profile['FullName']) && !empty($Profile['Email']) && !empty($Profile['ContactNo']) && !empty($Profile['City'])) {
 
-        if ($id == 0) {
-            foreach ($Profile as $key => $value) {
-                $record[$key] = ((isset($value)) ? $value : '');
-            }
+            if ($id == 0) {
 
-            $RecordId = $Crud->AddRecord("extended_profiles", $record);
-            if (isset($RecordId) && $RecordId > 0) {
-                $response['status'] = 'success';
-                $response['message'] = 'Profile Added Successfully...!';
+                $EmailRecord = $Crud->SingleRecord('extended_profiles', ["Email" => trim($Profile['Email'])]);
+                if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                            (($EmailRecord['FullName'] ?? $EmailRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+
+                $ContactNoRecord = $Crud->SingleRecord('extended_profiles', ['ContactNo' => trim($Profile['ContactNo'])]);
+                if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                            (($ContactNoRecord['FullName'] ?? $ContactNoRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+
+                if (trim($Profile['SubDomainUrl']) != '') {
+
+                    $SubDomainRecord = $Crud->SingleRecord('extended_profiles', ['SubDomainUrl' => trim($Profile['SubDomainUrl'])]);
+                    if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                        $response = [
+                            'status' => 'fail',
+                            'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                                (($SubDomainRecord['FullName'] ?? $SubDomainRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                        ];
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+
+                if (trim($Profile['DatabaseName']) != '') {
+
+                    $SubDomainRecord = $Crud->SingleRecord('extended_profiles', ['DatabaseName' => trim($Profile['DatabaseName'])]);
+                    if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                        $response = [
+                            'status' => 'fail',
+                            'message' => '<strong>DataBase Name</strong> Already Assigned to <strong>' .
+                                (($SubDomainRecord['FullName'] ?? $SubDomainRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                        ];
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+
+                foreach ($Profile as $key => $value) {
+                    $record[$key] = ((isset($value)) ? $value : '');
+                }
+                $RecordId = $Crud->AddRecord("extended_profiles", $record);
+                if (isset($RecordId) && $RecordId > 0) {
+
+                    $PackageUID = $this->request->getVar('Package');
+                    if (isset($PackageUID) && $PackageUID > 0) {
+
+                        $Invoices = new Invoices();
+                        $OriginalPrice = $this->request->getVar('OriginalPrice');
+                        $Discount = $this->request->getVar('Discount');
+                        $Price = $this->request->getVar('Price');
+                        $InvoiceDetailsArray = array(
+                            'ProfileName' => $Profile['FullName'],
+                            'ProductType' => 'extended',
+                            'Product' => 'hospitals',
+                            'ProfileUID' => $RecordId,
+                            'PackageUID' => $PackageUID,
+                            'OriginalPrice' => $OriginalPrice,
+                            'Discount' => $Discount,
+                            'Price' => $Price
+                        );
+                        $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
+                    }
+
+                    $response['status'] = 'success';
+                    $response['message'] = 'Profile Added Successfully...!';
+                    $response['subdomain'] = trim($Profile['SubDomainUrl']);
+                } else {
+                    $response['status'] = 'fail';
+                    $response['message'] = 'Data Didnt Submitted Successfully...!';
+                    $response['subdomain'] = trim($Profile['SubDomainUrl']);
+                }
             } else {
-                $response['status'] = 'fail';
-                $response['message'] = 'Data Didnt Submitted Successfully...!';
-            }
-        }
-        else {
-            foreach ($Profile as $key => $value) {
-                $record[$key] = $value;
-            }
 
+                $EmailRecord = $Crud->SingleRecord('extended_profiles', ["Email" => trim($Profile['Email']), 'UID !=' => $id]);
+                if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                            (($EmailRecord['FullName'] ?? $EmailRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
 
-            $Crud->UpdateRecord("extended_profiles", $record, array("UID" => $id));
-            $response['status'] = 'success';
-            $response['message'] = 'Updated Successfully...!';
-        }
-        }
-        else{
+                $ContactNoRecord = $Crud->SingleRecord('extended_profiles', ['ContactNo' => trim($Profile['ContactNo']), 'UID !=' => $id]);
+                if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                            (($ContactNoRecord['FullName'] ?? $ContactNoRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+
+                if (trim($Profile['SubDomainUrl']) != '') {
+
+                    $SubDomainRecord = $Crud->SingleRecord('extended_profiles', ['SubDomainUrl' => trim($Profile['SubDomainUrl']), 'UID !=' => $id]);
+                    if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                        $response = [
+                            'status' => 'fail',
+                            'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                                (($SubDomainRecord['FullName'] ?? $SubDomainRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                        ];
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+
+                if (trim($Profile['DatabaseName']) != '') {
+
+                    $SubDomainRecord = $Crud->SingleRecord('extended_profiles', ['DatabaseName' => trim($Profile['DatabaseName']), 'UID !=' => $id]);
+                    if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                        $response = [
+                            'status' => 'fail',
+                            'message' => '<strong>DataBase Name</strong> Already Assigned to <strong>' .
+                                (($SubDomainRecord['FullName'] ?? $SubDomainRecord['SubDomainUrl']) ?? 'Another Profile') . '</strong>!'
+                        ];
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+
+                foreach ($Profile as $key => $value) {
+                    $record[$key] = $value;
+                }
+                $Crud->UpdateRecord("extended_profiles", $record, array("UID" => $id));
+                $response['status'] = 'success';
+                $response['message'] = 'Updated Successfully...!';
+            }
+        } else {
             $response['status'] = 'fail';
             $response['message'] = 'Fields Cant Be Empty...!';
         }
@@ -404,7 +510,9 @@ class Extended extends BaseController
         $response['status'] = 'success';
         $response['message'] = ' Deleted Successfully...!';
         echo json_encode($response);
-    }  public function delete_profile()
+    }
+
+    public function delete_profile()
     {
         $Crud = new Crud();
         $id = $this->request->getVar('id');
@@ -458,24 +566,24 @@ class Extended extends BaseController
         }
 
         $custom = [
-            'DSN'          => '',
-            'hostname'     => PGDB_HOST,
-            'username'     => PGDB_USER,
-            'password'     => 'PostgreSql147',
-            'database'     => $DBName,
-            'DBDriver'     => 'Postgre',
-            'DBPrefix'      => '',
-            'pConnect'      => false,
-            'DBDebug'       => true,
-            'charset'       => 'utf8',
-            'DBCollat'      => 'utf8_general_ci',
-            'swapPre'       => '',
-            'encrypt'       => false,
-            'compress'      => false,
-            'strictOn'      => false,
-            'failover'      => [],
-            'port'          => 5432,
-            'numberNative'  => false,
+            'DSN' => '',
+            'hostname' => PGDB_HOST,
+            'username' => PGDB_USER,
+            'password' => 'PostgreSql147',
+            'database' => $DBName,
+            'DBDriver' => 'Postgre',
+            'DBPrefix' => '',
+            'pConnect' => false,
+            'DBDebug' => true,
+            'charset' => 'utf8',
+            'DBCollat' => 'utf8_general_ci',
+            'swapPre' => '',
+            'encrypt' => false,
+            'compress' => false,
+            'strictOn' => false,
+            'failover' => [],
+            'port' => 5432,
+            'numberNative' => false,
         ];
 
         $ExtendedDb = \Config\Database::connect($custom);
@@ -497,23 +605,23 @@ class Extended extends BaseController
                 $ExtendedDb->transStart();
 
                 $data = [
-                    'Username'    => $username,
-                    'Password'    => $password,
-                    'FullName'    => $name,
-                    'MobileNo'    => $contactno ?: '',
+                    'Username' => $username,
+                    'Password' => $password,
+                    'FullName' => $name,
+                    'MobileNo' => $contactno ?: '',
                     'AccessLevel' => $usertype,
-                    'Email'       => $email ?: '',
-                    'BranchID'    => $branch,
-                    'Archive'     => 0,
+                    'Email' => $email ?: '',
+                    'BranchID' => $branch,
+                    'Archive' => 0,
                 ];
 
                 if ($ExtendedDb->table('clinta.AdminUsers')->insert($data)) {
                     $insert_id = $ExtendedDb->insertID();
                     foreach ($result as $r) {
                         $ExtendedDb->table('clinta.AccessLevel')->insert([
-                            'UserID'   => $insert_id,
+                            'UserID' => $insert_id,
                             'AccessKey' => $r,
-                            'Access'    => 1
+                            'Access' => 1
                         ]);
                     }
                     $ExtendedDb->transComplete();
@@ -547,13 +655,13 @@ class Extended extends BaseController
                 ];
             } else {
                 $data = [
-                    'Username'    => $username,
-                    'FullName'    => $name,
-                    'MobileNo'    => $contactno ?: '',
+                    'Username' => $username,
+                    'FullName' => $name,
+                    'MobileNo' => $contactno ?: '',
                     'AccessLevel' => $usertype,
-                    'Email'       => $email ?: '',
-                    'BranchID'    => $branch,
-                    'Archive'     => 0,
+                    'Email' => $email ?: '',
+                    'BranchID' => $branch,
+                    'Archive' => 0,
                 ];
 
                 if ($password != '') {
@@ -581,14 +689,15 @@ class Extended extends BaseController
 
         echo json_encode($data);
     }
+
     public function get_record()
     {
         $Crud = new Crud();
         $ExtendedModel = new ExtendedModel();
 
-        $dbname= $_POST['dbname'];
+        $dbname = $_POST['dbname'];
         $id = $_POST['uid'];
-        $record=    $ExtendedModel->GetExtendedUserDataByDBOrID($dbname,$id);
+        $record = $ExtendedModel->GetExtendedUserDataByDBOrID($dbname, $id);
 //        $record = $Crud->SingleRecordExtended('clinta."AdminUsers"', array("UID" => $id));
         $response = array();
         $response['status'] = 'success';
@@ -596,6 +705,7 @@ class Extended extends BaseController
         $response['message'] = 'Record Get Successfully...!';
         echo json_encode($response);
     }
+
     public
     function update_extended_admin_settings()
     {
@@ -647,23 +757,23 @@ class Extended extends BaseController
 
         // Define the custom database configuration
         $custom = [
-            'DSN'          => '',
-            'hostname'     => PGDB_HOST,
-            'username'     => PGDB_USER,
-            'password'     => PGDB_PASS,
-            'database'     => $DBName,
-            'DBDriver'     => 'Postgre',
-            'DBPrefix'     => '',
-            'pConnect'     => false,
-            'DBDebug'      => true,
-            'charset'      => 'utf8',
-            'DBCollat'     => 'utf8_general_ci',
-            'swapPre'      => '',
-            'encrypt'      => false,
-            'compress'     => false,
-            'strictOn'     => false,
-            'failover'     => [],
-            'port'         => 5432,
+            'DSN' => '',
+            'hostname' => PGDB_HOST,
+            'username' => PGDB_USER,
+            'password' => PGDB_PASS,
+            'database' => $DBName,
+            'DBDriver' => 'Postgre',
+            'DBPrefix' => '',
+            'pConnect' => false,
+            'DBDebug' => true,
+            'charset' => 'utf8',
+            'DBCollat' => 'utf8_general_ci',
+            'swapPre' => '',
+            'encrypt' => false,
+            'compress' => false,
+            'strictOn' => false,
+            'failover' => [],
+            'port' => 5432,
             'numberNative' => false,
         ];
 
@@ -719,6 +829,7 @@ class Extended extends BaseController
 
         return true;
     }
+
     public function search_filter()
     {
         $session = session();
@@ -736,5 +847,28 @@ class Extended extends BaseController
         $response['message'] = "Filters Updated Successfully";
 
         echo json_encode($response);
+    }
+
+    public function CreateSubdomainsWorker()
+    {
+        header('Content-Type: application/json');
+        $subdomain = $this->request->getVar('subdomain');
+        if (!empty($subdomain)) {
+            $this->CreateSubDomains($subdomain);
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Sub Domains Created Successfully.'
+        ]);
+        return;
+    }
+
+    private function CreateSubDomains($subdomain = '')
+    {
+        /** Auto Creating Domain Code */
+        $parts = explode('.', $subdomain);
+        $cpanel_domain = $parts[0];
+        create_subdomain_cpanel(trim($cpanel_domain), 'clinta.biz', 'extended.clinta.biz');
     }
 }
