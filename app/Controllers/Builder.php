@@ -103,6 +103,7 @@ class Builder extends BaseController
         echo view('builder/specialities_gallery', $data);
         echo view('footer', $data);
     }
+
     public function add_theme()
     {
         $BuilderModel = new \App\Models\BuilderModel();
@@ -268,7 +269,7 @@ class Builder extends BaseController
 
         foreach ($Data as $record) {
             $Actions = [];
-            if( $Users->checkAccessKey('builder_doctor_profiles_update') )
+            if ($Users->checkAccessKey('builder_doctor_profiles_update'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="EditDoctors(' . htmlspecialchars($record['UID']) . ')">Update</a>';
 
             if ($Users->checkAccessKey('builder_doctor_profiles_delete'))
@@ -424,13 +425,13 @@ class Builder extends BaseController
         $cnt = $_POST['start'];
         foreach ($Data as $record) {
             $Actions = [];
-            if( $Users->checkAccessKey('builder_specialities_update') )
+            if ($Users->checkAccessKey('builder_specialities_update'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="UpdateSpecialities(' . htmlspecialchars($record['UID']) . ')">Update</a>';
-            if( $Users->checkAccessKey('builder_specialities_delete') )
+            if ($Users->checkAccessKey('builder_specialities_delete'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="Deletespecialities(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
-            if( $Users->checkAccessKey('builder_specialities_heading') )
+            if ($Users->checkAccessKey('builder_specialities_heading'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="AddHeadings(' . htmlspecialchars($record['UID']) . ')">Add heading</a>';
-            if( $Users->checkAccessKey('builder_specialities_gallery') )
+            if ($Users->checkAccessKey('builder_specialities_gallery'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="AddGallery(' . htmlspecialchars($record['UID']) . ')">Add Gallery</a>';
 
             $cnt++;
@@ -510,9 +511,9 @@ class Builder extends BaseController
         $Crud->DeleteRecordPG('public."profile_metas"', array("ProfileUID" => $id));
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Delete Doctor Through Admin Dright';
-        $logesegment='Doctor';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Delete Doctor Through Admin Dright';
+        $logesegment = 'Doctor';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $response = array();
         $response['status'] = 'success';
         $response['message'] = ' Deleted Successfully...!';
@@ -529,9 +530,9 @@ class Builder extends BaseController
         $Crud->DeleteRecordPG('public."profile_metas"', array("ProfileUID" => $id));
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Delete Hospital Through Admin Dright';
-        $logesegment='Hospital';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Delete Hospital Through Admin Dright';
+        $logesegment = 'Hospital';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $response = array();
         $response['status'] = 'success';
         $response['message'] = ' Deleted Successfully...!';
@@ -561,9 +562,9 @@ class Builder extends BaseController
         $Crud->DeleteRecord('specialities', array("UID" => $id));
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Delete specialities Through Admin Dright';
-        $logesegment='Specialities';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Delete specialities Through Admin Dright';
+        $logesegment = 'Specialities';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $response['status'] = 'success';
         $response['message'] .= ' And Specialities Deleted Successfully...!';
         echo json_encode($response);
@@ -588,7 +589,7 @@ class Builder extends BaseController
     public
     function submit_general_image()
     {
-       // echo'<pre>';print_r($_POST);exit;
+        // echo'<pre>';print_r($_POST);exit;
 
         $Crud = new Crud();
         $Main = new Main();
@@ -680,9 +681,9 @@ class Builder extends BaseController
         if (isset($RecordId) && $RecordId > 0) {
             $Main = new Main();
 
-            $msg=$_SESSION['FullName'].' Add Telemedicine Credit Through Admin Dright';
-            $logesegment='Telemedicine Credit';
-            $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+            $msg = $_SESSION['FullName'] . ' Add Telemedicine Credit Through Admin Dright';
+            $logesegment = 'Telemedicine Credit';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
             $response['status'] = 'success';
             $response['message'] = 'Telemedicine Credits Added Successfully...!';
         } else {
@@ -801,9 +802,9 @@ class Builder extends BaseController
         $RecordId = $Crud->AddRecordPG('public."options"', $record);
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Add SMS Credit Through Admin Dright';
-        $logesegment='SMS Credit';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Add SMS Credit Through Admin Dright';
+        $logesegment = 'SMS Credit';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         if (isset($RecordId) && $RecordId > 0) {
             $response['status'] = 'success';
             $response['message'] = 'SMS Credits Added Successfully...!';
@@ -823,9 +824,9 @@ class Builder extends BaseController
         $record = array();
 
 
-        $msg=$_SESSION['FullName'].' Specialities Image Submit Through Admin Dright';
-        $logesegment='Image Submit';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Specialities Image Submit Through Admin Dright';
+        $logesegment = 'Image Submit';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $filename = "";
 
         if ($_FILES['Image']['tmp_name']) {
@@ -960,7 +961,7 @@ class Builder extends BaseController
                         $record_option['ProfileUID'] = $website_profile_id;
                         $record_option['Name'] = $key;
                         $record_option['Description'] = $value;
-                       $Crud->AddRecordPG("public.options", $record_option);
+                        $Crud->AddRecordPG("public.options", $record_option);
                     }
                 }
 
@@ -1012,8 +1013,7 @@ class Builder extends BaseController
                 echo json_encode($response);
                 return;
             }
-        }
-        else {
+        } else {
 
             $subdomain = $this->request->getVar('sub_domain');
 
@@ -1290,8 +1290,7 @@ class Builder extends BaseController
                 return;
             }
 
-        }
-        else {
+        } else {
 
             $subdomain = $this->request->getVar('sub_domain');
             $AdminDomain = $this->request->getVar('AdminDomain');
@@ -1398,19 +1397,19 @@ class Builder extends BaseController
                 foreach ($Options as $key => $value) {
 
                     $Data = $Crud->SingleeRecord('public."options"', array("ProfileUID" => $id, 'Name' => $key));
-                        if (isset($Data['UID'])) {
-                            $Crud->DeleteRecordPG("public.options", array('UID' => $Data['UID']));
-                            $Options_record['Description'] = $value;
-                            $Options_record['Name'] = $key;
-                            $Options_record['ProfileUID'] = $id;
-                            $Crud->AddRecordPG("public.options", $Options_record);
+                    if (isset($Data['UID'])) {
+                        $Crud->DeleteRecordPG("public.options", array('UID' => $Data['UID']));
+                        $Options_record['Description'] = $value;
+                        $Options_record['Name'] = $key;
+                        $Options_record['ProfileUID'] = $id;
+                        $Crud->AddRecordPG("public.options", $Options_record);
 
-                        } else {
-                            $Options_record['Description'] = $value;
-                            $Options_record['Name'] = $key;
-                            $Options_record['ProfileUID'] = $id;
-                            $Crud->AddRecordPG("public.options", $Options_record);
-                        }
+                    } else {
+                        $Options_record['Description'] = $value;
+                        $Options_record['Name'] = $key;
+                        $Options_record['ProfileUID'] = $id;
+                        $Crud->AddRecordPG("public.options", $Options_record);
+                    }
                 }
 
                 if ($fileinitatived_logo != '') {
@@ -1520,7 +1519,9 @@ class Builder extends BaseController
         $response['message'] = "Filters Updated Successfully";
 
         echo json_encode($response);
-    }  public
+    }
+
+    public
     function doctor_search_filter()
     {
         $session = session();
@@ -1617,7 +1618,7 @@ class Builder extends BaseController
         $Main = new Main();
         $response = array();
         $record = array();
-        $fileImage='';
+        $fileImage = '';
         $id = $this->request->getVar('UID');
         $Sponsor = $this->request->getVar('Sponsor');
 
@@ -1631,14 +1632,15 @@ class Builder extends BaseController
             foreach ($Sponsor as $key => $value) {
                 $record[$key] = ((isset($value)) ? $value : '');
             }
-            if ($fileImage !=''){
+            if ($fileImage != '') {
                 $record['Image'] = base64_encode($fileImage);
 
-            }            $RecordId = $Crud->AddRecord("sponsors", $record);
+            }
+            $RecordId = $Crud->AddRecord("sponsors", $record);
             if (isset($RecordId) && $RecordId > 0) {
-                $msg=$_SESSION['FullName'].' Submit Sponser Through Admin Dright';
-                $logesegment='Sponsors';
-                $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+                $msg = $_SESSION['FullName'] . ' Submit Sponser Through Admin Dright';
+                $logesegment = 'Sponsors';
+                $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
                 $response['status'] = 'success';
                 $response['message'] = 'Added Successfully...!';
             } else {
@@ -1649,14 +1651,14 @@ class Builder extends BaseController
             foreach ($Sponsor as $key => $value) {
                 $record[$key] = $value;
             }
-            if ($fileImage !=''){
+            if ($fileImage != '') {
                 $record['Image'] = base64_encode($fileImage);
 
             }
             $Crud->UpdateRecord("sponsors", $record, array("UID" => $id));
-            $msg=$_SESSION['FullName'].' Update Sponsor Through Admin Dright';
-            $logesegment='Sponsors';
-            $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+            $msg = $_SESSION['FullName'] . ' Update Sponsor Through Admin Dright';
+            $logesegment = 'Sponsors';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
             $response['status'] = 'success';
             $response['message'] = 'Updated Successfully...!';
         }
@@ -1671,7 +1673,7 @@ class Builder extends BaseController
         $Main = new Main();
         $response = array();
         $record = array();
-        $fileImage='';
+        $fileImage = '';
 
         $id = $this->request->getVar('UID');
         $Sponsor = $this->request->getVar('SponsorProduct');
@@ -1693,14 +1695,15 @@ class Builder extends BaseController
             foreach ($Sponsor as $key => $value) {
                 $record[$key] = ((isset($value)) ? $value : '');
             }
-            if ($fileImage !=''){
+            if ($fileImage != '') {
                 $record['Image'] = base64_encode($fileImage);
 
-            }            $RecordId = $Crud->AddRecord("sponsors_products", $record);
+            }
+            $RecordId = $Crud->AddRecord("sponsors_products", $record);
             if (isset($RecordId) && $RecordId > 0) {
-                $msg=$_SESSION['FullName'].' Submit Sponsor Product Through Admin Dright';
-                $logesegment='Sponsors Product';
-                $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+                $msg = $_SESSION['FullName'] . ' Submit Sponsor Product Through Admin Dright';
+                $logesegment = 'Sponsors Product';
+                $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
                 $response['status'] = 'success';
                 $response['message'] = 'Added Successfully...!';
             } else {
@@ -1711,15 +1714,15 @@ class Builder extends BaseController
             foreach ($Sponsor as $key => $value) {
                 $record[$key] = $value;
             }
-            if ($fileImage !=''){
+            if ($fileImage != '') {
                 $record['Image'] = base64_encode($fileImage);
 
             }
 
             $Crud->UpdateRecord("sponsors_products", $record, array("UID" => $id));
-            $msg=$_SESSION['FullName'].' Submit Sponsor Product Through Admin Dright';
-            $logesegment='Sponsors Product';
-            $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+            $msg = $_SESSION['FullName'] . ' Submit Sponsor Product Through Admin Dright';
+            $logesegment = 'Sponsors Product';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
             $response['status'] = 'success';
             $response['message'] = 'Updated Successfully...!';
         }
@@ -1740,9 +1743,9 @@ class Builder extends BaseController
         $Crud->UpdateRecord($table, $record, $where);
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Delete Sponsor Through Admin Dright';
-        $logesegment='Sponsors';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Delete Sponsor Through Admin Dright';
+        $logesegment = 'Sponsors';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $response['status'] = 'success';
         $response['message'] = 'Deleted Successfully...!';
 
@@ -1761,9 +1764,9 @@ class Builder extends BaseController
         $Crud->UpdateRecord($table, $record, $where);
         $Main = new Main();
 
-        $msg=$_SESSION['FullName'].' Delete Sponsor Product Through Admin Dright';
-        $logesegment='Sponsors Product';
-        $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+        $msg = $_SESSION['FullName'] . ' Delete Sponsor Product Through Admin Dright';
+        $logesegment = 'Sponsors Product';
+        $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
         $response['status'] = 'success';
         $response['message'] = 'Deleted Successfully...!';
 
@@ -1843,6 +1846,7 @@ class Builder extends BaseController
 
         echo json_encode($response);
     }
+
     public function theme_form_submit()
     {
         $Crud = new Crud();
@@ -1857,16 +1861,16 @@ class Builder extends BaseController
         // echo'<pre>';print_r($option);exit();
         if ($id == 0) {
             foreach ($option as $key => $value) {
-                $Crud->DeleteRecordPG("public.options", array('Name' => $key , 'ProfileUID' => $ProfileUID));
+                $Crud->DeleteRecordPG("public.options", array('Name' => $key, 'ProfileUID' => $ProfileUID));
 
                 $record['Name'] = $key;
                 $record['Description'] = ((isset($value)) ? $value : '');
-                $record['ProfileUID']=$ProfileUID;
+                $record['ProfileUID'] = $ProfileUID;
                 $RecordId = $Crud->AddRecordPG('public."options"', $record);
             }
-            $msg=$_SESSION['FullName'].' Update Theme Setting Through Admin Dright';
-            $logesegment='Hospital';
-            $Main->adminlog($logesegment,$msg, $this->request->getIPAddress());
+            $msg = $_SESSION['FullName'] . ' Update Theme Setting Through Admin Dright';
+            $logesegment = 'Hospital';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
             if (isset($RecordId) && $RecordId > 0) {
                 $response['status'] = 'success';
                 $response['message'] = 'Added Successfully...!';
@@ -1879,7 +1883,6 @@ class Builder extends BaseController
 
         echo json_encode($response);
     }
-
 
 
     public

@@ -105,9 +105,9 @@ class Extended extends BaseController
 
             $data[] = isset($record['FullName']) ? '<b>' . htmlspecialchars($record['FullName']) . '</b>' : '';
             $data[] = isset($city[0]['FullName']) ? htmlspecialchars($city[0]['FullName']) : '';
-            $data[] = isset($record['DatabaseName']) ? htmlspecialchars($record['DatabaseName']) : '';
-            $data[] = isset($record['SubDomainUrl']) ? '<b>' . htmlspecialchars($record['SubDomainUrl']) . '</b>' : '';
-            $data[] = isset($record['ExpireDate']) ? '<b>' . date("d M, Y", strtotime(htmlspecialchars($record['ExpireDate']))) . '</b>' : '';
+            $data[] = ((isset($record['DatabaseName']) && $record['DatabaseName'] != '' )? htmlspecialchars($record['DatabaseName']) : '-' );
+            $data[] = ((isset($record['SubDomainUrl']) && $record['SubDomainUrl'] != '')? '<b>' . htmlspecialchars($record['SubDomainUrl']) . '</b>' : '-');
+            $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '' && $record['ExpireDate'] > date("Y-m-d"))? '<b>' . date("d M, Y", strtotime(htmlspecialchars($record['ExpireDate']))) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
             $data[] = isset($record['Status']) ? '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords(htmlspecialchars($record['Status'])) . '</badge>' : '';
 
             $smsCredits = isset($record['SMSCredits']) && $record['SMSCredits'] != ''
@@ -406,10 +406,12 @@ class Extended extends BaseController
                     $response['status'] = 'success';
                     $response['message'] = 'Profile Added Successfully...!';
                     $response['subdomain'] = trim($Profile['SubDomainUrl']);
+                    $response['database'] = trim($Profile['DatabaseName']);
                 } else {
                     $response['status'] = 'fail';
                     $response['message'] = 'Data Didnt Submitted Successfully...!';
                     $response['subdomain'] = trim($Profile['SubDomainUrl']);
+                    $response['database'] = trim($Profile['DatabaseName']);
                 }
             } else {
 
@@ -870,5 +872,26 @@ class Extended extends BaseController
         $parts = explode('.', $subdomain);
         $cpanel_domain = $parts[0];
         create_subdomain_cpanel(trim($cpanel_domain), 'clinta.biz', 'extended.clinta.biz');
+    }
+
+    public function CreateDataBaseWorker()
+    {
+        header('Content-Type: application/json');
+        $database = $this->request->getVar('database');
+        if (!empty($database)) {
+            $this->CreatePostgresSQLDataBase($database);
+        }
+
+        echo json_encode(array(
+            'status' => 'success',
+            'message' => 'DataBase Created Successfully.'
+        ));
+        return;
+    }
+
+    private function CreatePostgresSQLDataBase($database = '')
+    {
+        /** Auto Creating DataBase Code */
+        create_postgres_db_with_existing_user(trim($database), 'dright_maindb');
     }
 }

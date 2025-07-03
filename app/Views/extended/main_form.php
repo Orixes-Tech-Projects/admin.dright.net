@@ -153,10 +153,11 @@ if ($page == 'add-profile') {
                     <div class="form-group row">
                         <label class="col-sm-12">DataBase Name <span class="text-danger">*</span></label>
                         <div class="col-sm-12">
-                            <input type="text" id="database_name" name="Profile[DatabaseName]"
-                                   placeholder="Database Name"
-                                   value="<?= ((isset($PAGE['DatabaseName'])) ? $PAGE['DatabaseName'] : '') ?>"
-                                   class="form-control"/>
+                            <input <?= (($page == 'update-profile') ? 'readonly' : '') ?> type="text" id="database_name"
+                                                                                          name="Profile[DatabaseName]"
+                                                                                          placeholder="Database Name"
+                                                                                          value="<?= ((isset($PAGE['DatabaseName'])) ? $PAGE['DatabaseName'] : '') ?>"
+                                                                                          class="form-control"/>
                         </div>
                     </div>
                 </div>
@@ -164,9 +165,11 @@ if ($page == 'add-profile') {
                     <div class="form-group row">
                         <label class="col-sm-12">Sub Domain <span class="text-danger">*</span></label>
                         <div class="col-sm-12">
-                            <input type="text" id="subdomain_url" name="Profile[SubDomainUrl]" placeholder="Sub Domain"
-                                   value="<?= ((isset($PAGE['SubDomainUrl'])) ? $PAGE['SubDomainUrl'] : '') ?>"
-                                   class="form-control"/>
+                            <input <?= (($page == 'update-profile') ? 'readonly' : '') ?> type="text" id="subdomain_url"
+                                                                                          name="Profile[SubDomainUrl]"
+                                                                                          placeholder="Sub Domain"
+                                                                                          value="<?= ((isset($PAGE['SubDomainUrl'])) ? $PAGE['SubDomainUrl'] : '') ?>"
+                                                                                          class="form-control"/>
                         </div>
                     </div>
                 </div>
@@ -306,6 +309,7 @@ if ($page == 'add-profile') {
 <script>
 
     $(document).ready(function () {
+
         var currentPage = '<?=$page?>';
         if (currentPage === 'add-profile') {
             handlePackageChange();
@@ -460,9 +464,11 @@ if ($page == 'add-profile') {
                 $('.progress-percentage').text('100%');
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
-                /** Send Request TO CPanel For Creating SubDomains */
-                if (CurrentPage == 'add-profile') {
-                    AjaxResponse('Extended/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                if (CurrentPage === 'add-profile' && window.location.hostname !== 'localhost') {
+                    const DomainResponse = AjaxResponse('Extended/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                    if (DomainResponse.status == 'success') {
+                        AjaxResponse('Extended/CreateDataBaseWorker', 'database=' + response.database);
+                    }
                 }
 
                 setTimeout(function () {
