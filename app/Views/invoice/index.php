@@ -57,7 +57,7 @@
     <script>
         $(document).ready(function () {
             $('#record').DataTable({
-                "searching": true,
+                "searching": false,
                 "processing": true,
                 "serverSide": true,
                 "responsive": true,

@@ -2,7 +2,7 @@
 
 if (!function_exists('generate_invoice_number')) {
 
-    function generate_invoice_number(string $hospitalName, string $productType, string $product): string
+    function generate_invoice_number($hospitalName, $productType, $product)
     {
         $hospitalInitials = get_hospital_initials($hospitalName);
         $productCode = get_product_code($productType, $product);
@@ -15,7 +15,7 @@ if (!function_exists('generate_invoice_number')) {
 
 if (!function_exists('get_hospital_initials')) {
 
-    function get_hospital_initials(string $name): string
+    function get_hospital_initials($name)
     {
         $words = explode(' ', strtoupper($name));
         $initials = '';
@@ -30,7 +30,7 @@ if (!function_exists('get_hospital_initials')) {
 
 if (!function_exists('get_product_code')) {
 
-    function get_product_code(string $type, string $product): string
+    function get_product_code($type, $product)
     {
         $type = strtolower($type);
         $product = strtolower($product);
@@ -51,7 +51,7 @@ if (!function_exists('get_product_code')) {
 
 if (!function_exists('get_sequence_number')) {
 
-    function get_sequence_number(string $productType, string $product): string
+    function get_sequence_number($productType, $product)
     {
         $db = \Config\Database::connect();
 

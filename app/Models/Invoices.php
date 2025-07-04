@@ -123,7 +123,7 @@ class Invoices extends Model
                 JOIN `items` ON (`items`.`UID` = `invoices`.`PackageUID`)
                 WHERE `Archive` = \'0\'';
         if ($keyword != '') {
-            $SQL .= ' AND (`Name` LIKE \'%' . $keyword . '%\' OR `Email` LIKE \'%' . $keyword . '%\' OR `PhoneNumber` LIKE \'%' . $keyword . '%\')';
+            //$SQL .= ' AND (`Name` LIKE \'%' . $keyword . '%\' OR `Email` LIKE \'%' . $keyword . '%\' OR `PhoneNumber` LIKE \'%' . $keyword . '%\')';
         }
         $SQL .= ' ORDER BY `SystemDate` DESC';
         if ($length != -1) {

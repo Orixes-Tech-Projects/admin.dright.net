@@ -23,6 +23,22 @@ class Extended extends BaseController
         helper('cpanel');
     }
 
+    public function test_restore_pg_backup()
+    {
+        helper('pg_backup');
+        $dbName = 'dright_jawadhims2025';
+        $dbFileName = '/home/dright/public_html/extended.clinta.biz/db/dright_extended_blank_db.backup';
+
+        $result = pg_restore_database($dbName, $dbFileName);
+        echo'<pre>';print_r($result);exit;
+
+        if ($result === true) {
+            return "Database restored successfully!";
+        } else {
+            return "Error restoring database: <pre>$result</pre>";
+        }
+    }
+
     public function index()
     {
         $data = $this->data;
