@@ -237,11 +237,8 @@ class Crud extends Model
         if (!is_array($record)) {
             $record = array();
         }
-        //print_r($record);
-        //$record = $query->getRowArray();
         if ($view) echo $db->getLastQuery() . "<hr>";
 
-        // $db->close();
         return $record;
     }
     public
