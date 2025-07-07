@@ -88,15 +88,14 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                     <div class="mt-2" id="AddSmsCreditsResponse"></div>
                     <th data-priority="1">#</th>
                     <th data-priority="2">Name</th>
-                    <th data-priority="3">Sub Domain</th>
-                    <th data-priority="5">City</th>
-                    <th data-priority="6">Status</th>
-                    <th data-priority="7">Expire Date</th>
-                    <th data-priority="8">Email</th>
-                    <th data-priority="9">Telemedicine Credits</th>
-                    <th data-priority="10">SMS Credits</th>
-                    <th data-priority="11">Last Visit Date</th>
-                    <th data-priority="4">Actions</th>
+                    <th data-priority="3">Contact</th>
+                    <th data-priority="4">Sub Domain</th>
+                    <th data-priority="6">City</th>
+                    <th data-priority="7">Status</th>
+                    <th data-priority="8">Expire Date</th>
+                    <th data-priority="9">Email</th>
+                    <th data-priority="10">Last Visit Date</th>
+                    <th data-priority="5">Actions</th>
                 </tr>
                 </thead>
                 <tbody>

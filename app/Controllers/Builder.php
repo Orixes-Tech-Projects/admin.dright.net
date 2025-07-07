@@ -297,28 +297,12 @@ class Builder extends BaseController
             $data = [];
             $data[] = $cnt;
             $data[] = $record['Name'];
+            $data[] = ((isset($record['ContactNo']) && $record['ContactNo'] != '')? $record['ContactNo'] : '-');
             $data[] = !empty($record['SubDomain']) ? '<a style="color:crimson;" title="Click To View" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '-';
             $data[] = isset($city[0]['FullName']) ? $city[0]['FullName'] : '';
             $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
             $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
             $data[] = $record['Email'];
-
-            $telemedicineCredits = isset($TeleMedicineCredits[0]['Description']) && $TeleMedicineCredits[0]['Description'] != ''
-                ? '<strong>' . $TeleMedicineCredits[0]['Description'] . '</strong> TeleMedicine Credits<br>
-                <button class="btn btn-outline-success btn-sm" onclick="AddTeleMedicineCredits(' . $record['UID'] . ', 50);"><strong>50</strong></button>
-                <button  class="btn btn-outline-success btn-sm" onclick="AddTeleMedicineCredits(' . $record['UID'] . ', 100);"><strong>100</strong></button>'
-                : '<button  class="btn btn-outline-success btn-sm" onclick="AddTeleMedicineCredits(' . $record['UID'] . ', 100);"><strong>Free Credits</strong></button>';
-            $data[] = $telemedicineCredits;
-
-            // SMS Credits Column
-            $smsCredits = isset($SmsCredits[0]['Description']) && $SmsCredits[0]['Description'] != ''
-                ? '<strong>' . $SmsCredits[0]['Description'] . '</strong> SMS Credits<br>
-                <button style="border-radius:5px;"  class="btn btn-gradient-warning btn-sm" onclick="AddSmsCredits(' . $record['UID'] . ', 250);"><strong>250</strong></button>
-                <button style="border-radius:5px;"   class="btn btn-gradient-warning btn-sm" onclick="AddSmsCredits(' . $record['UID'] . ', 500);"><strong>500</strong></button>'
-                : '<button style="border-radius:5px;"   class="btn btn-gradient-warning btn-sm" onclick="AddSmsCredits(' . $record['UID'] . ', 100);"><strong>Free Credits</strong></button>';
-            $data[] = $smsCredits;
-
-
             $data[] = $lastVisit;
             $data[] = '<td class="text-end">
                         <div class="dropdown">
