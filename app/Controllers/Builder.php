@@ -283,9 +283,12 @@ class Builder extends BaseController
             $TeleMedicineCredits = array(); // $BuilderModel->get_profile_options_data_by_id_option($record['UID'], 'telemedicine_credits');
             $Sponsor = $BuilderModel->get_profile_options_data_by_id_option($record['UID'], 'sponsor');
             $Sponsor = (isset($Sponsor[0]['UID']) && $Sponsor[0]['Description'] != '') ? $Sponsor[0]['Description'] : 0;
-            $city = $PharmacyModal->getcitybyid($record['City']);
+            $CityName = '-';
+            if (isset($record['City']) && $record['City'] > 0) {
+                $city = $PharmacyModal->getcitybyid($record['City']);
+                $CityName = ((isset($city[0]['FullName']) && $city[0]['FullName'] != '') ? $city[0]['FullName'] : '-');
+            }
 
-            // Determine row color based on specific conditions
             $class = ($record['SubDomain'] == '') ? 'background-color: #FFD4DB;' : '';
             if ($record['LastVisitDateTime'] == date("Y-m-d")) {
                 $class = 'background-color: #D7FFCD;';
@@ -297,9 +300,9 @@ class Builder extends BaseController
             $data = [];
             $data[] = $cnt;
             $data[] = $record['Name'];
-            $data[] = ((isset($record['ContactNo']) && $record['ContactNo'] != '')? $record['ContactNo'] : '-');
+            $data[] = ((isset($record['ContactNo']) && $record['ContactNo'] != '') ? $record['ContactNo'] : '-');
             $data[] = !empty($record['SubDomain']) ? '<a style="color:crimson;" title="Click To View" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '-';
-            $data[] = isset($city[0]['FullName']) ? $city[0]['FullName'] : '';
+            $data[] = $CityName;
             $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
             $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
             $data[] = $record['Email'];
@@ -353,14 +356,18 @@ class Builder extends BaseController
 
             $cnt++;
             $SmsCredits = $BuilderModel->get_profile_options_data_by_id_option($record['UID'], 'sms_credits');
-            $city = $PharmacyModal->getcitybyid($record['City']);
+            $CityName = '-';
+            if (isset($record['City']) && $record['City'] > 0) {
+                $city = $PharmacyModal->getcitybyid($record['City']);
+                $CityName = ((isset($city[0]['FullName']) && $city[0]['FullName'] != '') ? $city[0]['FullName'] : '-');
+            }
             $lastVisit = !empty($record['LastVisitDateTime']) ? date("d M, Y", strtotime($record['LastVisitDateTime'])) : "N/A";
 
             $data = [];
             $data[] = $cnt;
             $data[] = $record['Name'];
             $data[] = !empty($record['SubDomain']) ? '<a title="Click to View" style="color:crimson" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
-            $data[] = $city[0]['FullName'];
+            $data[] = $CityName;
             $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
             $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
             $data[] = $record['Email'];
@@ -914,18 +921,19 @@ class Builder extends BaseController
 
 
                 $themeOptions = array(
-                    'banner_style' => 'basic',
+                    'banner_style' => 'version3',
                     'home_ceo_message' => 1,
                     'home_facilities' => 1,
                     'home_news' => 1,
                     'home_reviews' => 1,
                     'theme' => 'mist',
-                    'theme_primary_color' => '#F08080',
-                    'theme_secondary_color' => '#CCCCFF',
-                    'theme_header' => 'simple_header',
-                    'theme_footer' => 'smart_footer',
+                    'theme_primary_color' => '#9d0101',
+                    'theme_secondary_color' => '#ffffff',
+                    'theme_header' => 'icon-header',
+                    'theme_footer' => 'extended',
                     'theme_service' => 'version_1',
-                    'theme_facilities' => 'version_1',
+                    'theme_facilities' => 'simple-info-box',
+                    'theme_facilities' => 'theme_specialities',
                 );
                 foreach ($themeOptions as $key => $value) {
 
@@ -938,7 +946,12 @@ class Builder extends BaseController
                 }
 
                 $theme = $this->request->getVar('theme');
-                $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1);
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
+                    'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
+                    'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
                 foreach ($Options as $key => $value) {
 
                     if ($value != '') {
@@ -1037,7 +1050,6 @@ class Builder extends BaseController
                 }
             }
 
-
             $record['Type'] = 'hospitals';
             $record['Name'] = $this->request->getVar('name');
             $record['Email'] = $this->request->getVar('email');
@@ -1064,7 +1076,12 @@ class Builder extends BaseController
                 }
 
                 $theme = $this->request->getVar('theme');
-                $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1);
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
+                    'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
+                    'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
                 foreach ($Options as $key => $value) {
                     $Data = $Crud->SingleeRecord('public."options"', array("ProfileUID" => $id, 'Name' => $key));
                     if (isset($Data['UID'])) {
@@ -1180,18 +1197,19 @@ class Builder extends BaseController
             if ($website_profile_id) {
 
                 $themeOptions = array(
-                    'banner_style' => 'basic',
+                    'banner_style' => 'version3',
                     'home_ceo_message' => 1,
                     'home_facilities' => 1,
                     'home_news' => 1,
                     'home_reviews' => 1,
                     'theme' => 'mist',
-                    'theme_primary_color' => '#F08080',
-                    'theme_secondary_color' => '#CCCCFF',
-                    'theme_header' => 'simple_header',
-                    'theme_footer' => 'smart_footer',
+                    'theme_primary_color' => '#ff0000',
+                    'theme_secondary_color' => '#400080',
+                    'theme_header' => 'simple-header',
+                    'theme_footer' => 'dark-style-1',
                     'theme_service' => 'version_1',
-                    'theme_facilities' => 'version_1',
+                    'theme_facilities' => 'simple-info-box',
+                    'theme_specialities' => 'simple-info-box',
                 );
                 foreach ($themeOptions as $key => $value) {
 
@@ -1223,7 +1241,13 @@ class Builder extends BaseController
 
                 $Sponsor = $this->request->getVar('sponsor');
                 $theme = $this->request->getVar('theme');
-                $Options = array('award_nav' => 'show', 'patient_nav' => 'show', 'research_nav' => 'show', 'theme_css' => 'dore.light.red.css', 'custom_banners' => '5', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1, 'sponsor' => ((isset($Sponsor) && $Sponsor != '') ? $Sponsor : ''));
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $Options = array('award_nav' => 'show', 'patient_nav' => 'show', 'research_nav' => 'show', 'theme_css' => 'dore.light.red.css', 'custom_banners' => '5',
+                    'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1,
+                    'notify_email' => 1, 'sponsor' => ((isset($Sponsor) && $Sponsor != '') ? $Sponsor : ''),
+                    'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
                 foreach ($Options as $key => $value) {
 
                     $record_option['ProfileUID'] = $website_profile_id;
@@ -1315,7 +1339,6 @@ class Builder extends BaseController
                 }
             }
 
-
             $record['Type'] = 'doctors';
             $record['Name'] = $this->request->getVar('name');
             $record['Email'] = $this->request->getVar('email');
@@ -1377,6 +1400,10 @@ class Builder extends BaseController
 
                 $theme = $this->request->getVar('theme');
                 $Options = array('theme' => ((isset($theme) && $theme != '') ? $theme : ''));
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $Options['prescription_module'] = ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0);
+                $Options['opd_invoicing'] = ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0);
                 $Options_record = array();
                 foreach ($Options as $key => $value) {
 

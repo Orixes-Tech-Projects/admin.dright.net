@@ -114,6 +114,9 @@ if ($page == 'add-hospital') {
     $healthcarestatus = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'healthcare_status');
     $theme = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'theme');
     $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
+
+    $PrescriptionSegment = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_module');
+    $OPDInvoicing = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoicing');
 }
 
 ?>
@@ -187,7 +190,33 @@ if ($page == 'add-hospital') {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3">
+                    <label class="col-sm-12">Prescription Segment</label>
+                    <div class="col-sm-12">
+                        <select name="prescription_module" id="prescription_module" class="form-control">
+                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 0) ? 'selected' : '') ?>
+                                    value="0">De Activate
+                            </option>
+                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="1">Activate
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="col-sm-12">OPD Invoicing</label>
+                    <div class="col-sm-12">
+                        <select name="opd_invoicing" id="opd_invoicing" class="form-control">
+                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="0">De Activate
+                            </option>
+                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="1">Activate
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
                     <label for="validationCustom05">Profile</label>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="profile" name="profile">
@@ -320,7 +349,7 @@ if ($page == 'add-hospital') {
                                 <option value="basic" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'basic') ? 'selected' : '' ?>>
                                     Basic (Free)
                                 </option>
-                                <option value="deep-mind" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'deep-mind') ? 'selected' : '' ?>>
+                                <option value="mist" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'mist') ? 'selected' : '' ?>>
                                     Premium (Paid)
                                 </option>
                             </select>

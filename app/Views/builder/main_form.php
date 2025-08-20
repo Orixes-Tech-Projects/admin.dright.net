@@ -23,9 +23,9 @@ if ($page == 'add-doctor') {
     $healthcarestatus = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'healthcare_status');
     $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
     $theme = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'theme');
+    $PrescriptionSegment = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_module');
+    $OPDInvoicing = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoicing');
 }
-
-//print_r($sponsor);exit();
 ?>
 <style>
     /* Progress Modal (Overlay) */
@@ -264,7 +264,7 @@ if ($page == 'add-doctor') {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group row">
                         <label class="col-sm-12">e-Health Key</label>
                         <div class="col-sm-12">
@@ -275,34 +275,41 @@ if ($page == 'add-doctor') {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-
-                    <label for="validationCustom05">Profile</label>
-
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="profile" name="profile">
-                        <label class="custom-file-label" for="customFile">Choose file</label>
+                <div class="col-md-5 mb-3">
+                    <div class="row">
+                        <div class="<?= (($page == 'add-doctor') ? 'col-md-12' : 'col-md-9') ?>">
+                            <label for="validationCustom05">Profile</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="profile" name="profile">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                        </div>
+                        <?php if ($page != 'add-doctor') { ?>
+                            <div class="col-md-3">
+                                <img src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>" height="60">
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
-                <?php if ($page != 'add-doctor') { ?>
-                    <div class="col-md-4">
-                        <img src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>" height="70">
-                    </div>
-                <?php } ?>
-                <div class="col-md-4 mb-3">
-
-                    <label for="validationCustom05">Initatived LOGO</label>
-
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="initatived_logo" name="initatived_logo">
-                        <label class="custom-file-label" for="customFile">Choose file</label>
+                <div class="col-md-5 mb-3">
+                    <div class="row">
+                        <div class="<?= (($page == 'add-doctor') ? 'col-md-12' : 'col-md-10') ?>">
+                            <label for="validationCustom05">Initatived LOGO</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="initatived_logo"
+                                       name="initatived_logo">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                        </div>
+                        <?php if ($page != 'add-doctor') { ?>
+                            <div class="col-md-2"><img
+                                        src="<?= load_image_meta('pgsql|profile_metas|' . $PAGE['UID']) ?>" height="70">
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
-                <?php if ($page != 'add-doctor') { ?>
-                    <div class="col-md-4">
-                        <img src="<?= load_image_meta('pgsql|profile_metas|' . $PAGE['UID']) ?>" height="70">
-                    </div>
-                <?php } ?>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group row">
                         <label class="col-sm-12">Short Description</label>
@@ -371,7 +378,33 @@ if ($page == 'add-doctor') {
                     <h4>Clinta HealthCare</h4>
                     <hr>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="col-sm-12">Prescription Segment</label>
+                    <div class="col-sm-12">
+                        <select name="prescription_module" id="prescription_module" class="form-control">
+                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 0) ? 'selected' : '') ?>
+                                    value="0">De Activate
+                            </option>
+                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="1">Activate
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="col-sm-12">OPD Invoicing</label>
+                    <div class="col-sm-12">
+                        <select name="opd_invoicing" id="opd_invoicing" class="form-control">
+                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="0">De Activate
+                            </option>
+                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
+                                    value="1">Activate
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <label class="col-sm-12">Add-ons</label>
                     <div class="col-sm-12">
                         <select name="healthcare_status" id="healthcare_status" class="form-control">
@@ -401,8 +434,8 @@ if ($page == 'add-doctor') {
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="col-sm-12">Theme Setting</label>
+                <div class="col-md-2">
+                    <label class="col-sm-12">Theme</label>
                     <div class="col-sm-12">
                         <select name="theme" id="theme" class="form-control">
                             <option value="0" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == '0') ? 'selected' : '' ?>>
@@ -411,13 +444,13 @@ if ($page == 'add-doctor') {
                             <option value="basic" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'basic') ? 'selected' : '' ?>>
                                 Basic (Free)
                             </option>
-                            <option value="deep-mind" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'deep-mind') ? 'selected' : '' ?>>
+                            <option value="mist" <?= (is_array($theme) && !empty($theme) && isset($theme[0]['Description']) && $theme[0]['Description'] == 'mist') ? 'selected' : '' ?>>
                                 Premium (Paid)
                             </option>
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label class="col-sm-12">Patient Portal</label>
                     <div class="col-sm-12">
                         <select name="patient_portal" id="patient_portal" class="form-control">
@@ -445,7 +478,9 @@ if ($page == 'add-doctor') {
                             </svg>
                         </div>
                         <div class="progress-info">
-                            <h5><i class="feather feather-users mr-2"></i> <?=(($page == 'add-doctor')? 'Creating' : 'Updating')?> Your Digital Doctor Profile</h5>
+                            <h5>
+                                <i class="feather feather-users mr-2"></i> <?= (($page == 'add-doctor') ? 'Creating' : 'Updating') ?>
+                                Your Digital Doctor Profile</h5>
                             <p>Please wait while we save your details...</p>
                             <div class="progress-bar">
                                 <div class="progress-fill"></div>
