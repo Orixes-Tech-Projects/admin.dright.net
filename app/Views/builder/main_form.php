@@ -650,9 +650,11 @@ if ($page == 'add-doctor') {
                 $('.progress-percentage').text('100%');
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
-                /** Send Requet TO CPanel For Creating SubDomains */
-                if (CurrentPage == 'add-doctor') {
-                    AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                /** Send Request TO CPanel For Creating SubDomains */
+                if (CurrentPage == 'add-doctor' && response.subdomain) {
+                    if (response.subdomain.endsWith('.clinta.biz')) {
+                        AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                    }
                 }
 
                 setTimeout(function () {
