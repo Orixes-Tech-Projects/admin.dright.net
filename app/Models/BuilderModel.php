@@ -191,7 +191,7 @@ class BuilderModel extends Model
                         "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime",
                 "profiles"."Status", "profiles"."ExpireDate"
                 FROM public."profiles" 
-                WHERE public."profiles"."Type" = \'' . $ID . '\' ';
+                WHERE public."profiles"."Type" = \'' . $ID . '\' AND "profiles"."SubDomain" != \'\'  ';
         if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
             $Name = $SessionFilters['Name'];
             $SQL .= ' AND  public."profiles"."Name"  ILIKE \'%' . $Name . '%\'';

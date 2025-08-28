@@ -34,7 +34,7 @@ class ExtendedModel extends Model
             $SQL .= ' AND  `Status` LIKE \'%' . $Status . '%\'';
         }
         $SQL .= '  ORDER BY `extended_profiles`.`FullName` ASC';
-//        print_r($SQL);exit;
+
         return $SQL;
     }
     public function GetExtendedProfielDataByID($ID)
