@@ -39,32 +39,38 @@ class Builder extends BaseController
         echo view('header', $data);
         if ($data['page'] == 'add-doctor') {
             echo view('builder/main_form', $data);
-
         } elseif ($data['page'] == 'add-hospital') {
-
             echo view('builder/hospital_main_form', $data);
-
+        } elseif ($data['page'] == 'add-mini-hims') {
+            echo view('builder/mini_hims_form', $data);
         } elseif ($data['page'] == 'specialities') {
-
             echo view('builder/specialities', $data);
-
-        } elseif ($data['page'] == 'update-doctor') {
+        }
+        elseif ($data['page'] == 'update-doctor') {
             $UID = getSegment(3);
             $data['UID'] = $UID;
             $Crud = new Crud();
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/main_form', $data);
-
-        } elseif ($data['page'] == 'update-hospital') {
+        }
+        elseif ($data['page'] == 'update-hospital') {
             $UID = getSegment(3);
             $data['UID'] = $UID;
             $Crud = new Crud();
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/hospital_main_form', $data);
-
-        } elseif ($data['page'] == 'hospital') {
+        }
+        elseif ($data['page'] == 'update-mini-hims') {
+            $UID = getSegment(3);
+            $data['UID'] = $UID;
+            $Crud = new Crud();
+            $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
+            $data['PAGE'] = $PAGE;
+            echo view('builder/mini_hims_form', $data);
+        }
+        elseif ($data['page'] == 'hospital') {
             echo view('builder/hospital', $data);
 
         } elseif ($data['page'] == 'images') {
@@ -75,9 +81,10 @@ class Builder extends BaseController
             $data['specialities'] = $BuilderModel->specialities();
             echo view('builder/banners', $data);
 
+        } elseif ($data['page'] == 'mini_hims') {
+            echo view('builder/mini_hims', $data);
+
         } else {
-//            $data['doctors'] = $BuilderModel->Allprofiless('doctors');
-//            print_r($data['doctors'] );exit();
             echo view('builder/index', $data);
         }
         echo view('footer', $data);
@@ -1895,7 +1902,6 @@ class Builder extends BaseController
         echo json_encode($response);
     }
 
-
     public
     function submit_individual_banners()
     {
@@ -1984,6 +1990,265 @@ class Builder extends BaseController
         $parts = explode('.', $subdomain);
         $admin_cpanel_domain = 'admin.' . $parts[0];
         create_subdomain_cpanel(trim($admin_cpanel_domain), 'clinta.biz', 'admin.webbuilder');
+    }
+
+    public function CreateMiniHimsDomainsWorkers()
+    {
+        header('Content-Type: application/json');
+
+        $subdomain = $this->request->getVar('subdomain');
+
+        if (!empty($subdomain)) {
+            $this->CreateMiniHimsSubDomains($subdomain);
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Sub Domains Created Successfully.'
+        ]);
+        return;
+    }
+
+    private function CreateMiniHimsSubDomains($subdomain = '')
+    {
+        /** Auto Creating Domain Code */
+        $parts = explode('.', $subdomain);
+        $cpanel_domain = $parts[0];
+        create_subdomain_cpanel(trim($cpanel_domain), 'clinta.biz', 'admin.webbuilder');
+    }
+
+    public
+    function fetch_mini_hims()
+    {
+        $BuilderModel = new BuilderModel();
+        $PharmacyModal = new PharmacyModal();
+        $type = 'hospitals';
+        $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
+
+        $Data = $BuilderModel->get_doct_datatables($type, $keyword, 1);
+        $totalfilterrecords = $BuilderModel->count_doct_datatables($type, $keyword, 1);
+
+        $dataarr = array();
+        $cnt = $_POST['start'];
+        foreach ($Data as $record) {
+
+            $Actions = [];
+            $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="UpdateMiniHims(' . htmlspecialchars($record['UID']) . ')">Update</a>';
+            $cnt++;
+            $CityName = '-';
+            if (isset($record['City']) && $record['City'] > 0) {
+                $city = $PharmacyModal->getcitybyid($record['City']);
+                $CityName = ((isset($city[0]['FullName']) && $city[0]['FullName'] != '') ? $city[0]['FullName'] : '-');
+            }
+            $lastVisit = !empty($record['LastVisitDateTime']) ? date("d M, Y", strtotime($record['LastVisitDateTime'])) : "N/A";
+
+            $data = [];
+            $data[] = $cnt;
+            $data[] = $record['Name'];
+            $data[] = !empty($record['SubDomain']) ? '<a title="Click to View" style="color:crimson" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
+            $data[] = $CityName;
+            $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
+            $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
+            $data[] = $record['Email'];
+            $data[] = $lastVisit;
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button style="border-radius: 5px;" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">' . implode(" ", $Actions) . '</div>
+                            </div>
+                        </td>';
+
+            $dataarr[] = $data;
+        }
+
+        $response = array(
+            "draw" => intval($this->request->getPost('draw')),
+            "recordsTotal" => count($Data),
+            "recordsFiltered" => $totalfilterrecords,
+            "data" => $dataarr
+        );
+        echo json_encode($response);
+    }
+
+    public
+    function mini_hims_form_submit()
+    {
+        $Crud = new Crud();
+        $Main = new Main();
+        $response = array();
+        $record = array();
+        $records = array();
+        $id = $this->request->getVar('UID');
+        $email = $this->request->getVar('email');
+        $ContactNo = $this->request->getVar('ContactNo');
+        $file = $this->request->getFile('profile');
+        $fileContents = '';
+        if ($file->isValid() && !$file->hasMoved()) {
+            $fileContents = file_get_contents($file->getTempName());
+        }
+
+        if ($id == 0) {
+
+            $subdomain = $this->request->getVar('sub_domain');
+
+            $EmailRecord = $Crud->SingleeRecord('public."profiles"', ["Email" => trim($email)]);
+            if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                        (($EmailRecord['SubDomain'] ?? $EmailRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            $ContactNoRecord = $Crud->SingleeRecord('public."profiles"', ['ContactNo' => trim($ContactNo)]);
+            if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                        (($ContactNoRecord['SubDomain'] ?? $ContactNoRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            if (trim($subdomain) != '') {
+
+                $SubDomainRecord = $Crud->SingleeRecord('public."profiles"', ['SubDomain' => trim($subdomain)]);
+                if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                            (($SubDomainRecord['SubDomain'] ?? $SubDomainRecord['Name']) ?? 'another user') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+            }
+
+            $record['Type'] = 'hospitals';
+            $record['Name'] = $this->request->getVar('name');
+            $record['Email'] = $this->request->getVar('email');
+            $record['Password'] = $this->request->getVar('password');
+            $record['City'] = $this->request->getVar('city');
+            $record['ContactNo'] = $this->request->getVar('ContactNo');
+            $record['SubDomain'] = $subdomain;
+            $record['MiniHims'] = 1;
+            if ($fileContents != '') {
+                $record['Profile'] = base64_encode($fileContents);
+            } else {
+                $record['Profile'] = '';
+            }
+            $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
+            if ($website_profile_id) {
+
+                $PackageUID = $this->request->getVar('Package');
+                if (isset($PackageUID) && $PackageUID > 0) {
+
+                    $Invoices = new Invoices();
+                    $OriginalPrice = $this->request->getVar('OriginalPrice');
+                    $Discount = $this->request->getVar('Discount');
+                    $Price = $this->request->getVar('Price');
+                    $InvoiceDetailsArray = array(
+                        'ProfileName' => $record['Name'],
+                        'ProductType' => 'builder',
+                        'Product' => 'hospitals',
+                        'ProfileUID' => $website_profile_id,
+                        'PackageUID' => $PackageUID,
+                        'OriginalPrice' => $OriginalPrice,
+                        'Discount' => $Discount,
+                        'Price' => $Price
+                    );
+                    $Invoices->AddProfileSubscriptionDetails($InvoiceDetailsArray);
+                }
+
+                $msg = $_SESSION['FullName'] . ' Mini Hims Profile Submit Through Admin Dright';
+                $logesegment = 'Mini Hims';
+                $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
+                $response = array();
+                $response['status'] = "success";
+                $response['id'] = $website_profile_id;
+                $response['message'] = "Mini Hims Profile Added Successfully.....!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+
+            } else {
+
+                $response = array();
+                $response['status'] = "fail";
+                $response['message'] = "Error in Adding Mini Hims Profile...!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+                return;
+            }
+
+        } else {
+
+            $subdomain = $this->request->getVar('sub_domain');
+
+            $EmailRecord = $Crud->SingleeRecord('public."profiles"', ["Email" => trim($email), 'UID !=' => $id]);
+            if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                        (($EmailRecord['SubDomain'] ?? $EmailRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            $ContactNoRecord = $Crud->SingleeRecord('public."profiles"', ['ContactNo' => trim($ContactNo), 'UID !=' => $id]);
+            if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                        (($ContactNoRecord['SubDomain'] ?? $ContactNoRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            if (trim($subdomain) != '') {
+
+                $SubDomainRecord = $Crud->SingleeRecord('public."profiles"', ['SubDomain' => trim($subdomain), 'UID !=' => $id]);
+                if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                            (($SubDomainRecord['SubDomain'] ?? $SubDomainRecord['Name']) ?? 'another user') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+            }
+
+            $record['Type'] = 'hospitals';
+            $record['Name'] = $this->request->getVar('name');
+            $record['Email'] = $this->request->getVar('email');
+            $record['Password'] = $this->request->getVar('password');
+            $record['City'] = $this->request->getVar('city');
+            $record['ContactNo'] = $this->request->getVar('ContactNo');
+            $record['SubDomain'] = $subdomain;
+            $record['MiniHims'] = 1;
+            if ($fileContents != '') {
+                $record['Profile'] = base64_encode($fileContents);
+            }
+            $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
+            $msg = $_SESSION['FullName'] . ' Mini Hims Profile Update Through Admin Dright';
+            $logesegment = 'Mini Hims';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
+            $response = array();
+            $response['status'] = "success";
+            $response['id'] = $id;
+            $response['message'] = "Mini Hims Profile Updated Successfully.....!";
+            echo json_encode($response);
+        }
+
     }
 
 

@@ -59,7 +59,9 @@ $routes->group('builder', static function ($routes) {
     $routes->get('specialities', 'Builder::index');
     $routes->get('add-doctor', 'Builder::index');
     $routes->get('add-hospital', 'Builder::index');
+    $routes->get('add-mini-hims', 'Builder::index');
     $routes->get('hospital', 'Builder::index');
+    $routes->get('mini_hims', 'Builder::index');
     $routes->get('images', 'Builder::index');
     $routes->get('banners', 'Builder::index');
     $routes->post('get-banners', 'Builder::fetch_banners');
@@ -69,6 +71,7 @@ $routes->group('builder', static function ($routes) {
     $routes->get('dashboard', 'Builder::dashboard');
     $routes->post('submit-doctor', 'Builder::doctors_profile_form_submit');
     $routes->post('submit-hospital', 'Builder::hospitals_profile_form_submit');
+    $routes->post('submit-mini-hims', 'Builder::mini_hims_form_submit');
     $routes->post('add_telemedicine_credits', 'Builder::add_telemedicine_credits');
     $routes->post('add_sms_credits', 'Builder::add_sms_credits');
     $routes->post('submit-image', 'Builder::image_form_submit');
@@ -80,6 +83,7 @@ $routes->group('builder', static function ($routes) {
     $routes->get('update-doctor/(:num)', 'Builder::index');
     $routes->get('specialities-gallery/(:num)', 'Builder::gallery');
     $routes->get('update-hospital/(:num)', 'Builder::index');
+    $routes->get('update-mini-hims/(:num)', 'Builder::index');
 });
 $routes->group('users', static function ($routes) {
     $routes->get('/', 'Users::index');

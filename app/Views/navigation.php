@@ -41,128 +41,131 @@ $doctor = $checknav->checkAccessKey('doctor');
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_dashobard')) {
-                ?>
-                <li>
-                    <a href="#" data-menu-target="#pages" <?= ($segment_a == 'builder' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#" data-menu-target="#pages" <?= ($segment_a == 'builder' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="copy"></i>
                         </span>
-                        <span>Builder</span>
-                    </a>
-                </li>
+                            <span>Builder</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('health_care')) {
-                ?>
-                <li>
-                    <a href="#"
-                       data-menu-target="#forms" <?= ($segment_a == 'diet' || $segment_a == 'customers' || $segment_a == 'diseases' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#"
+                           data-menu-target="#forms" <?= ($segment_a == 'diet' || $segment_a == 'customers' || $segment_a == 'diseases' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i class="pe-is-w-thermometer-1-f"></i>
                         </span>
-                        <span>Health Care</span>
-                    </a>
-                </li>
+                            <span>Health Care</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('extended')) {
-                ?>
-                <li>
-                    <a href="#" data-menu-target="#plugins" <?= ($segment_a == 'extended' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#"
+                           data-menu-target="#plugins" <?= ($segment_a == 'extended' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="gift"></i>
                         </span>
-                        <span>Extended</span>
-                    </a>
-                </li>
+                            <span>Extended</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('invoice')) {
-                ?>
-                <li>
-                    <a href="#" data-menu-target="#invoice" <?= ($segment_a == 'invoice' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#"
+                           data-menu-target="#invoice" <?= ($segment_a == 'invoice' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="gift"></i>
                         </span>
-                        <span>Invoice</span>
-                    </a>
-                </li>
+                            <span>Invoice</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('investigation')) {
-                ?>
-                <li>
-                    <a href="#"
-                       data-menu-target="#investigation" <?= ($segment_a == 'investigation' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#"
+                           data-menu-target="#investigation" <?= ($segment_a == 'investigation' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="layers"></i>
                         </span>
-                        <span>Investigation</span>
-                    </a>
-                </li>
+                            <span>Investigation</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('pharmacy')) {
-                ?>
-                <li>
-                    <a href="#" data-menu-target="#other" <?= ($segment_a == 'medicine' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href="#" data-menu-target="#other" <?= ($segment_a == 'medicine' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="arrow-up-right"></i>
                         </span>
-                        <span>Pharmacy</span>
-                    </a>
-                </li>
+                            <span>Pharmacy</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('support_ticket')) {
-                ?>
-                <li>
-                    <a href="" data-menu-target="#apps" <?= ($segment_a == 'supportticket' ? 'class="active"' : '') ?>
-                    >     <span class="menu-tab-icon">
+                    ?>
+                    <li>
+                        <a href=""
+                           data-menu-target="#apps" <?= ($segment_a == 'supportticket' ? 'class="active"' : '') ?>
+                        >     <span class="menu-tab-icon">
                             <i data-feather="users"></i>
                     </span>
-                        <span>Support Ticket</span>
-                    </a>
-                </li>
+                            <span>Support Ticket</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('laboratories')) {
-                ?>
-                <li>
-                    <a href=""
-                       data-menu-target="#laboratories" <?= ($segment_a == 'laboratories' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href=""
+                           data-menu-target="#laboratories" <?= ($segment_a == 'laboratories' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="users"></i>
                         </span>
-                        <span>Laboratories</span>
-                    </a>
-                </li>
+                            <span>Laboratories</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('system')) {
-                ?>
+                    ?>
 
-                <li>
-                    <a href="#" data-menu-target="#users" <?= ($segment_a == 'users' ? 'class="active"' : '') ?>>
+                    <li>
+                        <a href="#" data-menu-target="#users" <?= ($segment_a == 'users' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="users"></i>
                         </span>
-                        <span>System</span>
-                    </a>
-                </li>
+                            <span>System</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('documentations')) {
-                ?>
-                <li>
-                    <a href=""
-                       data-menu-target="#document" <?= ($segment_a == 'document' ? 'class="active"' : '') ?>>
+                    ?>
+                    <li>
+                        <a href=""
+                           data-menu-target="#document" <?= ($segment_a == 'document' ? 'class="active"' : '') ?>>
                         <span class="menu-tab-icon">
                             <i data-feather="users"></i>
                         </span>
-                        <span>Documentations</span>
-                    </a>
-                </li>
+                            <span>Documentations</span>
+                        </a>
+                    </li>
                 <?php } ?>
             </ul>
         </div>
@@ -184,23 +187,23 @@ $doctor = $checknav->checkAccessKey('doctor');
                 </li>
                 <?php
                 if ($checknav->checkAccessKey('extended')) {
-                ?>
-                <li class="d-none">
-                    <a href="<?= $path ?>support-ticket/clinta_extended">
-                        <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Clinta Extended</span>
-                    </a>
-                </li>
+                    ?>
+                    <li class="d-none">
+                        <a href="<?= $path ?>support-ticket/clinta_extended">
+                            <span class="nav-link-icon" data-feather="file"></span>
+                            <span>Clinta Extended</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_support_ticket')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>support-ticket/builder_support_ticket">
-                        <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Builder Ticket</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>support-ticket/builder_support_ticket">
+                            <span class="nav-link-icon" data-feather="file"></span>
+                            <span>Builder Ticket</span>
+                        </a>
+                    </li>
                 <?php } ?>
 
             </ul>
@@ -209,33 +212,33 @@ $doctor = $checknav->checkAccessKey('doctor');
 
                 <?php
                 if ($checknav->checkAccessKey('invoice_invoice_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>invoice/index">
-                        <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Invoice</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>invoice/index">
+                            <span class="nav-link-icon" data-feather="file"></span>
+                            <span>Invoice</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('invoice_items_list')) {
                     ?>
                     <li class="d-none">
                         <a href="<?= $path ?>invoice/customer">
-                        <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Customer</span>
-                    </a>
-                </li>
+                            <span class="nav-link-icon" data-feather="file"></span>
+                            <span>Customer</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('invoice_items_list')) {
                     ?>
-                <li>
-                    <a href="<?= $path ?>support-ticket/items">
-                        <span class="nav-link-icon" data-feather="file"></span>
-                        <span>Packages</span>
-                    </a>
-                </li>
+                    <li>
+                        <a href="<?= $path ?>support-ticket/items">
+                            <span class="nav-link-icon" data-feather="file"></span>
+                            <span>Packages</span>
+                        </a>
+                    </li>
                 <?php } ?>
             </ul>
             <ul id="customers">
@@ -430,16 +433,16 @@ $doctor = $checknav->checkAccessKey('doctor');
                 </li>
                 <?php
                 if ($checknav->checkAccessKey('laboratories_laboratories_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>laboratories/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>laboratories/">
                         <span class="nav-link-icon">
                             <i data-feather="layers"></i>
                         </span>
-                        <span>Laboratories</span>
-                    </a>
+                            <span>Laboratories</span>
+                        </a>
 
-                </li>
+                    </li>
                 <?php } ?>
             </ul>
 
@@ -448,40 +451,40 @@ $doctor = $checknav->checkAccessKey('doctor');
 
                 <?php
                 if ($checknav->checkAccessKey('investigation')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>investigation/dashboard">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>investigation/dashboard">
                         <span class="nav-link-icon">
                             <i data-feather="pie-chart"></i>
                         </span>
-                        <span>Dashboard</span>
-                    </a>
+                            <span>Dashboard</span>
+                        </a>
 
-                </li>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('investigation_lab_report_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>investigation/all/reports">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>investigation/all/reports">
                         <span class="nav-link-icon">
                             <i data-feather="aperture"></i>
                         </span>
-                        <span>Lab Reports</span>
-                    </a>
-                </li>
+                            <span>Lab Reports</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('investigation_radiology_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>investigation/all/radiology">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>investigation/all/radiology">
                         <span class="nav-link-icon">
                             <i data-feather="anchor"></i>
                         </span>
-                        <span>Radiology</span>
-                    </a>
-                </li>
+                            <span>Radiology</span>
+                        </a>
+                    </li>
                 <?php } ?>
             </ul>
             <!--            health care-->
@@ -554,78 +557,78 @@ $doctor = $checknav->checkAccessKey('doctor');
             <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_diseases_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>diseases/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>diseases/">
                         <span class="nav-link-icon">
                             <i data-feather="layers"></i>
                         </span>
-                        <span>Diseases</span>
-                    </a>
-                </li>
+                            <span>Diseases</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_branches_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>frenchises/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>frenchises/">
                         <span class="nav-link-icon">
                             <i data-feather="book"></i>
                         </span>
-                        <span>Branches</span>
-                    </a>
-                </li>
+                            <span>Branches</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_discount_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>discount/discount_center">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>discount/discount_center">
                         <span class="nav-link-icon">
                             <i data-feather="book"></i>
                         </span>
-                        <span>Discounts</span>
-                    </a>
-                </li>
+                            <span>Discounts</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_clinta_member_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>clinta_members/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>clinta_members/">
                         <span class="nav-link-icon">
                             <i data-feather="layers"></i>
                         </span>
-                        <span>Clinta Member</span>
-                    </a>
+                            <span>Clinta Member</span>
+                        </a>
 
-                </li>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_customer_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>customers/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>customers/">
                         <span class="nav-link-icon">
                             <i data-feather="layers"></i>
                         </span>
-                        <span>Customers</span>
-                    </a>
+                            <span>Customers</span>
+                        </a>
 
-                </li>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('healthcare_rcc_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>representative/">
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>representative/">
                         <span class="nav-link-icon">
                             <i data-feather="disc"></i>
                         </span>
-                        <span>RCC</span>
-                    </a>
+                            <span>RCC</span>
+                        </a>
 
-                </li>
+                    </li>
                 <?php } ?>
 
             </ul>
@@ -644,33 +647,33 @@ $doctor = $checknav->checkAccessKey('doctor');
                 </li>
                 <?php
                 if ($checknav->checkAccessKey('extended_profiles_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>extended">
-                        <span class="nav-link-icon" data-feather="crop"></span>
-                        <span>Profiles</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>extended">
+                            <span class="nav-link-icon" data-feather="crop"></span>
+                            <span>Profiles</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('extended_default_lookup_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>extended/extended_default_config">
-                        <span class="nav-link-icon" data-feather="clipboard"></span>
-                        <span>Default Configuration</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>extended/extended_default_config">
+                            <span class="nav-link-icon" data-feather="clipboard"></span>
+                            <span>Default Configuration</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('extended_default_configration_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>extended/extended_default_lookup">
-                        <span class="nav-link-icon" data-feather="sliders"></span>
-                        <span>Default Lookups</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>extended/extended_default_lookup">
+                            <span class="nav-link-icon" data-feather="sliders"></span>
+                            <span>Default Lookups</span>
+                        </a>
+                    </li>
                 <?php } ?>
             </ul>
             <!--            Builder-->
@@ -704,47 +707,53 @@ $doctor = $checknav->checkAccessKey('doctor');
                             <span>Hospital</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?= $path ?>builder/mini_hims">
+                            <span class="nav-link-icon" data-feather="search"></span>
+                            <span>Mini Hims</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_images_list')) {
-                ?>
-                <li class="d-none">
-                    <a href="<?= $path ?>builder/images">
-                        <span class="nav-link-icon" data-feather="layout"></span>
-                        <span>v1.0 Banners</span>
+                    ?>
+                    <li class="d-none">
+                        <a href="<?= $path ?>builder/images">
+                            <span class="nav-link-icon" data-feather="layout"></span>
+                            <span>v1.0 Banners</span>
 
-                    </a>
-                </li>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_banners_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>builder/banners">
-                        <span class="nav-link-icon" data-feather="frown"></span>
-                        <span>Banners</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>builder/banners">
+                            <span class="nav-link-icon" data-feather="frown"></span>
+                            <span>Banners</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_sponser_list')) {
-                ?>
-                <li class="d-none">
-                    <a href="<?= $path ?>builder/sponser">
-                        <span class="nav-link-icon" data-feather="frown"></span>
-                        <span>Sponsor</span>
-                    </a>
-                </li>
+                    ?>
+                    <li class="d-none">
+                        <a href="<?= $path ?>builder/sponser">
+                            <span class="nav-link-icon" data-feather="frown"></span>
+                            <span>Sponsor</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_specialities_list')) {
-                ?>
-                <li>
-                    <a href="<?= $path ?>builder/specialities">
-                        <span class="nav-link-icon" data-feather="frown"></span>
-                        <span>Specialities</span>
-                    </a>
-                </li>
+                    ?>
+                    <li>
+                        <a href="<?= $path ?>builder/specialities">
+                            <span class="nav-link-icon" data-feather="frown"></span>
+                            <span>Specialities</span>
+                        </a>
+                    </li>
                 <?php } ?>
             </ul>
             <ul id="other">

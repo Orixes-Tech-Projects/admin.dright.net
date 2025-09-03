@@ -166,11 +166,11 @@ class BuilderModel extends Model
     }
 
     public
-    function get_doct_datatables($type, $keyword)
+    function get_doct_datatables($type, $keyword, $MiniHims = 0)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type, $keyword);
+        $SQL = $this->Allprofiless($type, $keyword, $MiniHims);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
         $records = $Crud->ExecutePgSQL($SQL);
@@ -178,7 +178,7 @@ class BuilderModel extends Model
         return $records;
     }
 
-    public function Allprofiless($ID, $keyword)
+    public function Allprofiless($ID, $keyword, $MiniHims = 0)
     {
         $Crud = new Crud();
         $session = session();
@@ -191,7 +191,7 @@ class BuilderModel extends Model
                         "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime",
                 "profiles"."Status", "profiles"."ExpireDate"
                 FROM public."profiles" 
-                WHERE public."profiles"."Type" = \'' . $ID . '\' AND "profiles"."SubDomain" != \'\'  ';
+                WHERE public."profiles"."Type" = \'' . $ID . '\' AND "profiles"."SubDomain" != \'\' AND "MiniHims" = ' . $MiniHims . ' ';
         if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
             $Name = $SessionFilters['Name'];
             $SQL .= ' AND  public."profiles"."Name"  ILIKE \'%' . $Name . '%\'';
@@ -209,11 +209,11 @@ class BuilderModel extends Model
     }
 
     public
-    function count_doct_datatables($type, $keyword)
+    function count_doct_datatables($type, $keyword, $MiniHims = 0)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type, $keyword);
+        $SQL = $this->Allprofiless($type, $keyword, $MiniHims);
         $records = $Crud->ExecutePgSQL($SQL);
         return count($records);
     }
