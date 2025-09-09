@@ -1,4 +1,11 @@
 <link rel="stylesheet" href="<?= $template ?>vendors/select2/css/select2.min.css" type="text/css">
+<style>
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        border-radius: 10px;
+        background: #e6e6e6;
+    }
+</style>
 <div class="modal" id="AddBannerModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document" style="min-width: 60% !important;">
         <div class="modal-content">
@@ -12,8 +19,17 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-row">
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom02">Alignment</label>
+                        <div class="col-md-6 mb-3">
+                            <label for="validationCustom02">Banner Type <small class="text-danger">*</small></label>
+                            <select class="form-control" id="type" name="type">
+                                <option value="">Select Type</option>
+                                <option value="custom-text">Custom Text</option>
+                                <option value="image-only">Image Only</option>
+                                <option value="pre-designed">Pre Designed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="validationCustom02">Alignment <small class="text-danger">*</small></label>
                             <select class="form-control" id="alignment" name="alignment">
                                 <option value="">Select Alignment</option>
                                 <option value="left">Left</option>
@@ -21,16 +37,8 @@
                                 <option value="center">Center</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom02">Color</label>
-                            <select class="form-control" id="color" name="color">
-                                <option value="">Select Color</option>
-                                <option value="light">Light</option>
-                                <option value="dark">Dark</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom02">Specialities</label>
+                        <div class="col-md-6 mb-3">
+                            <label for="validationCustom02">Specialities <small class="text-danger">*</small></label>
                             <select class="form-control" id="speciality" name="speciality">
                                 <option value="">Select Speciality</option>
                                 <?php foreach ($specialities as $record) { ?>
@@ -38,8 +46,8 @@
                                 <?php } ?>
                             </select>
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="validationCustom05">Profile</label>
+                        <div class="col-md-6 mb-3">
+                            <label for="validationCustom05">Profile <small class="text-danger">*</small></label>
                             <div class="custom-file">
                                 <input onchange="updateFileName(this)" type="file" class="custom-file-input"
                                        id="profile" name="profile"
@@ -66,6 +74,13 @@
 </div>
 <script src="<?= $template ?>vendors/select2/js/select2.min.js"></script>
 <script>
+
+    $(document).ready(function () {
+        $("#AddBannerModal select#speciality").select2({
+            dropdownParent: $("#AddBannerModal")
+        });
+    });
+
     function updateFileName(input) {
 
         if (input.files && input.files.length > 0) {
@@ -82,18 +97,20 @@
             $("#AddBannerModal #ajaxResponse").html('');
         }, 2000);
 
+        const Type = $("#AddBannerModal form#AddBannerForm select#type").val();
         const Alignment = $("#AddBannerModal form#AddBannerForm select#alignment").val();
-        const Color = $("#AddBannerModal form#AddBannerForm select#color").val();
         const Speciality = $("#AddBannerModal form#AddBannerForm select#speciality").val();
+
+        if (Type == '') {
+            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Type Required!</div>');
+            return false;
+        }
 
         if (Alignment == '') {
             $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Alignment Required!</div>');
             return false;
         }
-        if (Color == '') {
-            $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Color Required!</div>');
-            return false;
-        }
+
         if (Speciality == '') {
             $("#AddBannerModal #ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Speciality Required!</div>');
             return false;
@@ -158,4 +175,4 @@
         }, false);
     })();
 </script>
-<script src="<?=$template?>assets/js/examples/form-validation.js"></script>
+<script src="<?= $template ?>assets/js/examples/form-validation.js"></script>

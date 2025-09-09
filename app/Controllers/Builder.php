@@ -45,32 +45,28 @@ class Builder extends BaseController
             echo view('builder/mini_hims_form', $data);
         } elseif ($data['page'] == 'specialities') {
             echo view('builder/specialities', $data);
-        }
-        elseif ($data['page'] == 'update-doctor') {
+        } elseif ($data['page'] == 'update-doctor') {
             $UID = getSegment(3);
             $data['UID'] = $UID;
             $Crud = new Crud();
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/main_form', $data);
-        }
-        elseif ($data['page'] == 'update-hospital') {
+        } elseif ($data['page'] == 'update-hospital') {
             $UID = getSegment(3);
             $data['UID'] = $UID;
             $Crud = new Crud();
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/hospital_main_form', $data);
-        }
-        elseif ($data['page'] == 'update-mini-hims') {
+        } elseif ($data['page'] == 'update-mini-hims') {
             $UID = getSegment(3);
             $data['UID'] = $UID;
             $Crud = new Crud();
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/mini_hims_form', $data);
-        }
-        elseif ($data['page'] == 'hospital') {
+        } elseif ($data['page'] == 'hospital') {
             echo view('builder/hospital', $data);
 
         } elseif ($data['page'] == 'images') {
@@ -184,9 +180,9 @@ class Builder extends BaseController
             $cnt++;
             $data = array();
             $data[] = $cnt;
-            $data[] = isset($record['Alignment']) ? htmlspecialchars($record['Alignment']) : '';
-            $data[] = isset($record['Color']) ? htmlspecialchars($record['Color']) : '';
+            $data[] = isset($record['Type']) ? '<b>' . htmlspecialchars(ucwords(str_replace('-', ' ', $record['Type']))) . '</b>' : '';
             $data[] = isset($record['Title']) ? htmlspecialchars($record['Title']) : '';
+            $data[] = isset($record['Alignment']) ? htmlspecialchars(ucwords($record['Alignment'])) : '';
             $data[] = isset($record['Image'])
                 ? '<img src="' . load_image('mysql|general_banners|' . $record['UID']) . '" style="display: block; padding: 2px; border: 1px solid #145388 !important; border-radius: 3px; width: 150px;">'
                 : '';
@@ -2249,6 +2245,44 @@ class Builder extends BaseController
             echo json_encode($response);
         }
 
+    }
+
+    public
+    function mini_hims_search_filter()
+    {
+        $session = session();
+        $city = $this->request->getVar('City');
+        $Name = $this->request->getVar('Name');
+        $AllFilter = array(
+            'City' => ((isset($city) && $city != '') ? $city : ''),
+            'Name' => (($Name != '') ? trim($Name) : '')
+        );
+
+        $session->set('HospitalFilters', $AllFilter);
+
+        $response['status'] = "success";
+        $response['message'] = "Filters Updated Successfully";
+
+        echo json_encode($response);
+    }
+
+    public
+    function banners_search_filter()
+    {
+        $session = session();
+        $Speciality = $this->request->getVar('speciality');
+        $Type = $this->request->getVar('type');
+        $AllFilter = array(
+            'Speciality' => ((isset($Speciality) && $Speciality != '') ? $Speciality : ''),
+            'Type' => ((isset($Type) && $Type != '') ? $Type : '')
+        );
+
+        $session->set('GeneralBannersFilters', $AllFilter);
+
+        $response['status'] = "success";
+        $response['message'] = "Filters Updated Successfully";
+
+        echo json_encode($response);
     }
 
 

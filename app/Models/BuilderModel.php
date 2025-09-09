@@ -118,10 +118,22 @@ class BuilderModel extends Model
 
     public function general_banners()
     {
+        $session = session();
+        $SessionFilters = $session->get('GeneralBannersFilters');
+
         $Crud = new Crud();
         $SQL = 'SELECT `general_banners`.*, `specialities`.`Name` AS Title FROM `general_banners` 
-                LEFT JOIN `specialities` ON `general_banners`.`Speciality` = `specialities`.`UID`
-                ORDER BY `general_banners`.`SystemDate` DESC';
+                LEFT JOIN `specialities` ON `general_banners`.`Speciality` = `specialities`.`UID` WHERE 1=1 ';
+        if (isset($SessionFilters['Speciality']) && $SessionFilters['Speciality'] != '') {
+            $Speciality = $SessionFilters['Speciality'];
+            $SQL .= ' AND  `general_banners`.`Speciality` = ' . $Speciality . ' ';
+        }
+        if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
+            $Type = $SessionFilters['Type'];
+            $SQL .= ' AND  `general_banners`.`Type` = \'' . $Type . '\' ';
+        }
+        $SQL .= ' ORDER BY `general_banners`.`SystemDate` DESC';
+
         return $SQL;
     }
 
