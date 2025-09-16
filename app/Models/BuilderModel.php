@@ -334,4 +334,16 @@ class BuilderModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
+
+    public
+    function GetProfilesScripts($ProfileUID)
+    {
+        $Crud = new Crud();
+        $SQL = 'SELECT "third_party_scripts".* 
+                FROM public."third_party_scripts" 
+                Where "ProfileUID" = ' . $ProfileUID . ' ORDER BY "Title" ASC';
+        $records = $Crud->ExecutePgSQL($SQL);
+        return $records;
+    }
+
 }

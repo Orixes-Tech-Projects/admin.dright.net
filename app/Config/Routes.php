@@ -84,6 +84,7 @@ $routes->group('builder', static function ($routes) {
     $routes->get('specialities-gallery/(:num)', 'Builder::gallery');
     $routes->get('update-hospital/(:num)', 'Builder::index');
     $routes->get('update-mini-hims/(:num)', 'Builder::index');
+    $routes->get('third-party-script/(:num)', 'Builder::third_party_scripts');
 });
 $routes->group('users', static function ($routes) {
     $routes->get('/', 'Users::index');

@@ -274,6 +274,7 @@ class Builder extends BaseController
             $Actions = [];
             if ($Users->checkAccessKey('builder_doctor_profiles_update'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="EditDoctors(' . htmlspecialchars($record['UID']) . ')">Update</a>';
+            $Actions[] = '<a target="_blank" href="' . PATH . 'builder/third-party-script/' . $record['UID'] . '" style="cursor:pointer;" class="dropdown-item">Third Party Scripts</a>';
 
             if ($Users->checkAccessKey('builder_doctor_profiles_delete'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="DeleteDoctor(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
@@ -335,6 +336,8 @@ class Builder extends BaseController
     public
     function fetch_hospitals()
     {
+        $data = $this->data;
+
         $BuilderModel = new BuilderModel();
         $PharmacyModal = new PharmacyModal();
         $type = 'hospitals';
@@ -348,7 +351,7 @@ class Builder extends BaseController
         foreach ($Data as $record) {
             $Actions = [];
             $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="Updatehospital(' . htmlspecialchars($record['UID']) . ')">Update</a>';
-
+            $Actions[] = '<a target="_blank" href="' . PATH . 'builder/third-party-script/' . $record['UID'] . '" style="cursor:pointer;" class="dropdown-item">Third Party Scripts</a>';
             if ($Users->checkAccessKey('builder_hospital_profiles_delete'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="DeleteHospital(' . htmlspecialchars($record['UID']) . ')">Delete</a>';
 
@@ -2282,6 +2285,114 @@ class Builder extends BaseController
         $response['status'] = "success";
         $response['message'] = "Filters Updated Successfully";
 
+        echo json_encode($response);
+    }
+
+    public
+    function third_party_scripts()
+    {
+
+        $data = $this->data;
+        $Crud = new Crud();
+        $data['ProfileUID'] = $ProfileUID = getSegment(3);
+        if (isset($ProfileUID) && $ProfileUID != '' && $ProfileUID > 0) {
+
+            $data['ProfileData'] = $Crud->SingleeRecord('public."profiles"', array("UID" => $ProfileUID));
+
+            echo view('header', $data);
+            echo view('builder/third-party-script', $data);
+            echo view('footer', $data);
+
+        } else {
+            return redirect()->route('builder');
+        }
+    }
+
+    public
+    function profiles_script_form_submit()
+    {
+        $Crud = new Crud();
+        $ProfileUID = $this->request->getVar('ProfileUID');
+        $UID = $this->request->getVar('UID');
+        $Title = $this->request->getVar('title');
+        $Scripts = $this->request->getVar('script');
+
+        $SubmittedBy = $_SESSION['UID'];
+
+        if ($UID == 0) {
+
+            $record = array();
+            $record['SystemDate'] = date("Y-m-d H:i:s");
+            $record['ProfileUID'] = $ProfileUID;
+            $record['Title'] = trim($Title);
+            $record['Script'] = trim($Scripts);
+            $record['SubmittedBy'] = $SubmittedBy;
+            $ScriptInsertID = $Crud->AddRecordPG("public.third_party_scripts", $record);
+            if ($ScriptInsertID > 0) {
+                $response = array();
+                $response['status'] = "success";
+                $response['message'] = "Script Added Successfully...!";
+                echo json_encode($response);
+            } else {
+                $response = array();
+                $response['status'] = "fail";
+                $response['message'] = "Failed to Add Script!";
+                echo json_encode($response);
+            }
+
+        } else {
+
+            $record = array();
+            $record['ProfileUID'] = $ProfileUID;
+            $record['Title'] = trim($Title);
+            $record['Script'] = trim($Scripts);
+            $record['SubmittedBy'] = $SubmittedBy;
+            $Crud->UpdateeRecord("public.third_party_scripts", $record, array('UID' => $UID));
+
+            $response = array();
+            $response['status'] = "success";
+            $response['message'] = "Script Updated Successfully.....!";
+            echo json_encode($response);
+        }
+    }
+
+    public
+    function get_all_profiles_scripts()
+    {
+
+        $data = $this->data;
+        $BuilderModel = new BuilderModel();
+        $ProfileUID = $this->request->getVar('ProfileUID');
+        $data['ScriptRecords'] = $ScriptRecords = $BuilderModel->GetProfilesScripts($ProfileUID);
+        if (count($ScriptRecords) > 0) {
+            $page = view('builder/_ProfilesScriptGrid', $data);
+            echo json_encode(array('status' => 'success', 'page' => $page));
+        } else {
+            echo json_encode(array('status' => 'fail', 'page' => ''));
+        }
+    }
+
+    public
+    function get_profile_script_record_by_id()
+    {
+
+        $Crud = new Crud();
+        $ScriptUID = $this->request->getVar('ScriptUID');
+        $ScriptRecord = $Crud->SingleeRecord('public."third_party_scripts"', array("UID" => $ScriptUID));
+        echo json_encode($ScriptRecord);
+    }
+
+    public
+    function remove_profile_script()
+    {
+
+        $Crud = new Crud();
+        $ScriptUID = $this->request->getVar('ScriptUID');
+        $Crud->DeleteRecordPG('public."third_party_scripts"', array("UID" => $ScriptUID));
+
+        $response = array();
+        $response['status'] = 'success';
+        $response['message'] = 'Script Deleted Successfully';
         echo json_encode($response);
     }
 
