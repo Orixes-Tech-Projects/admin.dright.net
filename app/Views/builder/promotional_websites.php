@@ -4,12 +4,16 @@
 $session = session();
 $SessionFilters = $session->get('HospitalFilters');
 $Name = '';
-$City = '';
+$City = $Type = '';
 if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
     $Name = $SessionFilters['Name'];
 }
 if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
     $City = $SessionFilters['City'];
+}
+
+if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
+    $Type = $SessionFilters['Type'];
 }
 ?>
 <style>
@@ -27,8 +31,8 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                     <i class="accordion-status-icon open fa fa-chevron-down"></i>
                 </a>
                 <div class="accordion-body">
-                    <form method="post" name="AllMiniHimsFilterForm" id="AllMiniHimsFilterForm"
-                          onsubmit="SearchFilterFormSubmit('AllMiniHimsFilterForm');">
+                    <form method="post" name="AllPromotionalWebsitesFilterForm" id="AllPromotionalWebsitesFilterForm"
+                          onsubmit="SearchFilterFormSubmit('AllPromotionalWebsitesFilterForm');">
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-3">
@@ -51,9 +55,20 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6" style="margin-top: 33px;">
+                                <div class="col-md-3 ml-3">
+                                    <div class="row">
+                                        <label>Type:</label>
+                                        <select id="Type" name="Type" class="form-control"
+                                                data-validation-engine="validate[required]">
+                                            <option value="">Select Type</option>
+                                            <option <?=(($Type == 'doctors')? 'selected' : '')?> value="doctors">Doctors Websites</option>
+                                            <option <?=(($Type == 'hospitals')? 'selected' : '')?> value="hospitals">Hospital Websites</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-top: 33px;">
                                     <button style="border-radius: 5px;" class="btn btn-outline-success btn-sm"
-                                            onclick="SearchFilterFormSubmit('AllMiniHimsFilterForm');"
+                                            onclick="SearchFilterFormSubmit('AllPromotionalWebsitesFilterForm');"
                                             type="button">Search!
                                     </button>
                                     <button style="border-radius: 5px;" class="btn btn-outline-danger btn-sm"
@@ -73,22 +88,22 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
 </div>
 <div class="card mt-2">
     <div class="card-header">
-        <h5>List Of All Mini Hims
-            <button style="float: right; border-radius:5px;" type="button" onclick="AddMiniHims()"
+        <h5>List Of All Promotional Websites
+            <button style="float: right; border-radius:5px;" type="button" onclick="AddPromotionalWebsites()"
                     class="btn btn-primary btn-sm">
-                Add Mini Hims
+                Add Promotional Websites
             </button>
         </h5>
     </div>
     <div style="padding: 0.8rem !important;" class="card-body">
         <div class="table-responsive">
-            <table id="MiniHims" class="table table-striped table-bordered">
+            <table id="PromotionalWebsites" class="table table-striped table-bordered">
                 <thead>
                 <tr>
                     <th data-priority="1">#</th>
                     <th data-priority="2">Name</th>
                     <th data-priority="3">SubDomain</th>
-                    <th data-priority="5">City</th>
+                    <th data-priority="5">Type</th>
                     <th data-priority="6">Status</th>
                     <th data-priority="7">Expire Date</th>
                     <th data-priority="8">Email</th>
@@ -104,7 +119,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
 </div>
 <script>
     $(document).ready(function () {
-        $('#MiniHims').DataTable({
+        $('#PromotionalWebsites').DataTable({
             "scrollCollapse": true,
             "searching": true,
             "processing": true,
@@ -114,7 +129,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
             "pageLength": 25,
             "autoWidth": true,
             "ajax": {
-                "url": "<?= $path ?>builder/fetch_mini_hims",
+                "url": "<?= $path ?>builder/fetch_promotional_websites",
                 "type": "POST"
             }
         });
@@ -122,12 +137,12 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
 
 </script>
 <script>
-    function AddMiniHims() {
-        location.href = "<?=$path?>builder/add-mini-hims";
+    function AddPromotionalWebsites() {
+        location.href = "<?=$path?>builder/add-promotional-websites";
     }
 
-    function UpdateMiniHims(id) {
-        location.href = "<?=$path?>builder/update-mini-hims/" + id;
+    function UpdatePromotionalWebsites(id) {
+        location.href = "<?=$path?>builder/update-promotional-websites/" + id;
     }
 
     function SearchFilterFormSubmit(parent) {
@@ -135,7 +150,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
         var data = $("form#" + parent).serialize();
         var rslt = AjaxResponse('builder/mini_hims_search_filter', data);
         if (rslt.status == 'success') {
-            $("#AllMiniHimsFilterForm form #FilterResponse").html(rslt.message);
+            $("#AllPromotionalWebsitesFilterForm form #FilterResponse").html(rslt.message);
             location.reload();
         }
     }
@@ -143,7 +158,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
     function ClearAllFilter(Session) {
         var rslt = AjaxResponse('home/clear_session', 'SessionName=' + Session);
         if (rslt.status == 'success') {
-            $("#AllMiniHimsFilterForm form #FilterResponse").html(rslt.message);
+            $("#AllPromotionalWebsitesFilterForm form #FilterResponse").html(rslt.message);
             location.reload();
         }
     }

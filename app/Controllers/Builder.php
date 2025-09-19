@@ -8,6 +8,7 @@ use App\Models\Crud;
 use App\Models\Invoices;
 use App\Models\Main;
 use App\Models\PharmacyModal;
+use App\Models\ProfileDuplicate;
 use App\Models\SystemUser;
 
 class Builder extends BaseController
@@ -20,6 +21,14 @@ class Builder extends BaseController
         $this->MainModel = new Main();
         $this->data = $this->MainModel->DefaultVariable();
         helper('cpanel');
+    }
+
+    public
+    function test()
+    {
+
+        $ProfileDuplicate = new ProfileDuplicate();
+        $ProfileDuplicate->GetProfileExperienceRecordAndInsert(164, 545);
     }
 
 
@@ -43,6 +52,8 @@ class Builder extends BaseController
             echo view('builder/hospital_main_form', $data);
         } elseif ($data['page'] == 'add-mini-hims') {
             echo view('builder/mini_hims_form', $data);
+        } elseif ($data['page'] == 'add-promotional-websites') {
+            echo view('builder/promotional_websites_form', $data);
         } elseif ($data['page'] == 'specialities') {
             echo view('builder/specialities', $data);
         } elseif ($data['page'] == 'update-doctor') {
@@ -66,6 +77,13 @@ class Builder extends BaseController
             $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
             $data['PAGE'] = $PAGE;
             echo view('builder/mini_hims_form', $data);
+        } elseif ($data['page'] == 'update-promotional-websites') {
+            $UID = getSegment(3);
+            $data['UID'] = $UID;
+            $Crud = new Crud();
+            $PAGE = $Crud->SingleeRecord('public."profiles"', array("UID" => $UID));
+            $data['PAGE'] = $PAGE;
+            echo view('builder/promotional_websites_form', $data);
         } elseif ($data['page'] == 'hospital') {
             echo view('builder/hospital', $data);
 
@@ -79,6 +97,9 @@ class Builder extends BaseController
 
         } elseif ($data['page'] == 'mini_hims') {
             echo view('builder/mini_hims', $data);
+
+        } elseif ($data['page'] == 'promotional-websites') {
+            echo view('builder/promotional_websites', $data);
 
         } else {
             echo view('builder/index', $data);
@@ -2024,8 +2045,8 @@ class Builder extends BaseController
         $type = 'hospitals';
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
 
-        $Data = $BuilderModel->get_doct_datatables($type, $keyword, 1);
-        $totalfilterrecords = $BuilderModel->count_doct_datatables($type, $keyword, 1);
+        $Data = $BuilderModel->get_doct_datatables($type, $keyword, 1, 0);
+        $totalfilterrecords = $BuilderModel->count_doct_datatables($type, $keyword, 1, 0);
 
         $dataarr = array();
         $cnt = $_POST['start'];
@@ -2256,9 +2277,11 @@ class Builder extends BaseController
         $session = session();
         $city = $this->request->getVar('City');
         $Name = $this->request->getVar('Name');
+        $Type = $this->request->getVar('Type');
         $AllFilter = array(
             'City' => ((isset($city) && $city != '') ? $city : ''),
-            'Name' => (($Name != '') ? trim($Name) : '')
+            'Name' => (($Name != '') ? trim($Name) : ''),
+            'Type' => ((isset($Type) && $Type != '') ? $Type : '')
         );
 
         $session->set('HospitalFilters', $AllFilter);
@@ -2396,5 +2419,239 @@ class Builder extends BaseController
         echo json_encode($response);
     }
 
+
+    public
+    function fetch_promotional_websites()
+    {
+        $BuilderModel = new BuilderModel();
+        $type = 'all';
+        $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
+
+        $Data = $BuilderModel->get_doct_datatables($type, $keyword, 0, 1);
+        $totalfilterrecords = $BuilderModel->count_doct_datatables($type, $keyword, 0, 1);
+
+        $dataarr = array();
+        $cnt = $_POST['start'];
+        foreach ($Data as $record) {
+
+            $Actions = [];
+            $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="UpdatePromotionalWebsites(' . htmlspecialchars($record['UID']) . ')">Update</a>';
+            $cnt++;
+            $lastVisit = !empty($record['LastVisitDateTime']) ? date("d M, Y", strtotime($record['LastVisitDateTime'])) : "N/A";
+
+            $data = [];
+            $data[] = $cnt;
+            $data[] = $record['Name'];
+            $data[] = !empty($record['SubDomain']) ? '<a title="Click to View" style="color:crimson" href="https://' . $record['SubDomain'] . '" target="_blank">' . $record['SubDomain'] . '</a>' : '';
+            $data[] = ((isset($record['Type']) && $record['Type'] != '') ? '<badge style="color:white;" class="badge badge-' . (($record['Type'] == 'doctors') ? 'success' : 'warning') . '">' . ucwords($record['Type']) . '</badge>' : '');;
+            $data[] = '<badge class="badge badge-' . (($record['Status'] == 'active') ? 'success' : 'danger') . '">' . ucwords($record['Status']) . '</badge>';
+            $data[] = ((isset($record['ExpireDate']) && $record['ExpireDate'] != '') ? '<b>' . date('d M, Y', strtotime($record['ExpireDate'])) . '</b>' : '<badge class="badge badge-danger">Expired</badge>');
+            $data[] = $record['Email'];
+            $data[] = $lastVisit;
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button style="border-radius: 5px;" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">' . implode(" ", $Actions) . '</div>
+                            </div>
+                        </td>';
+
+            $dataarr[] = $data;
+        }
+
+        $response = array(
+            "draw" => intval($this->request->getPost('draw')),
+            "recordsTotal" => count($Data),
+            "recordsFiltered" => $totalfilterrecords,
+            "data" => $dataarr
+        );
+        echo json_encode($response);
+    }
+
+    public
+    function promotional_websites_form_submit()
+    {
+        $Crud = new Crud();
+        $Main = new Main();
+        $ProfileDuplicate = new ProfileDuplicate();
+        $response = array();
+        $record = array();
+        $records = array();
+        $id = $this->request->getVar('UID');
+        $email = $this->request->getVar('email');
+        $ContactNo = $this->request->getVar('ContactNo');
+        $file = $this->request->getFile('profile');
+        $fileContents = '';
+        if ($file->isValid() && !$file->hasMoved()) {
+            $fileContents = file_get_contents($file->getTempName());
+        }
+
+        $CopyProfileUID = $this->request->getVar('copy_profile_id');
+        $ProfileType = $this->request->getVar('profile_type');
+
+        if ($id == 0) {
+
+            $subdomain = $this->request->getVar('sub_domain');
+
+            $EmailRecord = $Crud->SingleeRecord('public."profiles"', ["Email" => trim($email)]);
+            if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                        (($EmailRecord['SubDomain'] ?? $EmailRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            $ContactNoRecord = $Crud->SingleeRecord('public."profiles"', ['ContactNo' => trim($ContactNo)]);
+            if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                        (($ContactNoRecord['SubDomain'] ?? $ContactNoRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            if (trim($subdomain) != '') {
+
+                $SubDomainRecord = $Crud->SingleeRecord('public."profiles"', ['SubDomain' => trim($subdomain)]);
+                if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                            (($SubDomainRecord['SubDomain'] ?? $SubDomainRecord['Name']) ?? 'another user') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+            }
+
+            $record['Type'] = $ProfileType;
+            $record['Name'] = $this->request->getVar('name');
+            $record['Email'] = $this->request->getVar('email');
+            $record['Password'] = $this->request->getVar('password');
+            $record['City'] = $this->request->getVar('city');
+            $record['ContactNo'] = $this->request->getVar('ContactNo');
+            $record['SubDomain'] = $subdomain;
+            $record['IsPromotionalWebsite'] = 1;
+            $record['Status'] = 'active';
+            $record['ExpireDate'] = date("Y-12-31", strtotime("+1 Year"));
+            if ($fileContents != '') {
+                $record['Profile'] = base64_encode($fileContents);
+            } else {
+                $record['Profile'] = '';
+            }
+            $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
+            if ($website_profile_id) {
+
+                $msg = $_SESSION['FullName'] . ' Promotional Website Profile Submit Through Admin Dright';
+                $logesegment = 'Promotional Website';
+                $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
+                $response = array();
+                $response['status'] = "success";
+                $response['id'] = $website_profile_id;
+                $response['message'] = "Promotional Website Profile Added Successfully.....!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+
+                if (isset($CopyProfileUID) && $CopyProfileUID > 0) {
+                    $ProfileDuplicate->GetProfileMetaRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileOptionsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileBannersRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileSpecialtiesRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileFacilitiesRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileAuthorsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileBlogsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileNewsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileReviewsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileGalleryRecordAndInsert($CopyProfileUID, $website_profile_id);
+
+                    if ($ProfileType == 'doctors') {
+                        $ProfileDuplicate->GetDoctorProfileHospitalClinicsRecordAndInsert($CopyProfileUID, $website_profile_id);
+                        $ProfileDuplicate->GetProfileAwardsAndMemberShipRecordAndInsert($CopyProfileUID, $website_profile_id);
+                        $ProfileDuplicate->GetProfileGraduationRecordAndInsert($CopyProfileUID, $website_profile_id);
+                        $ProfileDuplicate->GetProfilePostGraduationRecordAndInsert($CopyProfileUID, $website_profile_id);
+                        $ProfileDuplicate->GetProfileExperienceRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    }
+                }
+
+            } else {
+
+                $response = array();
+                $response['status'] = "fail";
+                $response['message'] = "Error in Adding Mini Hims Profile...!";
+                $response['subdomain'] = $subdomain;
+                echo json_encode($response);
+                return;
+            }
+
+        } else {
+
+            $subdomain = $this->request->getVar('sub_domain');
+
+            $EmailRecord = $Crud->SingleeRecord('public."profiles"', ["Email" => trim($email), 'UID !=' => $id]);
+            if (!empty($EmailRecord['UID']) && $EmailRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Email</strong> Already Assigned to <strong>' .
+                        (($EmailRecord['SubDomain'] ?? $EmailRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            $ContactNoRecord = $Crud->SingleeRecord('public."profiles"', ['ContactNo' => trim($ContactNo), 'UID !=' => $id]);
+            if (!empty($ContactNoRecord['UID']) && $ContactNoRecord['UID'] > 0) {
+                $response = [
+                    'status' => 'fail',
+                    'message' => '<strong>Contact No</strong> Already Assigned to <strong>' .
+                        (($ContactNoRecord['SubDomain'] ?? $ContactNoRecord['Name']) ?? 'another user') . '</strong>!'
+                ];
+                echo json_encode($response);
+                return;
+            }
+
+            if (trim($subdomain) != '') {
+
+                $SubDomainRecord = $Crud->SingleeRecord('public."profiles"', ['SubDomain' => trim($subdomain), 'UID !=' => $id]);
+                if (!empty($SubDomainRecord['UID']) && $SubDomainRecord['UID'] > 0) {
+                    $response = [
+                        'status' => 'fail',
+                        'message' => '<strong>Sub Domain</strong> Already Assigned to <strong>' .
+                            (($SubDomainRecord['SubDomain'] ?? $SubDomainRecord['Name']) ?? 'another user') . '</strong>!'
+                    ];
+                    echo json_encode($response);
+                    return;
+                }
+            }
+
+            $record['Name'] = $this->request->getVar('name');
+            $record['Email'] = $this->request->getVar('email');
+            $record['Password'] = $this->request->getVar('password');
+            $record['City'] = $this->request->getVar('city');
+            $record['ContactNo'] = $this->request->getVar('ContactNo');
+            $record['SubDomain'] = $subdomain;
+            $record['IsPromotionalWebsite'] = 1;
+            if ($fileContents != '') {
+                $record['Profile'] = base64_encode($fileContents);
+            }
+            $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
+            $msg = $_SESSION['FullName'] . ' Promotional Websites Profile Update Through Admin Dright';
+            $logesegment = 'Promotional Websites';
+            $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
+            $response = array();
+            $response['status'] = "success";
+            $response['id'] = $id;
+            $response['message'] = "Promotional Websites Profile Updated Successfully.....!";
+            echo json_encode($response);
+        }
+
+    }
 
 }

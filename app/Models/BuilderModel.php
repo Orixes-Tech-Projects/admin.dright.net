@@ -178,11 +178,11 @@ class BuilderModel extends Model
     }
 
     public
-    function get_doct_datatables($type, $keyword, $MiniHims = 0)
+    function get_doct_datatables($type, $keyword, $MiniHims = 0, $PromotionalWebsites = 0)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type, $keyword, $MiniHims);
+        $SQL = $this->Allprofiless($type, $keyword, $MiniHims, $PromotionalWebsites);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
         $records = $Crud->ExecutePgSQL($SQL);
@@ -190,7 +190,7 @@ class BuilderModel extends Model
         return $records;
     }
 
-    public function Allprofiless($ID, $keyword, $MiniHims = 0)
+    public function Allprofiless($ID = 'all', $keyword, $MiniHims = 0, $PromotionalWebsites = 0)
     {
         $Crud = new Crud();
         $session = session();
@@ -203,7 +203,10 @@ class BuilderModel extends Model
                         "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime",
                 "profiles"."Status", "profiles"."ExpireDate"
                 FROM public."profiles" 
-                WHERE public."profiles"."Type" = \'' . $ID . '\' AND "profiles"."SubDomain" != \'\' AND "MiniHims" = ' . $MiniHims . ' ';
+                WHERE "profiles"."SubDomain" != \'\' AND "MiniHims" = ' . $MiniHims . ' AND "IsPromotionalWebsite" = ' . $PromotionalWebsites . ' ';
+        if($ID != 'all'){
+            $SQL.=' AND "profiles"."Type" = \'' . $ID . '\' ';
+        }
         if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
             $Name = $SessionFilters['Name'];
             $SQL .= ' AND  public."profiles"."Name"  ILIKE \'%' . $Name . '%\'';
@@ -211,6 +214,10 @@ class BuilderModel extends Model
         if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
             $City = $SessionFilters['City'];
             $SQL .= ' AND  public."profiles"."City"  =' . $City . ' ';
+        }
+        if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
+            $Type = $SessionFilters['Type'];
+            $SQL .= ' AND  "profiles"."Type" = \'' . $Type . '\' ';
         }
         if ($keyword != '') {
             $SQL .= ' AND public."profiles"."Name"  ILIKE \'%' . $keyword . '%\'   ';
@@ -221,11 +228,11 @@ class BuilderModel extends Model
     }
 
     public
-    function count_doct_datatables($type, $keyword, $MiniHims = 0)
+    function count_doct_datatables($type, $keyword, $MiniHims = 0, $PromotionalWebsites = 0)
     {
         $Crud = new Crud();
 
-        $SQL = $this->Allprofiless($type, $keyword, $MiniHims);
+        $SQL = $this->Allprofiless($type, $keyword, $MiniHims, $PromotionalWebsites);
         $records = $Crud->ExecutePgSQL($SQL);
         return count($records);
     }
@@ -343,6 +350,20 @@ class BuilderModel extends Model
                 FROM public."third_party_scripts" 
                 Where "ProfileUID" = ' . $ProfileUID . ' ORDER BY "Title" ASC';
         $records = $Crud->ExecutePgSQL($SQL);
+        return $records;
+    }
+
+    public function BuilderAllProfiles()
+    {
+        $Crud = new Crud();
+        $SQL = 'SELECT "profiles"."UID", "profiles"."SystemDate", "profiles"."Type", "profiles"."Name", "profiles"."Email", 
+                        "profiles"."Password", "profiles"."City", "profiles"."ContactNo", "profiles"."SubDomain",  
+                        "profiles"."LastLoginDateTime",  "profiles"."LastVisitDateTime", "profiles"."Status", "profiles"."ExpireDate"
+                FROM public."profiles" 
+                WHERE "profiles"."SubDomain" != \'\' AND "MiniHims" = 0 AND "Status" = \'active\' ';
+        $SQL .= ' Order By public."profiles"."Name"  ASC';
+        $records = $Crud->ExecutePgSQL($SQL);
+
         return $records;
     }
 

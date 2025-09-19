@@ -713,6 +713,12 @@ $doctor = $checknav->checkAccessKey('doctor');
                             <span>Mini Hims</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?= $path ?>builder/promotional-websites">
+                            <span class="nav-link-icon" data-feather="search"></span>
+                            <span>Promotional Websites</span>
+                        </a>
+                    </li>
                 <?php } ?>
                 <?php
                 if ($checknav->checkAccessKey('builder_images_list')) {
