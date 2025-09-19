@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
 use App\Models\Crud;
+use CodeIgniter\Model;
 
 class ProfileDuplicate extends Model
 {
@@ -33,7 +33,7 @@ class ProfileDuplicate extends Model
                 unset($row['UID']);
 
                 $row['ProfileUID'] = $ProfileUID;
-                if($table != '"public"."options"'){
+                if ($table != '"public"."options"') {
                     $row['SystemDate'] = date("Y-m-d H:i:s");
                 }
 
@@ -191,5 +191,38 @@ class ProfileDuplicate extends Model
         $this->copyTableData('"public"."experience"', $CopyProfileUID, $ProfileUID);
     }
 
+    public function GetProfileDoctorsRecordAndInsert($CopyProfileUID, $ProfileUID)
+    {
+        $Crud = new Crud();
+
+        $CopyProfileUID = (int)$CopyProfileUID;
+        $ProfileUID = (int)$ProfileUID;
+
+        $SQL = 'SELECT * FROM "public"."profile_metas" 
+            WHERE "Option" = \'parent_id\' 
+            AND CAST("Value" AS INTEGER) = ' . $CopyProfileUID;
+
+        $ProfileDoctorsRecord = $Crud->ExecutePgSQL($SQL);
+
+        if (count($ProfileDoctorsRecord) > 0) {
+
+            $Crud->DeleteRecordPG(
+                '"public"."profile_metas"',
+                array(
+                    "Option" => 'parent_id',
+                    "Value" => (string)$ProfileUID
+                )
+            );
+
+            foreach ($ProfileDoctorsRecord as $row) {
+
+                unset($row['UID']);
+                $row['Value'] = (string)$ProfileUID;
+                $row['SystemDate'] = date("Y-m-d H:i:s");
+
+                $Crud->AddRecordPG('"public"."profile_metas"', $row);
+            }
+        }
+    }
 
 }

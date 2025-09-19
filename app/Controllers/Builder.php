@@ -28,7 +28,7 @@ class Builder extends BaseController
     {
 
         $ProfileDuplicate = new ProfileDuplicate();
-        $ProfileDuplicate->GetProfileExperienceRecordAndInsert(164, 545);
+        $ProfileDuplicate->GetProfileDoctorsRecordAndInsert(164, 545);
     }
 
 
@@ -2570,6 +2570,8 @@ class Builder extends BaseController
                     $ProfileDuplicate->GetProfileNewsRecordAndInsert($CopyProfileUID, $website_profile_id);
                     $ProfileDuplicate->GetProfileReviewsRecordAndInsert($CopyProfileUID, $website_profile_id);
                     $ProfileDuplicate->GetProfileGalleryRecordAndInsert($CopyProfileUID, $website_profile_id);
+                    $ProfileDuplicate->GetProfileDoctorsRecordAndInsert($CopyProfileUID, $website_profile_id);
+
 
                     if ($ProfileType == 'doctors') {
                         $ProfileDuplicate->GetDoctorProfileHospitalClinicsRecordAndInsert($CopyProfileUID, $website_profile_id);
