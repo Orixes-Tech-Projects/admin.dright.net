@@ -33,7 +33,7 @@ class ProfileDuplicate extends Model
                 unset($row['UID']);
 
                 $row['ProfileUID'] = $ProfileUID;
-                if ($table != '"public"."options"') {
+                if ($table != '"public"."options"' && $table != '"public"."hospitals_clinics"') {
                     $row['SystemDate'] = date("Y-m-d H:i:s");
                 }
 

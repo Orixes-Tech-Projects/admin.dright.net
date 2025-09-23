@@ -108,6 +108,14 @@ $BuilderModel = new BuilderModel();
 $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_portal = '';
 if ($page == 'add-mini-hims') {
     $AllPackages = $Crud->ListRecords('items');
+} else {
+    $PrescriptionSegment = 1;
+    $PrescriptionPricingType = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_pricing_type');
+    $PrescriptionPrice = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_price');
+
+    $OPDInvoicing = 1;
+    $OPDPricingType = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_pricing_type');
+    $OPDInvoicingPrice = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoice_price');
 }
 ?>
 <div class="card">
@@ -204,6 +212,70 @@ if ($page == 'add-mini-hims') {
                                       rows="6"><?php if (is_array($short_desc) && !empty($short_desc)) { ?><?= isset($short_desc[0]['Value']) ? $short_desc[0]['Value'] : ''; ?><?php } ?></textarea>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <input type="hidden" name="prescription_module" id="prescription_module" value="1">
+                <div class="col-md-12">
+                    <h4>Prescription Segment</h4>
+                    <hr>
+                </div>
+                <div class="col-md-12" id="prescription-pricing-type-col">
+                    <label>Pricing Type <small class="text-danger">*</small></label>
+                    <select name="prescription_pricing_type" id="prescription_pricing_type" class="form-control">
+                        <option value="">Select Option</option>
+                        <option <?= ((isset($PrescriptionPricingType[0]['Description']) && $PrescriptionPricingType[0]['Description'] == 'with-subscription') ? 'selected' : '') ?>
+                                value="with-subscription">With Subscription
+                        </option>
+                        <option <?= ((isset($PrescriptionPricingType[0]['Description']) && $PrescriptionPricingType[0]['Description'] == 'per-prescription') ? 'selected' : '') ?>
+                                value="per-prescription">Per Prescription
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6 d-none" id="prescription-price-col">
+                    <label>Per Prescription Price <small class="text-danger">*</small></label>
+                    <input value="<?= ((isset($PrescriptionPrice[0]['Description']) && $PrescriptionPrice[0]['Description'] != '') ? $PrescriptionPrice[0]['Description'] : 0) ?>"
+                           type="text" name="prescription_price" id="prescription_price" class="form-control"
+                           oninput="
+                             let v = this.value;
+                             v = v.replace(/[^0-9.]/g, '');
+                             if (v.startsWith('.')) v = '0' + v;
+                             v = v.replace(/(\..*?)\..*/g, '$1');
+                             v = v.replace(/^0+(?!\.)/, '');
+                             this.value = v;
+                           ">
+                </div>
+            </div>
+            <div class="row mt-4 mb-4">
+                <input type="hidden" name="opd_invoicing" id="opd_invoicing" value="1">
+                <div class="col-md-12">
+                    <h4>OPD Invoicing Segment </h4>
+                    <hr>
+                </div>
+                <div class="col-md-12" id="opd-pricing-type-col">
+                    <label>Pricing Type <small class="text-danger">*</small></label>
+                    <select name="opd_pricing_type" id="opd_pricing_type" class="form-control">
+                        <option value="">Select Option</option>
+                        <option <?= ((isset($OPDPricingType[0]['Description']) && $OPDPricingType[0]['Description'] == 'with-subscription') ? 'selected' : '') ?>
+                                value="with-subscription">With Subscription
+                        </option>
+                        <option <?= ((isset($OPDPricingType[0]['Description']) && $OPDPricingType[0]['Description'] == 'per-invoice') ? 'selected' : '') ?>
+                                value="per-invoice">Per Invoice
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-none" id="opd-price-col">
+                    <label>Per Invoice Price <small class="text-danger">*</small></label>
+                    <input type="text" name="opd_invoice_price" id="opd_invoice_price" class="form-control"
+                           value="<?= ((isset($OPDInvoicingPrice[0]['Description']) && $OPDInvoicingPrice[0]['Description'] != '') ? $OPDInvoicingPrice[0]['Description'] : 0) ?>"
+                           oninput="
+                             let v = this.value;
+                             v = v.replace(/[^0-9.]/g, '');
+                             if (v.startsWith('.')) v = '0' + v;
+                             v = v.replace(/(\..*?)\..*/g, '$1');
+                             v = v.replace(/^0+(?!\.)/, '');
+                             this.value = v;
+                           ">
                 </div>
             </div>
             <?php
@@ -354,6 +426,7 @@ if ($page == 'add-mini-hims') {
         setTimeout(() => {
 
             const CurrentPage = "<?=$page?>";
+            const Host = "<?=$_SERVER['HTTP_HOST']?>";
 
             const FullName = $("form#AddMiniHimsForm input#name").val();
             const Email = $("form#AddMiniHimsForm input#email").val();
@@ -361,6 +434,9 @@ if ($page == 'add-mini-hims') {
             const ContactNo = $("form#AddMiniHimsForm input#ContactNo").val();
             const City = $("form#AddMiniHimsForm select#city").val();
             const SubDomain = $("form#AddMiniHimsForm input#sub_domain").val();
+
+            const PrescriptionSegmentStatus = $("form#AddMiniHimsForm input#prescription_module").val();
+            const OPDInvoicingSegmentStatus = $("form#AddMiniHimsForm input#opd_invoicing").val();
 
             if (FullName == '') {
                 clearInterval(progressInterval);
@@ -399,6 +475,44 @@ if ($page == 'add-mini-hims') {
                 return false;
             }
 
+            if (PrescriptionSegmentStatus == 1) {
+                const PrescriptionPricingType = $("form#AddMiniHimsForm select#prescription_pricing_type").val();
+                const PrescriptionPrice = $("form#AddMiniHimsForm input#prescription_price").val().trim();
+
+                if (PrescriptionPricingType == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Prescription Pricing Type Required </div>');
+                    return false;
+                }
+
+                if (PrescriptionPricingType == 'per-prescription' && PrescriptionPrice == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Per Prescription Price Required </div>');
+                    return false;
+                }
+            }
+
+            if (OPDInvoicingSegmentStatus == 1) {
+                const OpdInvoicingPricingType = $("form#AddMiniHimsForm select#opd_pricing_type").val();
+                const OpdInvoicingPrice = $("form#AddMiniHimsForm input#opd_invoice_price").val().trim();
+
+                if (OpdInvoicingPricingType == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> OPD Invoicing Pricing Type Required </div>');
+                    return false;
+                }
+
+                if (OpdInvoicingPricingType == 'per-invoice' && OpdInvoicingPrice == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Per Invoice Price Required </div>');
+                    return false;
+                }
+            }
+
             if (CurrentPage == 'add-mini-hims') {
                 const Package = $("form#AddMiniHimsForm select#Package").val();
                 const OriginalPrice = $("form#AddMiniHimsForm input#OriginalPrice").val();
@@ -434,7 +548,7 @@ if ($page == 'add-mini-hims') {
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
                 /** Send Request TO CPanel For Creating SubDomains */
-                if (CurrentPage == 'add-mini-hims' && response.subdomain) {
+                if (CurrentPage == 'add-mini-hims' && response.subdomain && Host != 'localhost') {
                     if (response.subdomain.endsWith('.clinta.biz')) {
                         AjaxResponse('Builder/CreateMiniHimsDomainsWorkers', 'subdomain=' + response.subdomain);
                     }
@@ -479,4 +593,62 @@ if ($page == 'add-mini-hims') {
             return false;
         }
     }
+</script>
+<script>
+    $(document).ready(function () {
+        $('#prescription_module, #prescription_pricing_type').on('change', togglePrescriptionDetailsFields);
+        $('#opd_invoicing, #opd_pricing_type').on('change', toggleOPDFields);
+        togglePrescriptionDetailsFields();
+        toggleOPDFields();
+    });
+
+    function togglePrescriptionDetailsFields() {
+        const status = $('#prescription_module').val();
+        const pricingType = $('#prescription_pricing_type').val();
+
+        if (status === '1') {
+            $('#prescription-pricing-type-col').removeClass('d-none');
+            if (pricingType === 'per-prescription') {
+                $('#prescription-price-col').removeClass('d-none');
+                $('#prescription-pricing-type-col').removeClass('col-md-12').addClass('col-md-6');
+            } else {
+                $('#prescription-price-col').addClass('d-none');
+                $('#prescription-pricing-type-col').removeClass('col-md-6').addClass('col-md-12');
+            }
+
+        } else {
+            $('#prescription-price-col').addClass('d-none');
+            $('#prescription-pricing-type-col').removeClass('col-md-6').addClass('col-md-12');
+            $("#prescription_price").val(0);
+        }
+    }
+
+    function toggleOPDFields() {
+
+        const status = $('#opd_invoicing').val();
+        const pricingType = $('#opd_pricing_type').val();
+
+        if (status === '1') {
+
+            $('#opd-pricing-type-col').removeClass('d-none');
+            $('#opd-pricing-type-col').removeClass('col-md-12').addClass('col-md-6');
+
+            if (pricingType === 'per-invoice') {
+                $('#opd-price-col').removeClass('d-none');
+                $('#opd-pricing-type-col').removeClass('col-md-12').addClass('col-md-6');
+                $('#opd-price-col').removeClass('col-md-12').addClass('col-md-6');
+            } else {
+
+                $('#opd-price-col').addClass('d-none');
+                $('#opd-pricing-type-col').removeClass('col-md-6').addClass('col-md-12');
+            }
+        } else {
+
+            $('#opd-price-col').addClass('d-none');
+            $('#opd-pricing-type-col').removeClass('col-md-6 col-md-4').addClass('col-md-12');
+
+            $('#opd_invoice_price').val(0);
+        }
+    }
+
 </script>

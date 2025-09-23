@@ -116,9 +116,13 @@ if ($page == 'add-hospital') {
     $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
 
     $PrescriptionSegment = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_module');
-    $OPDInvoicing = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoicing');
-}
+    $PrescriptionPricingType = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_pricing_type');
+    $PrescriptionPrice = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescription_price');
 
+    $OPDInvoicing = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoicing');
+    $OPDPricingType = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_pricing_type');
+    $OPDInvoicingPrice = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoice_price');
+}
 ?>
 <div class="card">
     <div class="card-body">
@@ -190,33 +194,7 @@ if ($page == 'add-hospital') {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="col-sm-12">Prescription Segment</label>
-                    <div class="col-sm-12">
-                        <select name="prescription_module" id="prescription_module" class="form-control">
-                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 0) ? 'selected' : '') ?>
-                                    value="0">De Activate
-                            </option>
-                            <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 1) ? 'selected' : '') ?>
-                                    value="1">Activate
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <label class="col-sm-12">OPD Invoicing</label>
-                    <div class="col-sm-12">
-                        <select name="opd_invoicing" id="opd_invoicing" class="form-control">
-                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
-                                    value="0">De Activate
-                            </option>
-                            <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
-                                    value="1">Activate
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-<?=(($page != 'add-hospital')? '4' : '6')?> mb-3">
                     <label for="validationCustom05">Profile</label>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="profile" name="profile">
@@ -239,6 +217,92 @@ if ($page == 'add-hospital') {
                     </div>
                 </div>
             </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h4>Prescription Segment</h4>
+                    <hr>
+                </div>
+                <div class="col-md-12" id="prescription-status-col">
+                    <label>Status <small class="text-danger">*</small></label>
+                    <select name="prescription_module" id="prescription_module" class="form-control">
+                        <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 0) ? 'selected' : '') ?>
+                                value="0">De Activate
+                        </option>
+                        <option <?= ((isset($PrescriptionSegment[0]['Description']) && $PrescriptionSegment[0]['Description'] == 1) ? 'selected' : '') ?>
+                                value="1">Activate
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6 d-none" id="prescription-pricing-type-col">
+                    <label>Pricing Type <small class="text-danger">*</small></label>
+                    <select name="prescription_pricing_type" id="prescription_pricing_type" class="form-control">
+                        <option value="">Select Option</option>
+                        <option <?= ((isset($PrescriptionPricingType[0]['Description']) && $PrescriptionPricingType[0]['Description'] == 'with-subscription') ? 'selected' : '') ?>
+                                value="with-subscription">With Subscription
+                        </option>
+                        <option <?= ((isset($PrescriptionPricingType[0]['Description']) && $PrescriptionPricingType[0]['Description'] == 'per-prescription') ? 'selected' : '') ?>
+                                value="per-prescription">Per Prescription
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-none" id="prescription-price-col">
+                    <label>Per Prescription Price <small class="text-danger">*</small></label>
+                    <input value="<?= ((isset($PrescriptionPrice[0]['Description']) && $PrescriptionPrice[0]['Description'] != '') ? $PrescriptionPrice[0]['Description'] : 0) ?>"
+                           type="text" name="prescription_price" id="prescription_price" class="form-control"
+                           oninput="
+                             let v = this.value;
+                             v = v.replace(/[^0-9.]/g, '');
+                             if (v.startsWith('.')) v = '0' + v;
+                             v = v.replace(/(\..*?)\..*/g, '$1');
+                             v = v.replace(/^0+(?!\.)/, '');
+                             this.value = v;
+                           ">
+                </div>
+            </div>
+            <div class="row mt-4 mb-4">
+                <div class="col-md-12">
+                    <h4>OPD Invoicing Segment </h4>
+                    <hr>
+                </div>
+                <div class="col-md-12" id="opd-status-col">
+                    <label>Status <small class="text-danger">*</small></label>
+                    <select name="opd_invoicing" id="opd_invoicing" class="form-control">
+                        <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 0) ? 'selected' : '') ?>
+                                value="0">De Activate
+                        </option>
+                        <option <?= ((isset($OPDInvoicing[0]['Description']) && $OPDInvoicing[0]['Description'] == 1) ? 'selected' : '') ?>
+                                value="1">Activate
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6 d-none" id="opd-pricing-type-col">
+                    <label>Pricing Type <small class="text-danger">*</small></label>
+                    <select name="opd_pricing_type" id="opd_pricing_type" class="form-control">
+                        <option value="">Select Option</option>
+                        <option <?= ((isset($OPDPricingType[0]['Description']) && $OPDPricingType[0]['Description'] == 'with-subscription') ? 'selected' : '') ?>
+                                value="with-subscription">With Subscription
+                        </option>
+                        <option <?= ((isset($OPDPricingType[0]['Description']) && $OPDPricingType[0]['Description'] == 'per-invoice') ? 'selected' : '') ?>
+                                value="per-invoice">Per Invoice
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-none" id="opd-price-col">
+                    <label>Per Invoice Price <small class="text-danger">*</small></label>
+                    <input type="text" name="opd_invoice_price" id="opd_invoice_price" class="form-control"
+                           value="<?= ((isset($OPDInvoicingPrice[0]['Description']) && $OPDInvoicingPrice[0]['Description'] != '') ? $OPDInvoicingPrice[0]['Description'] : 0) ?>"
+                           oninput="
+                             let v = this.value;
+                             v = v.replace(/[^0-9.]/g, '');
+                             if (v.startsWith('.')) v = '0' + v;
+                             v = v.replace(/(\..*?)\..*/g, '$1');
+                             v = v.replace(/^0+(?!\.)/, '');
+                             this.value = v;
+                           ">
+                </div>
+            </div>
+
             <?php
             if ($page == 'add-hospital') { ?>
                 <div class="form-row mt-4">
@@ -479,6 +543,7 @@ if ($page == 'add-hospital') {
         setTimeout(() => {
 
             const CurrentPage = "<?=$page?>";
+            const Host = "<?=$_SERVER['HTTP_HOST']?>";
 
             const FullName = $("form#AddHospitalForm input#name").val();
             const Email = $("form#AddHospitalForm input#email").val();
@@ -486,6 +551,9 @@ if ($page == 'add-hospital') {
             const ContactNo = $("form#AddHospitalForm input#ContactNo").val();
             const City = $("form#AddHospitalForm select#city").val();
             const SubDomain = $("form#AddHospitalForm input#sub_domain").val();
+
+            const PrescriptionSegmentStatus = $("form#AddHospitalForm select#prescription_module").val();
+            const OPDInvoicingSegmentStatus = $("form#AddHospitalForm select#opd_invoicing").val();
 
             if (FullName == '') {
                 clearInterval(progressInterval);
@@ -524,6 +592,44 @@ if ($page == 'add-hospital') {
                 return false;
             }
 
+            if (PrescriptionSegmentStatus == 1) {
+                const PrescriptionPricingType = $("form#AddHospitalForm select#prescription_pricing_type").val();
+                const PrescriptionPrice = $("form#AddHospitalForm input#prescription_price").val().trim();
+
+                if (PrescriptionPricingType == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Prescription Pricing Type Required </div>');
+                    return false;
+                }
+
+                if (PrescriptionPricingType == 'per-prescription' && PrescriptionPrice == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Per Prescription Price Required </div>');
+                    return false;
+                }
+            }
+
+            if (OPDInvoicingSegmentStatus == 1) {
+                const OpdInvoicingPricingType = $("form#AddHospitalForm select#opd_pricing_type").val();
+                const OpdInvoicingPrice = $("form#AddHospitalForm input#opd_invoice_price").val().trim();
+
+                if (OpdInvoicingPricingType == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> OPD Invoicing Pricing Type Required </div>');
+                    return false;
+                }
+
+                if (OpdInvoicingPricingType == 'per-invoice' && OpdInvoicingPrice == '') {
+                    clearInterval(progressInterval);
+                    $('.progress-modal').hide();
+                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Per Invoice Price Required </div>');
+                    return false;
+                }
+            }
+
             if (CurrentPage == 'add-hospital') {
                 const Package = $("form#AddHospitalForm select#Package").val();
                 const OriginalPrice = $("form#AddHospitalForm input#OriginalPrice").val();
@@ -559,7 +665,7 @@ if ($page == 'add-hospital') {
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
                 /** Send Request TO CPanel For Creating SubDomains */
-                if (CurrentPage == 'add-hospital' && response.subdomain) {
+                if (CurrentPage == 'add-hospital' && response.subdomain && Host != 'localhost') {
                     if (response.subdomain.endsWith('.clinta.biz')) {
                         AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
                     }
@@ -604,4 +710,73 @@ if ($page == 'add-hospital') {
             return false;
         }
     }
+</script>
+<script>
+    $(document).ready(function () {
+        $('#prescription_module, #prescription_pricing_type').on('change', togglePrescriptionDetailsFields);
+        $('#opd_invoicing, #opd_pricing_type').on('change', toggleOPDFields);
+        togglePrescriptionDetailsFields();
+        toggleOPDFields();
+    });
+
+    function togglePrescriptionDetailsFields() {
+        const status = $('#prescription_module').val();
+        const pricingType = $('#prescription_pricing_type').val();
+
+        if (status === '1') {
+            $('#prescription-pricing-type-col').removeClass('d-none');
+            $('#prescription-status-col').removeClass('col-md-12').addClass('col-md-6');
+            if (pricingType === 'per-prescription') {
+                $('#prescription-price-col').removeClass('d-none');
+                $('#prescription-status-col').removeClass('col-md-6').addClass('col-md-4');
+                $('#prescription-pricing-type-col').removeClass('col-md-6').addClass('col-md-4');
+            } else {
+                $('#prescription-price-col').addClass('d-none');
+                $('#prescription-status-col').removeClass('col-md-4').addClass('col-md-6');
+                $('#prescription-pricing-type-col').removeClass('col-md-4').addClass('col-md-6');
+            }
+
+        } else {
+            $('#prescription-pricing-type-col').addClass('d-none');
+            $('#prescription-price-col').addClass('d-none');
+            $('#prescription-status-col').removeClass('col-md-6 col-md-4').addClass('col-md-12');
+
+            $("#prescription_pricing_type").val('');
+            $("#prescription_price").val(0);
+        }
+    }
+
+    function toggleOPDFields() {
+
+        const status = $('#opd_invoicing').val();
+        const pricingType = $('#opd_pricing_type').val();
+
+        if (status === '1') {
+
+            $('#opd-pricing-type-col').removeClass('d-none');
+            $('#opd-status-col').removeClass('col-md-12 col-md-6 col-md-4').addClass('col-md-6');
+            $('#opd-pricing-type-col').removeClass('col-md-4 col-md-12').addClass('col-md-6');
+
+            if (pricingType === 'per-invoice') {
+                $('#opd-price-col').removeClass('d-none');
+                $('#opd-status-col').removeClass('col-md-6').addClass('col-md-4');
+                $('#opd-pricing-type-col').removeClass('col-md-6').addClass('col-md-4');
+                $('#opd-price-col').removeClass('col-md-6 col-md-12').addClass('col-md-4');
+            } else {
+
+                $('#opd-price-col').addClass('d-none');
+                $('#opd-status-col').removeClass('col-md-4').addClass('col-md-6');
+                $('#opd-pricing-type-col').removeClass('col-md-4').addClass('col-md-6');
+            }
+        } else {
+
+            $('#opd-pricing-type-col').addClass('d-none');
+            $('#opd-price-col').addClass('d-none');
+            $('#opd-status-col').removeClass('col-md-6 col-md-4').addClass('col-md-12');
+
+            $('#opd_pricing_type').val('');
+            $('#opd_invoice_price').val(0);
+        }
+    }
+
 </script>

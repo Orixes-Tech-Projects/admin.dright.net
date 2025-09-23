@@ -974,13 +974,23 @@ class Builder extends BaseController
 
                 $theme = $this->request->getVar('theme');
                 $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+
                 $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
                     'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
-                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
-                foreach ($Options as $key => $value) {
+                    'prescription_pricing_type' => ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription'),
+                    'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
+                    'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
 
+                foreach ($Options as $key => $value) {
                     if ($value != '') {
                         $record_option['ProfileUID'] = $website_profile_id;
                         $record_option['Name'] = $key;
@@ -1104,11 +1114,21 @@ class Builder extends BaseController
 
                 $theme = $this->request->getVar('theme');
                 $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+
                 $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
                     'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
-                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
+                    'prescription_pricing_type' => ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription'),
+                    'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
+                    'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
                 foreach ($Options as $key => $value) {
                     $Data = $Crud->SingleeRecord('public."options"', array("ProfileUID" => $id, 'Name' => $key));
                     if (isset($Data['UID'])) {
@@ -1268,13 +1288,24 @@ class Builder extends BaseController
 
                 $Sponsor = $this->request->getVar('sponsor');
                 $theme = $this->request->getVar('theme');
+
                 $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
                 $Options = array('award_nav' => 'show', 'patient_nav' => 'show', 'research_nav' => 'show', 'theme_css' => 'dore.light.red.css', 'custom_banners' => '5',
                     'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1,
                     'notify_email' => 1, 'sponsor' => ((isset($Sponsor) && $Sponsor != '') ? $Sponsor : ''),
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
-                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0));
+                    'prescription_pricing_type' => ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription'),
+                    'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
+                    'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+
                 foreach ($Options as $key => $value) {
 
                     $record_option['ProfileUID'] = $website_profile_id;
@@ -1427,10 +1458,23 @@ class Builder extends BaseController
 
                 $theme = $this->request->getVar('theme');
                 $Options = array('theme' => ((isset($theme) && $theme != '') ? $theme : ''));
+
                 $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+
                 $Options['prescription_module'] = ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0);
+                $Options['prescription_pricing_type'] = ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription');
+                $Options['prescription_price'] = ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0);
+
                 $Options['opd_invoicing'] = ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0);
+                $Options['opd_pricing_type'] = ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription');
+                $Options['opd_invoice_price'] = ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0);
+
                 $Options_record = array();
                 foreach ($Options as $key => $value) {
 
@@ -2165,6 +2209,31 @@ class Builder extends BaseController
             $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
             if ($website_profile_id) {
 
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+
+                $Options = array(
+                    'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 1),
+                    'prescription_pricing_type' => ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription'),
+                    'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 1),
+                    'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+
+                foreach ($Options as $key => $value) {
+                    if ($value != '') {
+                        $record_option['ProfileUID'] = $website_profile_id;
+                        $record_option['Name'] = $key;
+                        $record_option['Description'] = $value;
+                        $Crud->AddRecordPG("public.options", $record_option);
+                    }
+                }
+
                 $PackageUID = $this->request->getVar('Package');
                 if (isset($PackageUID) && $PackageUID > 0) {
 
@@ -2206,7 +2275,8 @@ class Builder extends BaseController
                 return;
             }
 
-        } else {
+        }
+        else {
 
             $subdomain = $this->request->getVar('sub_domain');
 
@@ -2258,6 +2328,34 @@ class Builder extends BaseController
                 $record['Profile'] = base64_encode($fileContents);
             }
             $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
+            if($website_profile_id){
+                $PrescriptionSegment = $this->request->getVar('prescription_module');
+                $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
+                $PerPrescriptionPrice = $this->request->getVar('prescription_price');
+
+                $OPDInvoicing = $this->request->getVar('opd_invoicing');
+                $OPDPricingType = $this->request->getVar('opd_pricing_type');
+                $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+
+                $Options = array('prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 1),
+                    'prescription_pricing_type' => ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription'),
+                    'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
+                    'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 1),
+                    'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+                foreach ($Options as $key => $value) {
+                    $Data = $Crud->SingleeRecord('public."options"', array("ProfileUID" => $id, 'Name' => $key));
+                    if (isset($Data['UID'])) {
+                        $record_option['Description'] = $value;
+                        $Crud->UpdateeRecord("public.options", $record_option, array('UID' => $Data['UID']));
+                    } else {
+                        $record_option['Description'] = $value;
+                        $record_option['Name'] = $key;
+                        $record_option['ProfileUID'] = $id;
+                        $Crud->AddRecordPG("public.options", $record_option);
+                    }
+                }
+            }
             $msg = $_SESSION['FullName'] . ' Mini Hims Profile Update Through Admin Dright';
             $logesegment = 'Mini Hims';
             $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
