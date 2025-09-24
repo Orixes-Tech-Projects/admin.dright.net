@@ -25,6 +25,8 @@ $routes->post('miscellaneous-data', 'HealthCare::fetch_miscellaneous');
 $routes->post('/clear_session', 'Home::clear_session');
 $routes->post('/use-login-submit', 'Home::use_login_submit');
 $routes->get('/file-cdn/(.*)', 'Home::load_file');
+$routes->get('invoice/invoices-ledger', 'Invoice::per_invoice_ledgers');
+$routes->get('invoice/prescriptions-ledger', 'Invoice::per_prescription_ledgers');
 
 $routes->group('support-ticket', static function ($routes) {
     $routes->get('clinta_extended', 'SupportTickets::index');
@@ -112,7 +114,8 @@ $routes->group('document', static function ($routes) {
     $routes->get('dashboard', 'Document::dashboard');
     $routes->post('submit', 'Document::form_submit');
     $routes->post('delete', 'Document::delete');
-});$routes->group('frenchises', static function ($routes) {
+});
+$routes->group('frenchises', static function ($routes) {
     $routes->get('', 'HealthCare::frenchises');
     $routes->get('add', 'HealthCare::frenchises');
     $routes->get('update/(:num)', 'HealthCare::frenchises');

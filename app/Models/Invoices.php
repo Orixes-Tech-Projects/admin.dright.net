@@ -239,6 +239,46 @@ class Invoices extends Model
         return $profiles;
     }
 
+    public
+    function GetAllPerInvoiceLedgerRecord($keyword = '', $length = -1, $start = 0){
+
+        $Crud = new Crud();
+        $SQL = ' SELECT "profile_invoices_payments".*, 
+                        "profiles"."Name" AS "ProfileName", "profiles"."Type" AS "ProfileType", "profiles"."MiniHims"
+                 FROM public."profile_invoices_payments"
+                 JOIN public."profiles" ON ( "profiles"."UID" = "profile_invoices_payments"."ProfileUID" ) WHERE 1=1 ';
+        if ($keyword != '') {
+            $SQL .= ' AND  "profiles"."Name" LIKE \'%' . trim($keyword) . '%\'   ';
+        }
+        $SQL .= ' Order By public."profiles"."Name"  ASC';
+        if ($length != -1){
+            $SQL .= ' LIMIT ' . $length . ' OFFSET  ' . $start . '';
+        }
+        $records = $Crud->ExecutePgSQL($SQL);
+
+        return $records;
+    }
+
+    public
+    function GetAllPerPrescriptionLedgerRecord($keyword = '', $length = -1, $start = 0){
+
+        $Crud = new Crud();
+        $SQL = ' SELECT "profile_prescription_payments".*, 
+                        "profiles"."Name" AS "ProfileName", "profiles"."Type" AS "ProfileType", "profiles"."MiniHims"
+                 FROM public."profile_prescription_payments"
+                 JOIN public."profiles" ON ( "profiles"."UID" = "profile_prescription_payments"."ProfileUID" ) WHERE 1=1 ';
+        if ($keyword != '') {
+            $SQL .= ' AND  "profiles"."Name" LIKE \'%' . trim($keyword) . '%\'   ';
+        }
+        $SQL .= ' Order By public."profiles"."Name"  ASC';
+        if ($length != -1){
+            $SQL .= ' LIMIT ' . $length . ' OFFSET  ' . $start . '';
+        }
+        $records = $Crud->ExecutePgSQL($SQL);
+
+        return $records;
+    }
+
 }
 
 

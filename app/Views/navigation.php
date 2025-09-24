@@ -240,6 +240,18 @@ $doctor = $checknav->checkAccessKey('doctor');
                         </a>
                     </li>
                 <?php } ?>
+                <li>
+                    <a href="<?= $path ?>invoice/invoices-ledger">
+                        <span class="nav-link-icon" data-feather="file"></span>
+                        <span>Per Invoices Ledgers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= $path ?>invoice/prescriptions-ledger">
+                        <span class="nav-link-icon" data-feather="file"></span>
+                        <span>Per Prescriptions Ledgers</span>
+                    </a>
+                </li>
             </ul>
             <ul id="customers">
                 <li class="navigation-divider">Customers</li>
