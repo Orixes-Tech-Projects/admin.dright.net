@@ -612,6 +612,7 @@ class Builder extends BaseController
         $Crud = new Crud();
         $Main = new Main();
 
+        $Type = $this->request->getVar('type');
         $alignment = $this->request->getVar('alignment');
         $color = $this->request->getVar('color');
         $speciality = $this->request->getVar('speciality');
@@ -645,6 +646,7 @@ class Builder extends BaseController
             exit;
         }
 
+        $record['Type'] = ((isset($Type) && $Type != '')? $Type : 'custom-text');
         $record['Alignment'] = $alignment;
         $record['Color'] = $color;
         $record['Speciality'] = $speciality;
