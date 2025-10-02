@@ -646,7 +646,7 @@ class Builder extends BaseController
             exit;
         }
 
-        $record['Type'] = ((isset($Type) && $Type != '')? $Type : 'custom-text');
+        $record['Type'] = ((isset($Type) && $Type != '') ? $Type : 'custom-text');
         $record['Alignment'] = $alignment;
         $record['Color'] = $color;
         $record['Speciality'] = $speciality;
@@ -2277,8 +2277,7 @@ class Builder extends BaseController
                 return;
             }
 
-        }
-        else {
+        } else {
 
             $subdomain = $this->request->getVar('sub_domain');
 
@@ -2330,7 +2329,7 @@ class Builder extends BaseController
                 $record['Profile'] = base64_encode($fileContents);
             }
             $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
-            if($website_profile_id){
+            if ($website_profile_id) {
                 $PrescriptionSegment = $this->request->getVar('prescription_module');
                 $PrescriptionPricingType = $this->request->getVar('prescription_pricing_type');
                 $PerPrescriptionPrice = $this->request->getVar('prescription_price');
@@ -2648,6 +2647,15 @@ class Builder extends BaseController
             $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
             if ($website_profile_id) {
 
+                $record_meta = array();
+                $PatientPortal = $this->request->getVar('patient_portal');
+                if (isset($PatientPortal) && $PatientPortal != '') {
+                    $record_meta['ProfileUID'] = $website_profile_id;
+                    $record_meta['Option'] = 'patient_portal';
+                    $record_meta['Value'] = $PatientPortal;
+                    $Crud->AddRecordPG("public.profile_metas", $record_meta);
+                }
+
                 $msg = $_SESSION['FullName'] . ' Promotional Website Profile Submit Through Admin Dright';
                 $logesegment = 'Promotional Website';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
@@ -2743,6 +2751,20 @@ class Builder extends BaseController
                 $record['Profile'] = base64_encode($fileContents);
             }
             $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
+            if($website_profile_id){
+
+                $record_meta = array();
+                $PatientPortal = $this->request->getVar('patient_portal');
+                if (isset($PatientPortal) && $PatientPortal != '') {
+                    $Crud->DeleteRecordPG('public."profile_metas"', array("ProfileUID" => $id, 'Option' => 'patient_portal'));
+
+                    $record_meta['ProfileUID'] = $id;
+                    $record_meta['Option'] = 'patient_portal';
+                    $record_meta['Value'] = $PatientPortal;
+                    $Crud->AddRecordPG("public.profile_metas", $record_meta);
+                }
+            }
+
             $msg = $_SESSION['FullName'] . ' Promotional Websites Profile Update Through Admin Dright';
             $logesegment = 'Promotional Websites';
             $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());

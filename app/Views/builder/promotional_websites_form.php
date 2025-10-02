@@ -119,6 +119,9 @@ $BuilderModel = new BuilderModel();
 $BuilderAllProfiles = $BuilderModel->BuilderAllProfiles();
 
 $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_portal = '';
+if($page != 'add-promotional-websites'){
+    $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
+}
 ?>
 <div class="card">
     <div class="card-body">
@@ -167,7 +170,7 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                         Please provide a valid .
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group row">
                         <label class="col-sm-4">City <span class="text-danger">*</span></label>
                         <div class="col-sm-12">
@@ -181,7 +184,7 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group row">
                         <label class="col-sm-12">Sub Domain <span class="text-danger">*</span></label>
                         <div class="col-sm-12">
@@ -194,7 +197,25 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                         </div>
                     </div>
                 </div>
-                <div class="col-md-<?= (($page != 'add-promotional-websites') ? 3 : 6) ?> mb-3">
+                <div class="col-md-4">
+                    <div class="form-group row">
+                        <label class="col-sm-12">Patient Portal <span class="text-danger">*</span></label>
+                        <div class="col-sm-12">
+                            <select name="patient_portal" id="patient_portal" class="form-control">
+                                <option value=""<?= (is_array($patient_portal) && !empty($patient_portal) && isset($patient_portal[0]['Value']) && $patient_portal[0]['Value'] == '') ? 'selected' : '' ?>>
+                                    Please Select
+                                </option>
+                                <option value="1"<?= (is_array($patient_portal) && !empty($patient_portal) && isset($patient_portal[0]['Value']) && $patient_portal[0]['Value'] == '1') ? 'selected' : '' ?>>
+                                    Yes
+                                </option>
+                                <option value="0"<?= (is_array($patient_portal) && !empty($patient_portal) && isset($patient_portal[0]['Value']) && $patient_portal[0]['Value'] == '0') ? 'selected' : '' ?>>
+                                    No
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-<?= (($page != 'add-promotional-websites') ? 4 : 4) ?> mb-3">
                     <label for="validationCustom05">Profile</label>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="profile" name="profile">
@@ -203,7 +224,7 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                 </div>
                 <?php if ($page != 'add-promotional-websites') { ?>
                     <div class="col-md-3">
-                        <img style="float: right;" src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>"
+                        <img  src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>"
                              height="70">
                     </div>
                 <?php } ?>
@@ -224,7 +245,7 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-5">
                         <div class="form-group row">
                             <label class="col-sm-12">Clone From Existing Profile <span
                                         class="text-danger">*</span></label>
@@ -321,6 +342,7 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
             const ContactNo = $("form#AddPromotionalWebsitesForm input#ContactNo").val();
             const City = $("form#AddPromotionalWebsitesForm select#city").val();
             const SubDomain = $("form#AddPromotionalWebsitesForm input#sub_domain").val();
+            const PatientPortal = $("form#AddPromotionalWebsitesForm select#patient_portal").val();
 
             if (FullName == '') {
                 clearInterval(progressInterval);
@@ -356,6 +378,13 @@ $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_
                 clearInterval(progressInterval);
                 $('.progress-modal').hide();
                 $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Valid SubDomain Required </div>');
+                return false;
+            }
+
+            if (PatientPortal == '') {
+                clearInterval(progressInterval);
+                $('.progress-modal').hide();
+                $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Patient Portal Access Required </div>');
                 return false;
             }
 
