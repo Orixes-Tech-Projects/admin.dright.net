@@ -51,6 +51,12 @@ $doctor = $checknav->checkAccessKey('doctor');
                         </a>
                     </li>
                 <?php } ?>
+                <li>
+                    <a href="#" data-menu-target="#medicines" <?= ($segment_a == 'medicine' ? 'class="active"' : '') ?>>
+                        <span class="menu-tab-icon"><i data-feather="heart"></i></span>
+                        <span>Medicines</span>
+                    </a>
+                </li>
                 <?php
                 if ($checknav->checkAccessKey('health_care')) {
                     ?>
@@ -773,6 +779,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                         </a>
                     </li>
                 <?php } ?>
+
             </ul>
             <ul id="other">
                 <li class="navigation-divider">Medicine</li>
@@ -793,30 +800,6 @@ $doctor = $checknav->checkAccessKey('doctor');
                         <span>Pharmacy Profile</span>
                     </a>
 
-                </li>
-                <li>
-                    <a href="#">
-                        <span class="nav-link-icon" data-feather="activity"></span>
-                        <span>Medicine</span>
-                    </a>
-                    <ul>
-
-                        <li>
-                            <a href="<?= $path ?>medicine/">Medicine List</a>
-                        </li>
-                        <li>
-                            <a href="<?= $path ?>medicine/take_type">Take Type</a>
-                        </li>
-                        <li>
-                            <a href="<?= $path ?>medicine/medicine_forms">Forms</a>
-                        </li>
-                        <li>
-                            <a href="<?= $path ?>medicine/timing">Timing</a>
-                        </li>
-                        <li>
-                            <a href="<?= $path ?>medicine/company">Company</a>
-                        </li>
-                    </ul>
                 </li>
             </ul>
             <ul id="users">
@@ -862,6 +845,44 @@ $doctor = $checknav->checkAccessKey('doctor');
 
                 </li>
 
+            </ul>
+            <ul id="medicines">
+                <li class="navigation-divider">Medicines</li>
+
+                <li>
+                    <a href="<?= $path ?>medicine/">
+                        <span class="nav-link-icon" data-feather="list"></span>
+                        <span>List</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= $path ?>medicine/take_type">
+                        <span class="nav-link-icon" data-feather="chevrons-right"></span>
+                        <span>Take Type</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= $path ?>medicine/medicine_forms">
+                        <span class="nav-link-icon" data-feather="package"></span>
+                        <span>Forms</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= $path ?>medicine/timing">
+                        <span class="nav-link-icon" data-feather="clock"></span>
+                        <span>Timing</span>
+                    </a>
+                </li>
+
+                <li class="d-none">
+                    <a href="<?= $path ?>medicine/company">
+                        <span class="nav-link-icon" data-feather="briefcase"></span>
+                        <span>Company</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- ./ Menu body -->

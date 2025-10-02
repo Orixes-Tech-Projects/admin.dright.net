@@ -1,139 +1,82 @@
-<link rel="stylesheet" href="<?= $template ?>vendors/select2/css/select2.min.css" type="text/css">
-
-
 <div class="modal" id="AddMedicineModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" role="document" style="min-width: 60%">
         <div class="modal-content">
-            <form method="post" action="" name="AddMedicineForm" id="AddMedicineForm" class="needs-validation" novalidate=""
-                  enctype="multipart/form-data">
+            <form method="post" action="" name="AddMedicineForm" id="AddMedicineForm" class="needs-validation"
+                  novalidate enctype="multipart/form-data">
                 <input type="hidden" name="UID" id="UID" value="0">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Medicine </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i class="ti-close"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-row">
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Name</label>
-                        <input type="text" class="form-control" id="MedicineName" name="Medicine[MedicineTitle]"
-                               placeholder="Enter Medicine name"
-                              required="">
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom02">Pharma Company</label>
-                        <select class="form-control" id="PharmaCompanyUID" name="Medicine[PharmaCompanyUID]">
-                            <option value="">Please Select</option>
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Medicine</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="ti-close"></i>
+                    </button>
+                </div>
 
-                            <?php  foreach ($Company as $record) { ?>
-                            <option value="<?= $record['UID'] ?>"
-                               ><?= ucwords($record['CompanyName']); ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Ingredients</label>
-                        <input type="text" class="form-control" id="Ingredients" name="Medicine[Ingredients]"
-                               placeholder="Enter Ingredients"
-                               required="">
-                        <div class="valid-feedback">
-                            Looks good!
+                <div class="modal-body">
+                    <div class="form-row">
+
+                        <!-- Medicine Name -->
+                        <div class="col-md-12 mb-3">
+                            <label for="MedicineName">Medicine Name <small class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="MedicineName" name="Medicine[MedicineTitle]"
+                                   placeholder="Enter medicine name" required>
+                            <div class="invalid-feedback">Please enter the medicine name.</div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Dosage Form </label>
-                        <input type="text" class="form-control" id="DosageForm" name="Medicine[DosageForm]"
-                               placeholder="Enter Doasage Form"
-                               required="">
-                        <div class="valid-feedback">
-                            Looks good!
+
+                        <!-- Dosage Form -->
+                        <div class="col-md-6 mb-3">
+                            <label for="DosageForm">Formulation <small class="text-danger">*</small></label>
+                            <input type="text" class="form-control" id="DosageForm" name="Medicine[DosageForm]"
+                                   placeholder="Enter dosage form" required>
+                            <div class="invalid-feedback">Please enter the formulation.</div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Packing</label>
-                        <input type="text" class="form-control" id="Packing" name="Medicine[Packing]"
-                               placeholder="Enter Packing"
-                               required="">
-                        <div class="valid-feedback">
-                            Looks good!
+
+                        <!-- Strength & Unit -->
+                        <div class="col-md-6 mb-3">
+                            <label for="Packing" style="width: 100%;">Strength & Unit <small
+                                        class="text-danger">*</small>
+                                <small style="float: right; color: red;">(e.g., 100 MG, 100 ML)</small>
+                            </label>
+                            <input type="text" class="form-control" id="Packing" name="Medicine[Packing]"
+                                   placeholder="Enter strength and unit" required>
+                            <div class="invalid-feedback">Please enter strength and unit.</div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Trade Price </label>
-                        <input type="text" class="form-control" id="TradePrice" name="Medicine[TradePrice]"
-                               placeholder="Enter Trade Price"
-                               required="">
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div><div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Retail Price  </label>
-                        <input type="text" class="form-control" id="RetailPrice" name="Medicine[RetailPrice]"
-                               placeholder="Enter Retail Price"
-                               required="">
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
+
+                        <!-- Response -->
+                        <div class="col-md-12" id="ajaxResponse"></div>
+
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="AddMedicineFormFunction()">Save changes</button>
-            </div>
-            </form>
-            <div class="mt-4" id="ajaxResponse"></div>
 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="AddMedicineFormFunction()">Save changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<script src="<?= $template ?>vendors/select2/js/select2.min.js"></script>
-
 <script>
-
-
-    // $('.select2-example').select2({
-    //     placeholder: 'Select'
-    // });
-
-
     function AddMedicineFormFunction() {
-        var formdata = new window.FormData($("form#AddMedicineForm")[0]);
+        const form = document.getElementById('AddMedicineForm');
 
-        response = AjaxUploadResponse("medicine/submit_medicine_form", formdata);
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const Data = $("form#AddMedicineForm").serialize();
+        const response = AjaxResponse("medicine/submit_medicine_form", Data);
+
         if (response.status === 'success') {
-            $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
+            $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"><strong>Success!</strong> ' + response.message + '</div>');
             setTimeout(function () {
                 location.reload();
             }, 500);
         } else {
-            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> ' + response.message + ' </div>');
+            $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"><strong>Error!</strong> ' + response.message + '</div>');
         }
     }
 </script>
-<script>
-    (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-</script>
-<script src="<?=$template?>assets/js/examples/form-validation.js"></script>

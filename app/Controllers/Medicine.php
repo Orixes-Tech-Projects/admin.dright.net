@@ -89,7 +89,6 @@ class Medicine extends BaseController
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
 
         $Data = $MedicineModel->get_medicine_datatables($keyword);
-//        print_r($Data);exit();
         $totalfilterrecords = $MedicineModel->count_medicine_datatables($keyword);
         $dataarr = array();
         $cnt = $_POST['start'];
@@ -97,27 +96,20 @@ class Medicine extends BaseController
             $cnt++;
             $data = array();
             $data[] = $cnt;
-            $data[] = isset($record['MedicineTitle']) ? htmlspecialchars($record['MedicineTitle']) : '';
-
-            $data[] = isset($record['PharmaTitle']) ? htmlspecialchars($record['PharmaTitle']) : '';
-            $data[] = isset($record['Ingredients']) ? htmlspecialchars($record['Ingredients']) : '';
             $data[] = isset($record['DosageForm']) ? htmlspecialchars($record['DosageForm']) : '';
+            $data[] = isset($record['MedicineTitle']) ? htmlspecialchars($record['MedicineTitle']) : '';
             $data[] = isset($record['Packing']) ? htmlspecialchars($record['Packing']) : '';
-            $data[] = isset($record['TradePrice']) ? htmlspecialchars($record['TradePrice']) : '';
-            $data[] = isset($record['RetailPrice']) ? htmlspecialchars($record['RetailPrice']) : '';
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateMedicine(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteMedicine(' . htmlspecialchars($record['UID']) . ')">Delete</a>
-
-            </div>
-        </div>
-    </td>';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="UpdateMedicine(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                    <a class="dropdown-item" onclick="DeleteMedicine(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                                </div>
+                            </div>
+                        </td>';
             $dataarr[] = $data;
         }
 
@@ -191,21 +183,21 @@ class Medicine extends BaseController
             $cnt++;
             $data = array();
             $data[] = $cnt;
+            $data[] = isset($record['TakeTypeEng']) ? htmlspecialchars($record['TakeTypeEng']) : '-';
             $data[] = isset($record['TakeType']) ? htmlspecialchars($record['TakeType']) : '';
 
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateMedicineTakeType(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteMedicineTakeType(' . htmlspecialchars($record['UID']) . ')">Delete</a>
-
-            </div>
-        </div>
-    </td>';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="UpdateMedicineTakeType(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                    <a class="dropdown-item" onclick="DeleteMedicineTakeType(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                    
+                                </div>
+                            </div>
+                        </td>';
             $dataarr[] = $data;
         }
 
@@ -268,29 +260,28 @@ class Medicine extends BaseController
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
 
         $Data = $MedicineModel->get_medicine_forms_datatables($keyword);
-//        print_r($Data);exit();
         $totalfilterrecords = $MedicineModel->count_medicine_forms_datatables($keyword);
         $dataarr = array();
         $cnt = $_POST['start'];
         foreach ($Data as $record) {
+
             $cnt++;
             $data = array();
             $data[] = $cnt;
+            $data[] = isset($record['EngName']) ? htmlspecialchars($record['EngName']) : '-';
             $data[] = isset($record['Name']) ? htmlspecialchars($record['Name']) : '';
-
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateMedicineForms(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteMedicineForms(' . htmlspecialchars($record['UID']) . ')">Delete</a>
-
-            </div>
-        </div>
-    </td>';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="UpdateMedicineForms(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                    <a class="dropdown-item" onclick="DeleteMedicineForms(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                    
+                                </div>
+                            </div>
+                        </td>';
             $dataarr[] = $data;
         }
 
@@ -309,7 +300,6 @@ class Medicine extends BaseController
         $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
 
         $Data = $MedicineModel->get_medicine_timing_datatables($keyword);
-//        print_r($Data);exit();
         $totalfilterrecords = $MedicineModel->count_medicine_timing_datatables($keyword);
         $dataarr = array();
         $cnt = $_POST['start'];
@@ -317,22 +307,20 @@ class Medicine extends BaseController
             $cnt++;
             $data = array();
             $data[] = $cnt;
+            $data[] = isset($record['EngName']) ? htmlspecialchars($record['EngName']) : '-';
             $data[] = isset($record['Name']) ? htmlspecialchars($record['Name']) : '';
-            $data[] = isset($record['SortOrder']) ? htmlspecialchars($record['SortOrder']) : '';
-
-            $data[] = '
-    <td class="text-end">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Actions
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="UpdateMedicineTiming(' . htmlspecialchars($record['UID']) . ')">Update</a>
-                <a class="dropdown-item" onclick="DeleteMedicineTiming(' . htmlspecialchars($record['UID']) . ')">Delete</a>
-
-            </div>
-        </div>
-    </td>';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="UpdateMedicineTiming(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                    <a class="dropdown-item" onclick="DeleteMedicineTiming(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                    
+                                </div>
+                            </div>
+                        </td>';
             $dataarr[] = $data;
         }
 
@@ -391,12 +379,11 @@ class Medicine extends BaseController
         $id = $this->request->getVar('UID');
         $Medicine = $this->request->getVar('TakeType');
 
-
         if ($id == 0) {
+
             foreach ($Medicine as $key => $value) {
                 $record[$key] = ((isset($value)) ? $value : '');
             }
-
             $RecordId = $Crud->AddRecord("medicines_take_types", $record);
             if (isset($RecordId) && $RecordId > 0) {
                 $response['status'] = 'success';
@@ -406,6 +393,7 @@ class Medicine extends BaseController
                 $response['message'] = 'Data Didnt Submitted Successfully...!';
             }
         } else {
+
             foreach ($Medicine as $key => $value) {
                 $record[$key] = $value;
             }
@@ -452,6 +440,7 @@ class Medicine extends BaseController
 
         echo json_encode($response);
     }
+
     public function submit_medicine_company()
     {
         $Crud = new Crud();
@@ -497,13 +486,11 @@ class Medicine extends BaseController
 
         $id = $this->request->getVar('UID');
         $Medicine = $this->request->getVar('timing');
-
-
         if ($id == 0) {
+
             foreach ($Medicine as $key => $value) {
                 $record[$key] = ((isset($value)) ? $value : '');
             }
-
             $RecordId = $Crud->AddRecord("medicines_timings", $record);
             if (isset($RecordId) && $RecordId > 0) {
                 $response['status'] = 'success';
@@ -565,7 +552,9 @@ class Medicine extends BaseController
         $response['message'] = 'Deleted Successfully...!';
 
         echo json_encode($response);
-    }    public function delete_pharma_company()
+    }
+
+    public function delete_pharma_company()
     {
         $data = $this->data;
         $UID = $this->request->getVar('id');
@@ -617,7 +606,9 @@ class Medicine extends BaseController
         $response['record'] = $record;
         $response['message'] = 'Record Get Successfully...!';
         echo json_encode($response);
-    }   public function get_medicine_pharma_company()
+    }
+
+    public function get_medicine_pharma_company()
     {
         $Crud = new Crud();
         $id = $_POST['id'];

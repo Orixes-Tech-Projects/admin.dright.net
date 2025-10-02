@@ -32,92 +32,98 @@ class MedicineModel extends Model
 //        return $data;
 //    }
 
-    public function ListAllMedicines($keyword)
+    public
+    function ListAllMedicines($keyword)
     {
-
         $Crud = new Crud();
         $session = session();
         $SessionFilters = $session->get('MedicineFilters');
         $SQL = 'SELECT medicines.*, pharma_company.CompanyName AS PharmaTitle FROM medicines
-    LEFT JOIN pharma_company ON medicines.PharmaCompanyUID = pharma_company.UID
-        WHERE medicines.`Archive`=\'0\'
-
-';
+                        LEFT JOIN pharma_company ON medicines.PharmaCompanyUID = pharma_company.UID
+                WHERE medicines.`Archive` = 0 ';
         if (isset($SessionFilters['MedicineName']) && $SessionFilters['MedicineName'] != '') {
             $MedicineName = $SessionFilters['MedicineName'];
-            $SQL .= ' AND  `MedicineTitle` LIKE \'%' . $MedicineName . '%\'';
+            $SQL .= ' AND  `MedicineTitle` LIKE \'%' . trim($MedicineName) . '%\'';
         }
-        if($keyword!=''){
-            $SQL .= ' AND  ( `MedicineTitle` LIKE \'%' . $keyword . '%\'  OR `Ingredients` LIKE \'%' . $keyword . '%\') ';
+        if ($keyword != '') {
+            $SQL .= ' AND  ( `MedicineTitle` LIKE \'%' . trim($keyword) . '%\'  OR `Packing` LIKE \'%' . trim($keyword) . '%\') ';
         }
         $SQL .= ' ORDER BY medicines.`MedicineTitle` ASC';
-//print_r($SQL);exit();
-//        $Admin = $Crud->ExecuteSQL($SQL);
+
         return $SQL;
     }
-    public function ListAllMedicinesbyID($keyword,$id)
+
+    public function ListAllMedicinesbyID($keyword, $id)
     {
 
         $Crud = new Crud();
 
         $SQL = 'SELECT medicines.*, pharma_company.CompanyName AS PharmaTitle FROM medicines
     LEFT JOIN pharma_company ON medicines.PharmaCompanyUID = pharma_company.UID
-        WHERE medicines.`Archive`=\'0\' AND medicines.`PharmaCompanyUID`= '.$id.'
+        WHERE medicines.`Archive`=\'0\' AND medicines.`PharmaCompanyUID`= ' . $id . '
 
 ';
 
-        if($keyword!=''){
+        if ($keyword != '') {
             $SQL .= ' AND  ( `MedicineTitle` LIKE \'%' . $keyword . '%\'  OR `Ingredients` LIKE \'%' . $keyword . '%\') ';
         }
         $SQL .= ' ORDER BY medicines.`MedicineTitle` ASC';
-//print_r($SQL);exit();
-//        $Admin = $Crud->ExecuteSQL($SQL);
         return $SQL;
     }
+
     public function medicines_take_types($keyword)
     {
         $Crud = new Crud();
-
-        $SQL = "SELECT * FROM `medicines_take_types` Where 1=1 ";
-        if($keyword!=''){
-            $SQL .= ' AND  `TakeType` LIKE \'%' . $keyword . '%\'   ';
+        $SQL = "SELECT * FROM `medicines_take_types` WHERE 1=1";
+        if ($keyword != '') {
+            $SQL .= " AND (`TakeType` LIKE '%" . $keyword . "%' OR `TakeTypeEng` LIKE '%" . $keyword . "%')";
         }
-        $SQL .= ' ORDER BY `TakeType` ASC';
+        $SQL .= " ORDER BY `TakeType` ASC";
+
         return $SQL;
     }
-    public function medicines_forms($keyword)
+
+    public
+    function medicines_forms($keyword)
     {
         $Crud = new Crud();
 
-        $SQL = "SELECT * FROM `medicines_forms` Where 1=1 ";
-        if($keyword!=''){
-            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
+        $SQL = "SELECT * FROM `medicines_forms` WHERE 1=1";
+
+        if ($keyword != '') {
+            $SQL .= " AND (`Name` LIKE '%" . $keyword . "%' OR `EngName` LIKE '%" . $keyword . "%')";
         }
-        $SQL .= ' ORDER BY `SortOrder` ASC';
+
+        $SQL .= " ORDER BY `SortOrder` ASC";
+
         return $SQL;
     }
+
     public function pharma_company($keyword)
     {
         $Crud = new Crud();
 
         $SQL = "SELECT * FROM `pharma_company` Where 1=1 ";
-        if($keyword!=''){
+        if ($keyword != '') {
             $SQL .= ' AND  `CompanyName` LIKE \'%' . $keyword . '%\'   ';
         }
         $SQL .= ' ORDER BY `CompanyName` ASC';
         return $SQL;
     }
-    public function medicines_timing($keyword)
+
+    public
+    function medicines_timing($keyword)
     {
         $Crud = new Crud();
 
         $SQL = "SELECT * FROM `medicines_timings` Where 1=1 ";
-        if($keyword!=''){
-            $SQL .= ' AND  `Name` LIKE \'%' . $keyword . '%\'   ';
+        if ($keyword != '') {
+            $SQL .= " AND (`Name` LIKE '%" . trim($keyword) . "%' OR `EngName` LIKE '%" . trim($keyword) . "%')";
         }
-        $SQL .= ' ORDER BY `SortOrder` ASC';
+        $SQL .= ' ORDER BY `Name` ASC';
         return $SQL;
     }
+
     public function ListAllCompanies()
     {
         $Crud = new Crud();
@@ -125,6 +131,7 @@ class MedicineModel extends Model
         $Admin = $Crud->ExecuteSQL($SQL);
         return $Admin;
     }
+
     public function GetMedicinesByPharmaID($id)
     {
         $Crud = new Crud();
@@ -142,7 +149,6 @@ class MedicineModel extends Model
         $SQL = $this->ListAllMedicines($keyword);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
-//        echo nl2br($SQL); exit;
         $records = $Crud->ExecuteSQL($SQL);
         return $records;
     }
@@ -156,6 +162,7 @@ class MedicineModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
+
     public
     function get_medicine_take_type_datatables($keyword)
     {
@@ -176,6 +183,7 @@ class MedicineModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
+
     public
     function get_medicine_forms_datatables($keyword)
     {
@@ -196,6 +204,7 @@ class MedicineModel extends Model
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
+
     public
     function get_medicine_timing_datatables($keyword)
     {
@@ -215,7 +224,9 @@ class MedicineModel extends Model
         $SQL = $this->medicines_timing($keyword);
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
-    } public
+    }
+
+    public
     function get_pharma_company_datatables($keyword)
     {
         $Crud = new Crud();
@@ -234,12 +245,14 @@ class MedicineModel extends Model
         $SQL = $this->pharma_company($keyword);
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
-    }public
-    function get_med_by_id_datatables($keyword,$id)
+    }
+
+    public
+    function get_med_by_id_datatables($keyword, $id)
     {
         $Crud = new Crud();
 
-        $SQL = $this->ListAllMedicinesbyID($keyword,$id);
+        $SQL = $this->ListAllMedicinesbyID($keyword, $id);
         if ($_POST['length'] != -1)
             $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
         $records = $Crud->ExecuteSQL($SQL);
@@ -247,10 +260,10 @@ class MedicineModel extends Model
     }
 
     public
-    function count_med_by_id_datatables($keyword,$id)
+    function count_med_by_id_datatables($keyword, $id)
     {
         $Crud = new Crud();
-        $SQL = $this->ListAllMedicinesbyID($keyword,$id);
+        $SQL = $this->ListAllMedicinesbyID($keyword, $id);
         $records = $Crud->ExecuteSQL($SQL);
         return count($records);
     }
