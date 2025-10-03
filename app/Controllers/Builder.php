@@ -983,6 +983,8 @@ class Builder extends BaseController
                 $OPDPricingType = $this->request->getVar('opd_pricing_type');
                 $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
 
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+
                 $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
                     'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
@@ -990,7 +992,8 @@ class Builder extends BaseController
                     'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
                     'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
                     'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
-                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0),
+                    'prescribe_medicine_list' => ((isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') ? $PrescriptionMedicineList : 'built_in'));
 
                 foreach ($Options as $key => $value) {
                     if ($value != '') {
@@ -1123,6 +1126,8 @@ class Builder extends BaseController
                 $OPDPricingType = $this->request->getVar('opd_pricing_type');
                 $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
 
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+
                 $Options = array('theme_css' => 'dore.light.red.css', 'theme' => ((isset($theme) && $theme != '') ? $theme : ''),
                     'sms_credits' => 100, 'notify_sms' => 1, 'notify_email' => 1,
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
@@ -1130,8 +1135,11 @@ class Builder extends BaseController
                     'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
                     'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
                     'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
-                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0),
+                    'prescribe_medicine_list' => ((isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') ? $PrescriptionMedicineList : 'built_in'));
+
                 foreach ($Options as $key => $value) {
+
                     $Data = $Crud->SingleeRecord('public."options"', array("ProfileUID" => $id, 'Name' => $key));
                     if (isset($Data['UID'])) {
                         $record_option['Description'] = $value;
@@ -1155,7 +1163,6 @@ class Builder extends BaseController
             $response['message'] = "Hospitals Profile Updated Successfully.....!";
             echo json_encode($response);
         }
-
     }
 
 
@@ -1298,7 +1305,11 @@ class Builder extends BaseController
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
                 $OPDPricingType = $this->request->getVar('opd_pricing_type');
                 $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
-                $Options = array('award_nav' => 'show', 'patient_nav' => 'show', 'research_nav' => 'show', 'theme_css' => 'dore.light.red.css', 'custom_banners' => '5',
+
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+
+                $Options = array('award_nav' => 'show', 'patient_nav' => 'show', 'research_nav' => 'show',
+                    'theme_css' => 'dore.light.red.css', 'custom_banners' => '5',
                     'theme' => ((isset($theme) && $theme != '') ? $theme : ''), 'sms_credits' => 100, 'notify_sms' => 1,
                     'notify_email' => 1, 'sponsor' => ((isset($Sponsor) && $Sponsor != '') ? $Sponsor : ''),
                     'prescription_module' => ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0),
@@ -1306,7 +1317,8 @@ class Builder extends BaseController
                     'prescription_price' => ((isset($PerPrescriptionPrice) && $PerPrescriptionPrice != '') ? $PerPrescriptionPrice : 0),
                     'opd_invoicing' => ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0),
                     'opd_pricing_type' => ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription'),
-                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0));
+                    'opd_invoice_price' => ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0),
+                    'prescribe_medicine_list' => ((isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') ? $PrescriptionMedicineList : 'built_in'));
 
                 foreach ($Options as $key => $value) {
 
@@ -1347,9 +1359,8 @@ class Builder extends BaseController
                 $response['subdomain'] = $subdomain;
                 echo json_encode($response);
 
-                return;
-
             } else {
+
                 $response = array();
                 $response['status'] = "fail";
                 $response['message'] = "Error in Adding Doctors Profile...!";
@@ -1468,6 +1479,7 @@ class Builder extends BaseController
                 $OPDInvoicing = $this->request->getVar('opd_invoicing');
                 $OPDPricingType = $this->request->getVar('opd_pricing_type');
                 $OPDInvoicePrice = $this->request->getVar('opd_invoice_price');
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
 
                 $Options['prescription_module'] = ((isset($PrescriptionSegment) && $PrescriptionSegment != '') ? $PrescriptionSegment : 0);
                 $Options['prescription_pricing_type'] = ((isset($PrescriptionPricingType) && $PrescriptionPricingType != '') ? $PrescriptionPricingType : 'with-subscription');
@@ -1476,6 +1488,8 @@ class Builder extends BaseController
                 $Options['opd_invoicing'] = ((isset($OPDInvoicing) && $OPDInvoicing != '') ? $OPDInvoicing : 0);
                 $Options['opd_pricing_type'] = ((isset($OPDPricingType) && $OPDPricingType != '') ? $OPDPricingType : 'with-subscription');
                 $Options['opd_invoice_price'] = ((isset($OPDInvoicePrice) && $OPDInvoicePrice != '') ? $OPDInvoicePrice : 0);
+
+                $Options['prescribe_medicine_list'] = ((isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') ? $PrescriptionMedicineList : 'built_in');
 
                 $Options_record = array();
                 foreach ($Options as $key => $value) {
@@ -1524,7 +1538,7 @@ class Builder extends BaseController
                 $response['id'] = $id;
                 $response['message'] = "Doctors Profile Updated Successfully.....!";
                 echo json_encode($response);
-                return;
+
             } else {
 
                 $response = array();
@@ -2656,7 +2670,16 @@ class Builder extends BaseController
                     $Crud->AddRecordPG("public.profile_metas", $record_meta);
                 }
 
-                $msg = $_SESSION['FullName'] . ' Promotional Website Profile Submit Through Admin Dright';
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+                if (isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') {
+                    $record_option = array();
+                    $record_option['ProfileUID'] = $website_profile_id;
+                    $record_option['Name'] = 'prescribe_medicine_list';
+                    $record_option['Description'] = $PrescriptionMedicineList;
+                    $Crud->AddRecordPG("public.options", $record_option);
+                }
+
+                $msg = $_SESSION['FullName'] . ' Promotional Website Profile Submit Through Admin DRight';
                 $logesegment = 'Promotional Website';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
 
@@ -2751,7 +2774,7 @@ class Builder extends BaseController
                 $record['Profile'] = base64_encode($fileContents);
             }
             $website_profile_id = $Crud->UpdateeRecord("public.profiles", $record, array('UID' => $id));
-            if($website_profile_id){
+            if ($website_profile_id) {
 
                 $record_meta = array();
                 $PatientPortal = $this->request->getVar('patient_portal');
@@ -2762,6 +2785,17 @@ class Builder extends BaseController
                     $record_meta['Option'] = 'patient_portal';
                     $record_meta['Value'] = $PatientPortal;
                     $Crud->AddRecordPG("public.profile_metas", $record_meta);
+                }
+
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+                if (isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') {
+                    $Crud->DeleteRecordPG('public."options"', array("ProfileUID" => $id, 'Name' => 'prescribe_medicine_list'));
+
+                    $record_option = array();
+                    $record_option['ProfileUID'] = $id;
+                    $record_option['Name'] = 'prescribe_medicine_list';
+                    $record_option['Description'] = $PrescriptionMedicineList;
+                    $Crud->AddRecordPG("public.options", $record_option);
                 }
             }
 

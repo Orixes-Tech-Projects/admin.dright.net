@@ -122,6 +122,8 @@ if ($page == 'add-hospital') {
     $OPDInvoicing = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoicing');
     $OPDPricingType = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_pricing_type');
     $OPDInvoicingPrice = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'opd_invoice_price');
+
+    $PrescribeMedicineList = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescribe_medicine_list');
 }
 ?>
 <div class="card">
@@ -206,6 +208,20 @@ if ($page == 'add-hospital') {
                         <img src="<?= load_image('pgsql|profiles|' . $PAGE['UID']) ?>" height="70">
                     </div>
                 <?php } ?>
+
+                <div class="col-md-12 mb-3">
+                    <label for="prescribe_medicine_list">
+                        Prescription Medicine List <small class="text-danger">*</small>
+                    </label>
+                    <select name="prescribe_medicine_list" id="prescribe_medicine_list" class="form-control">
+                        <option <?= ((isset($PrescribeMedicineList[0]['Description']) && $PrescribeMedicineList[0]['Description'] == 'built_in') ? 'selected' : '') ?>
+                                value="built_in">Built-in
+                        </option>
+                        <option <?= ((isset($PrescribeMedicineList[0]['Description']) && $PrescribeMedicineList[0]['Description'] == 'user_defined') ? 'selected' : '') ?>
+                                value="user_defined">User-defined
+                        </option>
+                    </select>
+                </div>
 
                 <div class="col-md-12">
                     <div class="form-group row">
