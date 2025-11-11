@@ -20,7 +20,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
 <div class="row">
     <div class="col-md-12">
         <div class="accordion accordion-primary custom-accordion">
-            <div class="accordion-row <?=((isset($SessionFilters) && $SessionFilters != '' && count($SessionFilters) > 0)? 'open' : '')?>">
+            <div class="accordion-row <?= ((isset($SessionFilters) && $SessionFilters != '' && count($SessionFilters) > 0) ? 'open' : '') ?>">
                 <a href="#" class="accordion-header">
                     <span>Search Filters <small>( Click to Search Records From Filter )</small></span>
                     <i class="accordion-status-icon close fa fa-chevron-up"></i>
@@ -104,6 +104,7 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
         </div>
     </div>
 </div>
+<?php echo view('builder/modal/add_individual_banner'); ?>
 <script>
     $(document).ready(function () {
         $('#doctor').DataTable({

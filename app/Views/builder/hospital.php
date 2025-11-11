@@ -56,7 +56,8 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                                             onclick="SearchFilterFormSubmit('AllHospitalFilterForm');"
                                             type="button">Search!
                                     </button>
-                                    <button style="border-radius: 5px;" class="btn btn-outline-danger btn-sm" onclick="ClearAllFilter('HospitalFilters');"
+                                    <button style="border-radius: 5px;" class="btn btn-outline-danger btn-sm"
+                                            onclick="ClearAllFilter('HospitalFilters');"
                                             type="button">Clear
                                     </button>
                                 </div>
@@ -101,8 +102,8 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
             </table>
         </div>
     </div>
-    <?php echo view('builder/modal/add_individual_banner'); ?>
 </div>
+<?php echo view('builder/modal/add_individual_banner'); ?>
 <script>
     $(document).ready(function () {
         $('#hospital').DataTable({
@@ -142,57 +143,57 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                 setTimeout(function () {
                     location.reload();
                 }, 1000);
-                } else {
-                    $("#AddSmsCreditsResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Added</strong>  </div>')
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
-                }
+            } else {
+                $("#AddSmsCreditsResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Added</strong>  </div>')
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             }
         }
+    }
 
-        function AddTheme(id) {
-            location.href = "<?=$path?>builder/add_theme/" + id;
+    function AddTheme(id) {
+        location.href = "<?=$path?>builder/add_theme/" + id;
 
-        }
+    }
 
-        function DeleteHospital(id) {
-            if (confirm("Are you Sure U want to Delete this?")) {
-                response = AjaxResponse("builder/delete-hospital", "id=" + id);
-                if (response.status == 'success') {
-                    $("#Response").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Deleted Successfully!</strong>  </div>')
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    $("#Response").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Deleted</strong>  </div>')
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
-                }
-
+    function DeleteHospital(id) {
+        if (confirm("Are you Sure U want to Delete this?")) {
+            response = AjaxResponse("builder/delete-hospital", "id=" + id);
+            if (response.status == 'success') {
+                $("#Response").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Deleted Successfully!</strong>  </div>')
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            } else {
+                $("#Response").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Deleted</strong>  </div>')
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             }
+
         }
+    }
 
-        function SearchFilterFormSubmit(parent) {
+    function SearchFilterFormSubmit(parent) {
 
-            var data = $("form#" + parent).serialize();
-            var rslt = AjaxResponse('builder/hospital_search_filter', data);
-            if (rslt.status == 'success') {
-                $("#AllHospitalFilterForm form #FilterResponse").html(rslt.message);
-                location.reload();
-            }
+        var data = $("form#" + parent).serialize();
+        var rslt = AjaxResponse('builder/hospital_search_filter', data);
+        if (rslt.status == 'success') {
+            $("#AllHospitalFilterForm form #FilterResponse").html(rslt.message);
+            location.reload();
         }
+    }
 
-        function ClearAllFilter(Session) {
-            var rslt = AjaxResponse('home/clear_session', 'SessionName=' + Session);
-            if (rslt.status == 'success') {
-                $("#AllHospitalFilterForm form #FilterResponse").html(rslt.message);
-                location.reload();
-            }
+    function ClearAllFilter(Session) {
+        var rslt = AjaxResponse('home/clear_session', 'SessionName=' + Session);
+        if (rslt.status == 'success') {
+            $("#AllHospitalFilterForm form #FilterResponse").html(rslt.message);
+            location.reload();
         }
-    </script>
+    }
+</script>
 
-    <script src="<?= $template ?>vendors/dataTable/datatables.min.js"></script>
-    <script src="<?= $template ?>assets/js/examples/datatable.js"></script>
-    <script src="<?= $template ?>vendors/prism/prism.js"></script>
+<script src="<?= $template ?>vendors/dataTable/datatables.min.js"></script>
+<script src="<?= $template ?>assets/js/examples/datatable.js"></script>
+<script src="<?= $template ?>vendors/prism/prism.js"></script>

@@ -306,6 +306,8 @@ class Builder extends BaseController
 
             if ($Users->checkAccessKey('builder_doctor_profiles_add_theme'))
                 $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="AddTheme(' . htmlspecialchars($record['UID']) . ')">Add Theme</a>';
+            if ($Users->checkAccessKey('builder_banners_add'))
+                $Actions[] = '<a style="cursor:pointer;" class="dropdown-item" onclick="LoadIndividualBannerModal(' . htmlspecialchars($record['UID']) . ')">Individualized Banner</a>';
 
             $cnt++;
             $SmsCredits = $BuilderModel->get_profile_options_data_by_id_option($record['UID'], 'sms_credits');
