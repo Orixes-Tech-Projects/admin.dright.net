@@ -204,8 +204,8 @@ class BuilderModel extends Model
                 "profiles"."Status", "profiles"."ExpireDate"
                 FROM public."profiles" 
                 WHERE "profiles"."SubDomain" != \'\' AND "MiniHims" = ' . $MiniHims . ' AND "IsPromotionalWebsite" = ' . $PromotionalWebsites . ' ';
-        if($ID != 'all'){
-            $SQL.=' AND "profiles"."Type" = \'' . $ID . '\' ';
+        if ($ID != 'all') {
+            $SQL .= ' AND "profiles"."Type" = \'' . $ID . '\' ';
         }
         if (isset($SessionFilters['Name']) && $SessionFilters['Name'] != '') {
             $Name = $SessionFilters['Name'];
@@ -365,6 +365,209 @@ class BuilderModel extends Model
         $records = $Crud->ExecutePgSQL($SQL);
 
         return $records;
+    }
+
+    public function GetBuilderProfilesDashboardGridDetails($keyword = '', $limit = -1, $start = 0)
+    {
+        $Crud = new Crud();
+
+        $session = session();
+        $SessionFilters = $session->get('BuilderDashboardClientsFilters');
+
+        $SQL = 'SELECT "profiles"."UID", "profiles"."SystemDate", "profiles"."Name", "profiles"."Type", "profiles"."SubDomain", 
+               "profiles"."ExpireDate", "profiles"."MiniHims",
+               CASE 
+                   WHEN EXISTS (SELECT 1 FROM public."options" pm1 
+                               WHERE pm1."ProfileUID" = "profiles"."UID" 
+                               AND pm1."Name" = \'opd_invoicing\' 
+                               AND pm1."Description" = \'1\')
+                        OR 
+                        EXISTS (SELECT 1 FROM public."options" pm2 
+                               WHERE pm2."ProfileUID" = "profiles"."UID" 
+                               AND pm2."Name" = \'prescription_module\' 
+                               AND pm2."Description" = \'1\')
+                   THEN \'VAS\' 
+                   ELSE \'Standard\' 
+               END AS "ClientLevel",
+               (SELECT COUNT(*) FROM public."profile_invoice_subscription" 
+                WHERE "ProfileUID" = "profiles"."UID") AS "SubscriptionInvoices",
+               COALESCE((SELECT SUM(CAST("Price" AS INTEGER)) FROM public."profile_invoice_subscription" 
+                WHERE "ProfileUID" = "profiles"."UID"), 0) AS "SubscriptionInvoicesAmount",
+               (SELECT COUNT(*) FROM public."profile_prescription_subscription" 
+                WHERE "ProfileUID" = "profiles"."UID") AS "SubscriptionPrescriptions",
+               COALESCE((SELECT SUM(CAST("Price" AS INTEGER)) FROM public."profile_prescription_subscription" 
+                WHERE "ProfileUID" = "profiles"."UID"), 0) AS "SubscriptionPrescriptionsAmount"
+        FROM public."profiles"
+        WHERE "profiles"."SubDomain" != \'\' 
+            AND "profiles"."Status" = \'active\' 
+            AND "profiles"."IsPromotionalWebsite" = 0 AND "profiles"."MiniHims" = 0 ';
+
+        // Date filter
+        if (isset($SessionFilters['StartDate']) && $SessionFilters['StartDate'] != ''
+            && isset($SessionFilters['EndDate']) && $SessionFilters['EndDate'] != '') {
+            $SQL .= ' AND "profiles"."SystemDate" BETWEEN \'' . date("Y-m-d", strtotime($SessionFilters['StartDate'])) . ' 00:00:00\' AND \'' . date("Y-m-d", strtotime($SessionFilters['EndDate'])) . ' 23:59:59\' ';
+        }
+
+        // Client Type filter
+        if (isset($SessionFilters['ClientType']) && $SessionFilters['ClientType'] != '') {
+            $SQL .= ' AND "Type" = \'' . $SessionFilters['ClientType'] . '\' ';
+        }
+
+        // Client Level filter
+        if (isset($SessionFilters['ClientLevel']) && $SessionFilters['ClientLevel'] != '') {
+            if ($SessionFilters['ClientLevel'] == 'VAS') {
+                $SQL .= ' AND (EXISTS (SELECT 1 FROM public."options" pm1 
+                                  WHERE pm1."ProfileUID" = "profiles"."UID" 
+                                  AND pm1."Name" = \'opd_invoicing\' 
+                                  AND pm1."Description" = \'1\')
+                         OR 
+                         EXISTS (SELECT 1 FROM public."options" pm2 
+                                  WHERE pm2."ProfileUID" = "profiles"."UID" 
+                                  AND pm2."Name" = \'prescription_module\' 
+                                  AND pm2."Description" = \'1\')) ';
+            } elseif ($SessionFilters['ClientLevel'] == 'Standard') {
+                $SQL .= ' AND NOT (EXISTS (SELECT 1 FROM public."options" pm1 
+                                      WHERE pm1."ProfileUID" = "profiles"."UID" 
+                                      AND pm1."Name" = \'opd_invoicing\' 
+                                      AND pm1."Description" = \'1\')
+                             OR 
+                             EXISTS (SELECT 1 FROM public."options" pm2 
+                                      WHERE pm2."ProfileUID" = "profiles"."UID" 
+                                      AND pm2."Name" = \'prescription_module\' 
+                                      AND pm2."Description" = \'1\')) ';
+            }
+        }
+
+        $SQL .= ' ORDER BY "profiles"."SystemDate" DESC';
+
+        if ($limit != -1) {
+            $SQL .= ' LIMIT ' . $limit . ' OFFSET ' . $start . ' ';
+        }
+
+        $records = $Crud->ExecutePgSQL($SQL);
+        $invoiceData = $this->getInvoiceDataFromMySQL();
+
+        return $this->mergeProfileWithInvoiceData($records, $invoiceData);
+    }
+
+    private function getInvoiceDataFromMySQL()
+    {
+        $Crud = new Crud();
+        $SQL = 'SELECT ProfileUID, Product, 
+                   COUNT(UID) as TotalInvoices,
+                   SUM(Price) as TotalAmount,
+                   SUM(ReceivedAmount) as ReceivedAmount
+            FROM invoices WHERE ProductType = \'builder\'
+            GROUP BY ProfileUID, Product ';
+
+        return $Crud->ExecuteSQL($SQL);
+    }
+
+    private function mergeProfileWithInvoiceData($profiles, $invoiceData)
+    {
+        // Create a lookup array for invoice data
+        $invoiceLookup = [];
+        foreach ($invoiceData as $invoice) {
+            $key = $invoice['ProfileUID'] . '|' . $invoice['Product'];
+            $invoiceLookup[$key] = $invoice;
+        }
+
+        // Merge data
+        foreach ($profiles as &$profile) {
+            $key = $profile['UID'] . '|' . $profile['Type'];
+
+            if (isset($invoiceLookup[$key])) {
+                $profile['TotalInvoices'] = $invoiceLookup[$key]['TotalInvoices'];
+                $profile['TotalAmount'] = $invoiceLookup[$key]['TotalAmount'];
+                $profile['ReceivedAmount'] = $invoiceLookup[$key]['ReceivedAmount'];
+            } else {
+                $profile['TotalInvoices'] = 0;
+                $profile['TotalAmount'] = 0;
+                $profile['ReceivedAmount'] = 0;
+            }
+        }
+
+        return $profiles;
+    }
+
+    public function GetDashboardStats()
+    {
+        $FinalArray = array();
+        $Crud = new Crud();
+
+        // Total Clients
+        $SQL = 'SELECT COUNT("profiles"."UID") AS "TotalClients"             
+        FROM public."profiles"             
+        WHERE "profiles"."SubDomain" != \'\'             
+        AND "profiles"."Status" = \'active\'             
+        AND "profiles"."IsPromotionalWebsite" = 0             
+        AND "profiles"."MiniHims" = 0 ';
+        $records = $Crud->ExecutePgSQL($SQL);
+        $FinalArray['TotalClients'] = $records[0]['TotalClients'];
+
+        // MTD Revenue and Outstanding Value - Make sure to specify database
+        $SQL_Stats = 'SELECT                     
+        COALESCE(SUM(CASE WHEN MONTH(`SystemDate`) = MONTH(CURRENT_DATE)                       
+        AND YEAR(`SystemDate`) = YEAR(CURRENT_DATE)                       
+        THEN `Price` ELSE 0 END), 0) AS "MTDRevenue",                    
+        COALESCE(SUM(`Price` - `ReceivedAmount`), 0) AS "OutstandingValue"                  
+        FROM `invoices`                   
+        WHERE (`Price` - `ReceivedAmount`) > 0                   
+        OR (MONTH(`SystemDate`) = MONTH(CURRENT_DATE)                       
+        AND YEAR(`SystemDate`) = YEAR(CURRENT_DATE))';
+        $records_Stats = $Crud->ExecuteSQL($SQL_Stats);
+        $FinalArray['MTDRevenue'] = $records_Stats[0]['MTDRevenue'];
+        $FinalArray['OutstandingValue'] = $records_Stats[0]['OutstandingValue'];
+
+        // Current Month Expiry - Count profiles expiring in current month
+        $SQL_MonthExpiry = 'SELECT COUNT("profiles"."UID") AS "CurrentMonthExpiry"             
+        FROM public."profiles"             
+        WHERE "profiles"."SubDomain" != \'\'             
+        AND "profiles"."Status" = \'active\'             
+        AND "profiles"."IsPromotionalWebsite" = 0             
+        AND "profiles"."MiniHims" = 0
+        AND EXTRACT(MONTH FROM "profiles"."ExpireDate") = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM "profiles"."ExpireDate") = EXTRACT(YEAR FROM CURRENT_DATE)';
+        $records_MonthExpiry = $Crud->ExecutePgSQL($SQL_MonthExpiry);
+        $FinalArray['CurrentMonthExpiry'] = $records_MonthExpiry[0]['CurrentMonthExpiry'];
+
+        // Quarter Expiry - Count profiles expiring in current quarter
+        $SQL_QuarterExpiry = 'SELECT COUNT("profiles"."UID") AS "QuarterExpiry"             
+        FROM public."profiles"             
+        WHERE "profiles"."SubDomain" != \'\'             
+        AND "profiles"."Status" = \'active\'             
+        AND "profiles"."IsPromotionalWebsite" = 0             
+        AND "profiles"."MiniHims" = 0
+        AND EXTRACT(QUARTER FROM "profiles"."ExpireDate") = EXTRACT(QUARTER FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM "profiles"."ExpireDate") = EXTRACT(YEAR FROM CURRENT_DATE)';
+        $records_QuarterExpiry = $Crud->ExecutePgSQL($SQL_QuarterExpiry);
+        $FinalArray['QuarterExpiry'] = $records_QuarterExpiry[0]['QuarterExpiry'];
+
+        // Current Month Inactive Domains - Count blocked profiles that expired in current month
+        $SQL_MonthInactive = 'SELECT COUNT("profiles"."UID") AS "CurrentMonthInactive"             
+        FROM public."profiles"             
+        WHERE "profiles"."SubDomain" != \'\'             
+        AND "profiles"."Status" = \'block\'             
+        AND "profiles"."IsPromotionalWebsite" = 0             
+        AND "profiles"."MiniHims" = 0
+        AND EXTRACT(MONTH FROM "profiles"."ExpireDate") = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM "profiles"."ExpireDate") = EXTRACT(YEAR FROM CURRENT_DATE)';
+        $records_MonthInactive = $Crud->ExecutePgSQL($SQL_MonthInactive);
+        $FinalArray['CurrentMonthInactive'] = $records_MonthInactive[0]['CurrentMonthInactive'];
+
+        // Quarter Inactive Domains - Count blocked profiles that expired in current quarter
+        $SQL_QuarterInactive = 'SELECT COUNT("profiles"."UID") AS "QuarterInactive"             
+        FROM public."profiles"             
+        WHERE "profiles"."SubDomain" != \'\'             
+        AND "profiles"."Status" = \'block\'             
+        AND "profiles"."IsPromotionalWebsite" = 0             
+        AND "profiles"."MiniHims" = 0
+        AND EXTRACT(QUARTER FROM "profiles"."ExpireDate") = EXTRACT(QUARTER FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM "profiles"."ExpireDate") = EXTRACT(YEAR FROM CURRENT_DATE)';
+        $records_QuarterInactive = $Crud->ExecutePgSQL($SQL_QuarterInactive);
+        $FinalArray['QuarterInactive'] = $records_QuarterInactive[0]['QuarterInactive'];
+
+        return $FinalArray;
     }
 
 }

@@ -26,9 +26,10 @@ class Builder extends BaseController
     public
     function test()
     {
-
-        $ProfileDuplicate = new ProfileDuplicate();
-        $ProfileDuplicate->GetProfileDoctorsRecordAndInsert(164, 545);
+        $BuilderModel = new BuilderModel();
+        $Record = $BuilderModel->GetBuilderProfilesDashboardGridDetails();
+        echo '<pre>';
+        print_r($Record);
     }
 
 
@@ -110,6 +111,9 @@ class Builder extends BaseController
     public function dashboard()
     {
         $data = $this->data;
+        $BuilderModel = new BuilderModel();
+        $data['ProfilesRecord'] = $BuilderModel->GetBuilderProfilesDashboardGridDetails();
+
         echo view('header', $data);
         echo view('builder/dashboard', $data);
         echo view('footer', $data);
@@ -2810,6 +2814,84 @@ class Builder extends BaseController
             echo json_encode($response);
         }
 
+    }
+
+    public
+    function get_clients_dashboard_records()
+    {
+        $BuilderModel = new BuilderModel();
+        $FinalArray = array();
+        $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
+
+        $Data = $BuilderModel->GetBuilderProfilesDashboardGridDetails($keyword, $_POST['length'], $_POST['start']);
+        $totalfilterrecords = count($BuilderModel->GetBuilderProfilesDashboardGridDetails());
+
+        $cnt = $_POST['start'];
+        foreach ($Data as $record) {
+
+            $cnt++;
+
+            $subdomainUrl = $record['SubDomain'];
+            if (!empty($subdomainUrl) && !preg_match("~^(?:f|ht)tps?://~i", $subdomainUrl)) {
+                $subdomainUrl = "https://" . $subdomainUrl;
+            }
+
+            $data = [];
+            $data[] = $cnt;
+            $data[] = '<a title="'.$subdomainUrl.'" target="_blank" href="'.$subdomainUrl.'" style="line-height: 17px !important; color:#1b2e4b;">'.wordwrap($record['Name'], 20, '<br>', true).'</a>';
+            $data[] = date("d M, Y", strtotime($record['SystemDate']));
+            $data[] = '<badge class="badge badge-success">' . strtoupper((($record['Type'] == 'hospitals' && $record['MiniHims'] == 1) ? 'MINI HIMS' : $record['Type'])) . '</badge>';
+            $data[] = $record['TotalInvoices'];
+            $data[] = '<b>' . money($record['TotalAmount'], false) . '</b>';
+            $data[] = '<b>' . money($record['ReceivedAmount'], false) . '</b>';
+            $data[] = '<b>' . money((($record['TotalAmount'] - $record['ReceivedAmount']) + 0), false) . '</b>';
+            $data[] = '<b>' . date("d M, Y", strtotime($record['ExpireDate'])) . '</b>';
+            $data[] = '<badge class="badge badge-' . (($record['ClientLevel'] == 'Standard') ? 'primary' : 'success') . '">' . $record['ClientLevel'] . '</badge>';
+            $data[] = $record['SubscriptionInvoices'] . ' / ' . '<b>' . money($record['SubscriptionInvoicesAmount'], false) . '</b>';
+            $data[] = $record['SubscriptionPrescriptions'] . ' / ' . '<b>' . money($record['SubscriptionPrescriptionsAmount'], false) . '</b>';
+            $data[] = money((($record['SubscriptionInvoicesAmount'] + $record['SubscriptionPrescriptionsAmount']) + 0), false);
+
+            if (substr($record['SubDomain'], -strlen('.clinta.biz')) === '.clinta.biz') {
+                $data[] = '<badge class="badge bagde-success badge-mini">Sub Domain</badge>';
+            } else {
+                $data[] = '<badge class="badge badge-dark">Domain</badge>';
+            }
+
+            $FinalArray[] = $data;
+        }
+
+        $response = array(
+            "draw" => intval($this->request->getPost('draw')),
+            "recordsTotal" => count($Data),
+            "recordsFiltered" => $totalfilterrecords,
+            "data" => $FinalArray
+        );
+        echo json_encode($response);
+    }
+
+
+    public
+    function builder_clients_dashboard_search_filters()
+    {
+        $session = session();
+        $session->set('BuilderDashboardClientsFilters', array());
+
+        $ClientType = $this->request->getVar('ClientType');
+        $StartDate = $this->request->getVar('StartDate');
+        $EndDate = $this->request->getVar('EndDate');
+        $ClientLevel = $this->request->getVar('ClientLevel');
+        $AllFilter = array(
+            'ClientType' => (($ClientType != '') ? $ClientType : ''),
+            'StartDate' => (($StartDate != '') ? $StartDate : ''),
+            'EndDate' => (($EndDate != '') ? $EndDate : ''),
+            'ClientLevel' => (($ClientLevel != '') ? $ClientLevel : '')
+        );
+        $session->set('BuilderDashboardClientsFilters', $AllFilter);
+
+        $response['status'] = "success";
+        $response['message'] = "Filters Updated Successfully";
+
+        echo json_encode($response);
     }
 
 }
