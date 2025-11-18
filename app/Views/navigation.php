@@ -876,6 +876,12 @@ $doctor = $checknav->checkAccessKey('doctor');
                         <span>Timing</span>
                     </a>
                 </li>
+                <li>
+                    <a href="<?= $path ?>medicine/routes">
+                        <span class="nav-link-icon" data-feather="clock"></span>
+                        <span>Routes</span>
+                    </a>
+                </li>
 
                 <li class="d-none">
                     <a href="<?= $path ?>medicine/company">

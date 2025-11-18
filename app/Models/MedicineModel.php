@@ -269,4 +269,38 @@ class MedicineModel extends Model
     }
 
 
+    public
+    function get_medicine_routes_datatables($keyword)
+    {
+        $Crud = new Crud();
+
+        $SQL = $this->medicines_routes($keyword);
+        if ($_POST['length'] != -1)
+            $SQL .= ' limit ' . $_POST['length'] . ' offset  ' . $_POST['start'] . '';
+        $records = $Crud->ExecuteSQL($SQL);
+        return $records;
+    }
+
+    public
+    function count_medicine_routes_datatables($keyword)
+    {
+        $Crud = new Crud();
+        $SQL = $this->medicines_routes($keyword);
+        $records = $Crud->ExecuteSQL($SQL);
+        return count($records);
+    }
+
+    public
+    function medicines_routes($keyword)
+    {
+        $Crud = new Crud();
+
+        $SQL = "SELECT * FROM `medicine_routes` Where 1=1 ";
+        if ($keyword != '') {
+            $SQL .= " AND (`Name` LIKE '%" . trim($keyword) . "%' OR `EngName` LIKE '%" . trim($keyword) . "%')";
+        }
+        $SQL .= ' ORDER BY `Name` ASC';
+        return $SQL;
+    }
+
 }

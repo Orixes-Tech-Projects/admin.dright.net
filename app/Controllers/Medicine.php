@@ -670,4 +670,114 @@ class Medicine extends BaseController
 
         echo json_encode($response);
     }
+
+
+    public function routes()
+    {
+        $data = $this->data;
+        echo view('header', $data);
+        echo view('medicine/routes', $data);
+        echo view('footer', $data);
+    }
+
+    public function fetch_medicine_routes()
+    {
+        $MedicineModel = new MedicineModel();
+        $keyword = ((isset($_POST['search']['value'])) ? $_POST['search']['value'] : '');
+
+        $Data = $MedicineModel->get_medicine_routes_datatables($keyword);
+        $totalfilterrecords = $MedicineModel->count_medicine_routes_datatables($keyword);
+        $dataarr = array();
+        $cnt = $_POST['start'];
+        foreach ($Data as $record) {
+            $cnt++;
+            $data = array();
+            $data[] = $cnt;
+            $data[] = isset($record['EngName']) ? htmlspecialchars($record['EngName']) : '-';
+            $data[] = isset($record['Name']) ? htmlspecialchars($record['Name']) : '';
+            $data[] = '<td class="text-end">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="UpdateMedicineRoutes(' . htmlspecialchars($record['UID']) . ')">Update</a>
+                                    <a class="dropdown-item" onclick="DeleteMedicineRoutes(' . htmlspecialchars($record['UID']) . ')">Delete</a>
+                    
+                                </div>
+                            </div>
+                        </td>';
+            $dataarr[] = $data;
+        }
+
+        $response = array(
+            "draw" => intval($this->request->getPost('draw')),
+            "recordsTotal" => count($Data),
+            "recordsFiltered" => $totalfilterrecords,
+            "data" => $dataarr
+        );
+        echo json_encode($response);
+    }
+
+    public function submit_medicine_routes()
+    {
+        $Crud = new Crud();
+        $Main = new Main();
+        $response = array();
+        $record = array();
+
+        $id = $this->request->getVar('UID');
+        $Medicine = $this->request->getVar('Routes');
+        if ($id == 0) {
+
+            foreach ($Medicine as $key => $value) {
+                $record[$key] = ((isset($value)) ? $value : '');
+            }
+            $RecordId = $Crud->AddRecord("medicine_routes", $record);
+            if (isset($RecordId) && $RecordId > 0) {
+                $response['status'] = 'success';
+                $response['message'] = 'Added Successfully...!';
+            } else {
+                $response['status'] = 'fail';
+                $response['message'] = 'Data Didnt Submitted Successfully...!';
+            }
+        } else {
+            foreach ($Medicine as $key => $value) {
+                $record[$key] = $value;
+            }
+            $Crud->UpdateRecord("medicine_routes", $record, array("UID" => $id));
+            $response['status'] = 'success';
+            $response['message'] = 'Updated Successfully...!';
+        }
+
+        echo json_encode($response);
+    }
+
+    public function get_medicine_routes_record()
+    {
+        $Crud = new Crud();
+        $id = $_POST['id'];
+
+        $record = $Crud->SingleRecord("medicine_routes", array("UID" => $id));
+        $response = array();
+        $response['status'] = 'success';
+        $response['record'] = $record;
+        $response['message'] = 'Record Get Successfully...!';
+        echo json_encode($response);
+    }
+
+    public function delete_routes()
+    {
+        $data = $this->data;
+        $UID = $this->request->getVar('id');
+        $Crud = new Crud();
+        $table = "medicine_routes";
+        $where = array('UID' => $UID);
+        $Crud->DeleteRecord($table, $where);
+        $response['status'] = 'success';
+        $response['message'] = 'Deleted Successfully...!';
+
+        echo json_encode($response);
+    }
+
 }
