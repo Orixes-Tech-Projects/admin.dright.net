@@ -121,10 +121,8 @@ $BuilderAllProfiles = $BuilderModel->BuilderAllProfiles();
 $short_desc = $clinta_extended_profiles = $healthcarestatus = $theme = $patient_portal = '';
 if ($page != 'add-promotional-websites') {
     $patient_portal = $BuilderModel->get_website_profile_meta_data_by_id_option($PAGE['UID'], 'patient_portal');
-
     $PrescribeMedicineList = $BuilderModel->get_profile_options_data_by_id_option($PAGE['UID'], 'prescribe_medicine_list');
-}
-?>
+}?>
 <div class="card">
     <div class="card-body">
         <h6 style="margin-bottom: 1rem !important;"
@@ -249,8 +247,7 @@ if ($page != 'add-promotional-websites') {
                     </div>
                     <div class="col-md-5">
                         <div class="form-group row">
-                            <label class="col-sm-12">Clone From Existing Profile <span
-                                        class="text-danger">*</span></label>
+                            <label class="col-sm-12">Clone From Existing Profile</label>
                             <div class="col-sm-12">
                                 <select id="copy_profile_id" name="copy_profile_id" class="form-control"
                                         data-validation-engine="validate[required]">
@@ -415,12 +412,13 @@ if ($page != 'add-promotional-websites') {
                     $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Profile Type Required </div>');
                     return false;
                 }
-                if (CopyProfileID == '') {
-                    clearInterval(progressInterval);
-                    $('.progress-modal').hide();
-                    $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Existing Profile Required </div>');
-                    return false;
-                }
+
+                // if (CopyProfileID == '') {
+                //     clearInterval(progressInterval);
+                //     $('.progress-modal').hide();
+                //     $("#ajaxResponse").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error!</strong> Existing Profile Required </div>');
+                //     return false;
+                // }
             }
 
             const formdata = new window.FormData($("form#AddPromotionalWebsitesForm")[0]);
@@ -432,11 +430,11 @@ if ($page != 'add-promotional-websites') {
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
                 /** Send Request TO CPanel For Creating SubDomains */
-                if (CurrentPage == 'add-promotional-websites' && response.subdomain) {
-                    if (response.subdomain.endsWith('.clinta.biz')) {
-                        AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
-                    }
-                }
+                // if (CurrentPage == 'add-promotional-websites' && response.subdomain) {
+                //     if (response.subdomain.endsWith('.clinta.biz')) {
+                //         AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                //     }
+                // }
 
                 setTimeout(function () {
                     $('.progress-modal').hide();

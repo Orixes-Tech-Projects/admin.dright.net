@@ -2667,24 +2667,6 @@ class Builder extends BaseController
             $website_profile_id = $Crud->AddRecordPG("public.profiles", $record);
             if ($website_profile_id) {
 
-                $record_meta = array();
-                $PatientPortal = $this->request->getVar('patient_portal');
-                if (isset($PatientPortal) && $PatientPortal != '') {
-                    $record_meta['ProfileUID'] = $website_profile_id;
-                    $record_meta['Option'] = 'patient_portal';
-                    $record_meta['Value'] = $PatientPortal;
-                    $Crud->AddRecordPG("public.profile_metas", $record_meta);
-                }
-
-                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
-                if (isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') {
-                    $record_option = array();
-                    $record_option['ProfileUID'] = $website_profile_id;
-                    $record_option['Name'] = 'prescribe_medicine_list';
-                    $record_option['Description'] = $PrescriptionMedicineList;
-                    $Crud->AddRecordPG("public.options", $record_option);
-                }
-
                 $msg = $_SESSION['FullName'] . ' Promotional Website Profile Submit Through Admin DRight';
                 $logesegment = 'Promotional Website';
                 $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
@@ -2710,13 +2692,37 @@ class Builder extends BaseController
                     $ProfileDuplicate->GetProfileDoctorsRecordAndInsert($CopyProfileUID, $website_profile_id);
 
 
-                    if ($ProfileType == 'doctors') {
+                    if (isset($ProfileType) && $ProfileType == 'doctors') {
                         $ProfileDuplicate->GetDoctorProfileHospitalClinicsRecordAndInsert($CopyProfileUID, $website_profile_id);
                         $ProfileDuplicate->GetProfileAwardsAndMemberShipRecordAndInsert($CopyProfileUID, $website_profile_id);
                         $ProfileDuplicate->GetProfileGraduationRecordAndInsert($CopyProfileUID, $website_profile_id);
                         $ProfileDuplicate->GetProfilePostGraduationRecordAndInsert($CopyProfileUID, $website_profile_id);
                         $ProfileDuplicate->GetProfileExperienceRecordAndInsert($CopyProfileUID, $website_profile_id);
                     }
+                }
+
+                $record_meta = array();
+                $PatientPortal = $this->request->getVar('patient_portal');
+                if (isset($PatientPortal) && $PatientPortal != '') {
+
+                    $Crud->DeleteRecordPG('public."profile_metas"', ["ProfileUID" => $website_profile_id, 'Option' => 'patient_portal']);
+
+                    $record_meta['ProfileUID'] = $website_profile_id;
+                    $record_meta['Option'] = 'patient_portal';
+                    $record_meta['Value'] = $PatientPortal;
+                    $Crud->AddRecordPG("public.profile_metas", $record_meta);
+                }
+
+                $PrescriptionMedicineList = $this->request->getVar('prescribe_medicine_list');
+                if (isset($PrescriptionMedicineList) && $PrescriptionMedicineList != '') {
+
+                    $Crud->DeleteRecordPG('public."options"', ["ProfileUID" => $website_profile_id, 'Name' => 'prescribe_medicine_list']);
+
+                    $record_option = array();
+                    $record_option['ProfileUID'] = $website_profile_id;
+                    $record_option['Name'] = 'prescribe_medicine_list';
+                    $record_option['Description'] = $PrescriptionMedicineList;
+                    $Crud->AddRecordPG("public.options", $record_option);
                 }
 
             } else {

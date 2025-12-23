@@ -100,12 +100,12 @@ class ProfileDuplicate extends Model
 
     public function GetProfileMetaRecordAndInsert($CopyProfileUID, $ProfileUID)
     {
-        $this->copyTableData('"public"."profile_metas"', $CopyProfileUID, $ProfileUID);
+        $this->copyTableData('"public"."profile_metas"', $CopyProfileUID, $ProfileUID, [], 'AND "Option" != \'patient_portal\'');
     }
 
     public function GetProfileOptionsRecordAndInsert($CopyProfileUID, $ProfileUID)
     {
-        $this->copyTableData('"public"."options"', $CopyProfileUID, $ProfileUID);
+        $this->copyTableData('"public"."options"', $CopyProfileUID, $ProfileUID, [], 'AND "Name" != \'prescribe_medicine_list\'');
     }
 
     public function GetProfileBannersRecordAndInsert($CopyProfileUID, $ProfileUID)
