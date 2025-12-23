@@ -2699,6 +2699,14 @@ class Builder extends BaseController
                         $ProfileDuplicate->GetProfilePostGraduationRecordAndInsert($CopyProfileUID, $website_profile_id);
                         $ProfileDuplicate->GetProfileExperienceRecordAndInsert($CopyProfileUID, $website_profile_id);
                     }
+
+                }else{
+
+                    $record_option = array();
+                    $record_option['ProfileUID'] = $website_profile_id;
+                    $record_option['Name'] = 'theme';
+                    $record_option['Description'] = 'mist';
+                    $Crud->AddRecordPG("public.options", $record_option);
                 }
 
                 $record_meta = array();

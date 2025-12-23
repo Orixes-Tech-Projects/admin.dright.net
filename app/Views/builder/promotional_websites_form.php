@@ -430,11 +430,11 @@ if ($page != 'add-promotional-websites') {
                 $("#ajaxResponse").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Success!</strong> ' + response.message + ' </div>');
 
                 /** Send Request TO CPanel For Creating SubDomains */
-                // if (CurrentPage == 'add-promotional-websites' && response.subdomain) {
-                //     if (response.subdomain.endsWith('.clinta.biz')) {
-                //         AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
-                //     }
-                // }
+                if (CurrentPage == 'add-promotional-websites' && response.subdomain) {
+                    if (response.subdomain.endsWith('.clinta.biz')) {
+                        AjaxResponse('Builder/CreateSubdomainsWorker', 'subdomain=' + response.subdomain);
+                    }
+                }
 
                 setTimeout(function () {
                     $('.progress-modal').hide();
