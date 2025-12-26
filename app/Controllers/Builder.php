@@ -2707,6 +2707,12 @@ class Builder extends BaseController
                     $record_option['Name'] = 'theme';
                     $record_option['Description'] = 'mist';
                     $Crud->AddRecordPG("public.options", $record_option);
+
+                    $record_option = array();
+                    $record_option['ProfileUID'] = $website_profile_id;
+                    $record_option['Name'] = 'theme_css';
+                    $record_option['Description'] = 'dore.light.red.css';
+                    $Crud->AddRecordPG("public.options", $record_option);
                 }
 
                 $record_meta = array();
