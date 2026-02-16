@@ -66,6 +66,8 @@ if ($_SERVER['HTTP_HOST'] == 'admin.dright.dev') {
     define('DB_NAME', 'dright_clintamaindb');
 }
 
+define('WHATSAPP_ADMIN_NUMBERS', '923455913609,923155913609');
+
 // Ensure the current directory is pointing to the front controller's directory
 if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
     chdir(FCPATH);

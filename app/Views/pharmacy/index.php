@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="<?= $template ?>vendors/dataTable/datatables.min.css" type="text/css">
 <?php
-
 $session = session();
 $SessionFilters = $session->get('PharmacyFilters');
 $MACAddress = '';
@@ -29,42 +28,41 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
                 </a>
                 <div class="accordion-body">
                     <form method="post" name="AllFilterForm" id="AllFilterForm"
-                          onsubmit="SearchFilterFormSubmit('AllFilterForm');">
+                        onsubmit="SearchFilterFormSubmit('AllFilterForm');">
                         <div class="row mt-2">
                             <div class="form-group col-md-3">
                                 <label class="form-control-label no-padding-right">FullName:</label>
                                 <input type="text" id="FullName" value="<?= $FullName; ?>" name="FullName"
-                                       placeholder="FullName"
-                                       class="form-control " data-validation-engine="validate[required]"
-                                />
+                                    placeholder="FullName"
+                                    class="form-control " data-validation-engine="validate[required]" />
                             </div>
                             <div class="form-group col-md-3">
                                 <label class="col-sm-12">City:</label>
                                 <div class="col-sm-12">
                                     <select id="City" name="City" class="form-control"
-                                            data-validation-engine="validate[required]">
+                                        data-validation-engine="validate[required]">
                                         <option value="">Please Select</option>
                                         <?php foreach ($cities as $record) { ?>
-                                            <option value="<?= $record['UID'] ?>"
-                                            ><?= ucwords($record['FullName']); ?></option>
-                                        <?php } ?>                                </select>
+                                            <option value="<?= $record['UID'] ?>"><?= ucwords($record['FullName']); ?></option>
+                                        <?php } ?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group col-md-3">
                                 <label class="col-sm-12">Deployment Date *</label>
                                 <div class="col-sm-12">
                                     <input type="date" id="DeploymentDate" name="DeploymentDate"
-                                           placeholder="Deployment Date" data-validation-engine="validate[required]"
-                                           class="form-control"/>
+                                        placeholder="Deployment Date" data-validation-engine="validate[required]"
+                                        class="form-control" />
                                 </div>
                             </div>
                             <div class="form-group col-md-3" style="text-align: right; margin-top: 28px;">
                                 <button class="btn btn-outline-success"
-                                        onclick="SearchFilterFormSubmit('AllFilterForm');"
-                                        type="button">Search!
+                                    onclick="SearchFilterFormSubmit('AllFilterForm');"
+                                    type="button">Search!
                                 </button>
                                 <button class="btn btn-outline-primary" onclick="ClearAllFilter('PharmacyFilters');"
-                                        type="button">Clear
+                                    type="button">Clear
                                 </button>
                             </div>
                             <div class="mt-4" id="FilterResponse"></div>
@@ -79,8 +77,8 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
     <div class="card-header">
         <h3>List Of All Offline Pharmacy Profiles
             <button style="float: right;" type="button" onclick="AddPharmacy()"
-                    class="btn btn-primary "
-                    data-toggle="modal" data-target="#exampleModal">
+                class="btn btn-primary "
+                data-toggle="modal" data-target="#exampleModal">
                 Add Profile
             </button>
         </h3>
@@ -89,17 +87,17 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
         <div class="table-responsive">
             <table id="frutis" class="table table-striped table-bordered">
                 <thead>
-                <tr>
-                    <th data-priority="1">#</th>
-                    <th data-priority="2">Name</th>
-                    <th data-priority="8">City</th>
-                    <th data-priority="3">Contact</th>
-                    <th>Mac Address</th>
-                    <th data-priority="7">Deployment Date</th>
-                    <th data-priority="4">Expire Date</th>
-                    <th data-priority="5">Status</th>
-                    <th data-priority="6">Actions</th>
-                </tr>
+                    <tr>
+                        <th data-priority="1">#</th>
+                        <th data-priority="2">Name</th>
+                        <th data-priority="8">City</th>
+                        <th data-priority="3">Contact</th>
+                        <th>Mac Address</th>
+                        <th data-priority="7">Deployment Date</th>
+                        <th data-priority="4">Expire Date</th>
+                        <th data-priority="5">Status</th>
+                        <th data-priority="6">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -110,13 +108,16 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
     <?php echo view('pharmacy/modal/update'); ?>
     <?php echo view('pharmacy/modal/pharmacy_license'); ?>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#frutis').DataTable({
                 "searching": true,
                 "processing": true,
                 "serverSide": true,
                 "responsive": true,
-                "lengthMenu": [[25, 50, 100, 500, 1000, -1], [25, 50, 100, 500, 1000, 'All']],
+                "lengthMenu": [
+                    [25, 50, 100, 500, 1000, -1],
+                    [25, 50, 100, 500, 1000, 'All']
+                ],
                 "pageLength": 25,
                 "autoWidth": true,
                 "ajax": {
@@ -125,7 +126,6 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
                 }
             });
         });
-
     </script>
     <script>
         function AddPharmacy() {
@@ -138,12 +138,12 @@ if (isset($SessionFilters['DeploymentDate']) && $SessionFilters['DeploymentDate'
                 response = AjaxResponse("pharmacy/delete", "id=" + id);
                 if (response.status == 'success') {
                     $("#Response").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Deleted Successfully!</strong>  </div>')
-                    setTimeout(function () {
+                    setTimeout(function() {
                         location.reload();
                     }, 1000);
                 } else {
                     $("#Response").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Deleted</strong>  </div>')
-                    setTimeout(function () {
+                    setTimeout(function() {
                         location.reload();
                     }, 1000);
                 }

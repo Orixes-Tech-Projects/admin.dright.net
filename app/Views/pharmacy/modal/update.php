@@ -78,6 +78,15 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group row">
+                                <label class="col-sm-12">Expire Date</label>
+                                <div class="col-sm-12">
+                                    <input type="date" id="expire_date" name="Pharmacy[ExpireDate]"
+                                           placeholder="Expire Date" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
                                 <label class="col-sm-12"> Mac Address <span class="text-danger">*</span></label>
                                 <div class="col-sm-12">
                                     <input type="text" id="mac_address" name="Pharmacy[MAC]" placeholder="Mac Address"
@@ -121,6 +130,7 @@
         $('#UpdatePharmacyModal form#UpdatePharmacyForm input#address').val(Items.record.Address);
         $('#UpdatePharmacyModal form#UpdatePharmacyForm input#sale_agent').val(Items.record.SaleAgent);
         $('#UpdatePharmacyModal form#UpdatePharmacyForm input#deployment_date').val(Items.record.DeploymentDate);
+        $('#UpdatePharmacyModal form#UpdatePharmacyForm input#expire_date').val(Items.record.ExpireDate && Items.record.ExpireDate != '0000-00-00' ? Items.record.ExpireDate : '');
         $('#UpdatePharmacyModal form#UpdatePharmacyForm input#mac_address').val(Items.record.MAC);
         $('#UpdatePharmacyModal form#UpdatePharmacyForm select#city').val(Items.record.City);
 

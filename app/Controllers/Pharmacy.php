@@ -138,6 +138,16 @@ class Pharmacy extends BaseController
             foreach ($Pharmacy as $key => $value) {
                 $record[$key] = ((isset($value)) ? $value : '');
             }
+            // Generate LicenseCode when ExpireDate and MAC are provided
+            if (!empty($record['ExpireDate']) && $record['ExpireDate'] != '0000-00-00' && !empty($record['MAC'])) {
+                $license = array(
+                    'RAND' => rand(1000000000, 9999999999),
+                    'ExpireDate' => $record['ExpireDate'],
+                    'CODE' => md5($record['MAC']),
+                    'MAC' => $record['MAC']
+                );
+                $record['LicenseCode'] = base64_encode(json_encode($license));
+            }
 
             $RecordId = $Crud->AddRecord("pharmacy_profiles", $record);
             if (isset($RecordId) && $RecordId > 0) {
@@ -169,10 +179,65 @@ class Pharmacy extends BaseController
                 $response['message'] = 'Data Didnt Submitted Successfully...!';
             }
         } else {
+            // Get old profile record before updating
+            $oldProfile = $Crud->SingleRecord("pharmacy_profiles", array("UID" => $id));
+            $oldExpireDate = isset($oldProfile['ExpireDate']) ? $oldProfile['ExpireDate'] : '';
+
             foreach ($Pharmacy as $key => $value) {
                 $record[$key] = $value;
             }
+
+            // Check if ExpireDate is being updated
+            $newExpireDate = isset($record['ExpireDate']) ? $record['ExpireDate'] : '';
+            $expireDateChanged = false;
+
+            // Normalize dates for comparison (handle '0000-00-00' and empty values)
+            $oldExpireDateNormalized = ($oldExpireDate == '' || $oldExpireDate == '0000-00-00') ? '' : $oldExpireDate;
+            $newExpireDateNormalized = ($newExpireDate == '' || $newExpireDate == '0000-00-00') ? '' : $newExpireDate;
+
+            if ($oldExpireDateNormalized != $newExpireDateNormalized && !empty($newExpireDateNormalized)) {
+                $expireDateChanged = true;
+            }
+
+            // Regenerate LicenseCode when ExpireDate or MAC is updated (license contains both)
+            if (!empty($record['ExpireDate']) && $record['ExpireDate'] != '0000-00-00') {
+                $profile = $oldProfile; // Use already fetched profile
+                $MAC = $record['MAC'] ?? ($profile['MAC'] ?? '');
+                if (!empty($MAC)) {
+                    $license = array(
+                        'RAND' => rand(1000000000, 9999999999),
+                        'ExpireDate' => $record['ExpireDate'],
+                        'CODE' => md5($MAC),
+                        'MAC' => $MAC
+                    );
+                    $record['LicenseCode'] = base64_encode(json_encode($license));
+                }
+            }
+
             $Crud->UpdateRecord("pharmacy_profiles", $record, array("UID" => $id));
+
+            // Send WhatsApp notification if ExpireDate was updated
+            if ($expireDateChanged) {
+                helper('whatsapp');
+                $pharmacyName = isset($record['FullName']) ? trim($record['FullName']) : (isset($oldProfile['FullName']) ? $oldProfile['FullName'] : 'Unknown Pharmacy');
+                $newExpireFormatted = date("d M, Y", strtotime($newExpireDateNormalized));
+                $oldExpireFormatted = !empty($oldExpireDateNormalized) ? date("d M, Y", strtotime($oldExpireDateNormalized)) : 'N/A';
+                $cityRecord = $Crud->SingleRecord("cities", array("UID" => (isset($record['City']) ? $record['City'] : 0)));
+                $cityName = isset($cityRecord['FullName']) ? $cityRecord['FullName'] : 'N/A';
+                $contactNo = isset($record['ContactNo']) ? $record['ContactNo'] : (isset($oldProfile['ContactNo']) ? $oldProfile['ContactNo'] : 'N/A');
+                $saleAgent = isset($record['SaleAgent']) ? $record['SaleAgent'] : (isset($oldProfile['SaleAgent']) ? $oldProfile['SaleAgent'] : 'N/A');
+                $message = "🔄 *Pharmacy License Updated*\n\n"
+                    . "*Pharmacy:* {$pharmacyName}\n"
+                    . "*Profile ID:* {$id}\n\n"
+                    . "*License expiry*\n"
+                    . "Previous: {$oldExpireFormatted}\n"
+                    . "New: {$newExpireFormatted}\n\n"
+                    . "*Contact:* {$contactNo}\n"
+                    . "*City:* {$cityName}\n"
+                    . "*Sale Agent:* {$saleAgent}";
+                SendWhatsAPPWithBCC('923455913609', $message);
+            }
+
             $response['status'] = 'success';
             $response['message'] = 'Updated Successfully...!';
         }
@@ -189,6 +254,7 @@ class Pharmacy extends BaseController
         $response = array();
         $response['status'] = 'success';
         $response['record'] = $record;
+        $response['code_detail'] = base64_decode($record['LicenseCode']);
         $response['message'] = 'Record Get Successfully...!';
         echo json_encode($response);
     }
