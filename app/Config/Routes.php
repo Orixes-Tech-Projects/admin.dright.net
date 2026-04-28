@@ -98,6 +98,8 @@ $routes->group('users', static function ($routes) {
     $routes->get('access-level', 'Users::index');
     $routes->get('admin-activites', 'Users::index');
     $routes->get('admin-approval', 'Users::index');
+    $routes->get('database-backup', 'Users::index');
+    $routes->get('download-database-backup', 'Users::download_database_backup');
     $routes->post('users-data', 'Users::fetch_users');
     $routes->post('get-record', 'Users::get_item_record');
     $routes->get('dashboard', 'Users::dashboard');

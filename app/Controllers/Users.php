@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Models\Crud;
 use App\Models\Main;
 use App\Models\SystemUser;
+use Config\Database;
 
 class Users extends BaseController
 {
@@ -35,6 +36,8 @@ class Users extends BaseController
             echo view('users/admin_activites', $data);
         } elseif ($data['page'] == 'admin-approval') {
             echo view('users/admin_approval', $data);
+        } elseif ($data['page'] == 'database-backup') {
+            echo view('users/database_backup', $data);
         } else {
             echo view('users/index', $data);
         }
@@ -290,5 +293,155 @@ class Users extends BaseController
         $response['record'] = $record;
         $response['message'] = 'Record Get Successfully...!';
         echo json_encode($response);
+    }
+
+    public function download_database_backup()
+    {
+        $backupDir = WRITEPATH . 'uploads/database-backups/';
+        if (!is_dir($backupDir)) {
+            mkdir($backupDir, 0775, true);
+        }
+
+        if (!class_exists('ZipArchive')) {
+            return redirect()->to(PATH . 'users/database-backup')->with('error', 'ZIP extension is not enabled on server.');
+        }
+
+        $timestamp = date('Ymd_His');
+        $fileName = 'database_backup_' . $timestamp . '.zip';
+        $filePath = $backupDir . $fileName;
+
+        $zip = new \ZipArchive();
+        if ($zip->open($filePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return redirect()->to(PATH . 'users/database-backup')->with('error', 'Unable to create backup zip file.');
+        }
+
+        $manifest = array(
+            'generated_at' => date('c'),
+            'generated_by' => (isset($_SESSION['FullName']) ? $_SESSION['FullName'] : 'system'),
+            'format_version' => '1.0',
+            'description' => 'Portable DB backup for import on another system.'
+        );
+
+        try {
+            $mysqlExport = $this->export_mysql_tables();
+            $pgsqlExport = $this->export_pgsql_tables();
+
+            $zip->addFromString('manifest.json', json_encode($manifest, JSON_PRETTY_PRINT));
+            $zip->addFromString('README.txt', $this->backup_readme_text());
+            $zip->addFromString('mysql/tables.json', json_encode($mysqlExport, JSON_PRETTY_PRINT));
+            $zip->addFromString('pgsql/tables.json', json_encode($pgsqlExport, JSON_PRETTY_PRINT));
+            $zip->addFromString('mysql/backup.sql', $this->generate_mysql_import_sql($mysqlExport));
+            $zip->addFromString('pgsql/backup.sql', $this->generate_pgsql_import_sql($pgsqlExport));
+
+            $zip->close();
+        } catch (\Throwable $e) {
+            $zip->close();
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+            return redirect()->to(PATH . 'users/database-backup')->with('error', 'Backup failed: ' . $e->getMessage());
+        }
+
+        register_shutdown_function(static function () use ($filePath) {
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        });
+
+        return $this->response->download($filePath, null);
+    }
+
+    private function export_mysql_tables()
+    {
+        $db = Database::connect('default');
+        $tables = $db->listTables();
+        $export = array();
+
+        foreach ($tables as $table) {
+            $rows = $db->table($table)->get()->getResultArray();
+            $export[$table] = $rows;
+        }
+
+        return $export;
+    }
+
+    private function export_pgsql_tables()
+    {
+        $db = Database::connect('website_db');
+        $tables = $db->query("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename ASC")->getResultArray();
+        $export = array();
+
+        foreach ($tables as $tableRow) {
+            $table = $tableRow['tablename'];
+            $rows = $db->query('SELECT * FROM public."' . $table . '"')->getResultArray();
+            $export[$table] = $rows;
+        }
+
+        return $export;
+    }
+
+    private function generate_mysql_import_sql($export)
+    {
+        $sql = "-- MySQL import file generated at " . date('Y-m-d H:i:s') . "\n\n";
+        foreach ($export as $table => $rows) {
+            $sql .= "TRUNCATE TABLE `" . $table . "`;\n";
+            foreach ($rows as $row) {
+                $columns = array_map(static function ($col) {
+                    return '`' . str_replace('`', '``', $col) . '`';
+                }, array_keys($row));
+                $values = array_map(array($this, 'sql_value_mysql'), array_values($row));
+                $sql .= "INSERT INTO `" . $table . "` (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $values) . ");\n";
+            }
+            $sql .= "\n";
+        }
+        return $sql;
+    }
+
+    private function generate_pgsql_import_sql($export)
+    {
+        $sql = "-- PostgreSQL import file generated at " . date('Y-m-d H:i:s') . "\n\n";
+        foreach ($export as $table => $rows) {
+            $sql .= "TRUNCATE TABLE public.\"" . $table . "\" RESTART IDENTITY CASCADE;\n";
+            foreach ($rows as $row) {
+                $columns = array_map(static function ($col) {
+                    return '"' . str_replace('"', '""', $col) . '"';
+                }, array_keys($row));
+                $values = array_map(array($this, 'sql_value_pgsql'), array_values($row));
+                $sql .= "INSERT INTO public.\"" . $table . "\" (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $values) . ");\n";
+            }
+            $sql .= "\n";
+        }
+        return $sql;
+    }
+
+    private function sql_value_mysql($value)
+    {
+        if ($value === null) {
+            return 'NULL';
+        }
+        return "'" . addslashes((string)$value) . "'";
+    }
+
+    private function sql_value_pgsql($value)
+    {
+        if ($value === null) {
+            return 'NULL';
+        }
+        return "'" . str_replace("'", "''", (string)$value) . "'";
+    }
+
+    private function backup_readme_text()
+    {
+        return "Database Backup Package\n"
+            . "=======================\n\n"
+            . "This ZIP contains portable exports for both databases used by the system.\n\n"
+            . "Included:\n"
+            . "- manifest.json\n"
+            . "- mysql/tables.json\n"
+            . "- mysql/backup.sql\n"
+            . "- pgsql/tables.json\n"
+            . "- pgsql/backup.sql\n\n"
+            . "Import note:\n"
+            . "Use SQL files for direct DB restore, or JSON files for custom import tooling.\n";
     }
 }
