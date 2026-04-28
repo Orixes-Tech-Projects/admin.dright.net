@@ -23,7 +23,7 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
                 </a>
                 <div class="accordion-body">
                     <form method="post" name="AllGeneralBannersFilterForm" id="AllGeneralBannersFilterForm"
-                          onsubmit="SearchFilterFormSubmit('AllGeneralBannersFilterForm');">
+                        onsubmit="SearchFilterFormSubmit('AllGeneralBannersFilterForm');">
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-4">
@@ -41,25 +41,25 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
                                         <select class="form-control" id="type" name="type">
                                             <option value="">Select Type</option>
                                             <option <?= (($Type == 'custom-text') ? 'selected' : '') ?>
-                                                    value="custom-text">Custom Text
+                                                value="custom-text">Custom Text
                                             </option>
                                             <option <?= (($Type == 'image-only') ? 'selected' : '') ?>
-                                                    value="image-only">Image Only
+                                                value="image-only">Image Only
                                             </option>
                                             <option <?= (($Type == 'pre-designed') ? 'selected' : '') ?>
-                                                    value="pre-designed">Pre Designed
+                                                value="pre-designed">Pre Designed
                                             </option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-5" style="margin-top: 33px;">
                                     <button style="border-radius: 5px;" class="btn btn-outline-success btn-sm"
-                                            onclick="SearchFilterFormSubmit('AllGeneralBannersFilterForm');"
-                                            type="button">Search!
+                                        onclick="SearchFilterFormSubmit('AllGeneralBannersFilterForm');"
+                                        type="button">Search!
                                     </button>
                                     <button style="border-radius: 5px;" class="btn btn-outline-danger btn-sm"
-                                            onclick="ClearAllFilter('GeneralBannersFilters');"
-                                            type="button">Clear
+                                        onclick="ClearAllFilter('GeneralBannersFilters');"
+                                        type="button">Clear
                                     </button>
                                 </div>
                                 <div class="mt-4 col-md-12" id="FilterResponse"></div>
@@ -75,8 +75,8 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
     <div class="card-header">
         <h4>List Of All General Banners
             <button style="float: right; border-radius: 5px;" type="button" onclick="AddBanner()"
-                    class="btn btn-primary btn-sm" data-toggle="modal"
-                    data-target="#exampleModal">Add General Banners
+                class="btn btn-primary btn-sm" data-toggle="modal"
+                data-target="#exampleModal">Add General Banners
             </button>
         </h4>
     </div>
@@ -84,14 +84,14 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
         <div class="table-responsive">
             <table id="record" class="table table-striped table-bordered">
                 <thead>
-                <tr>
-                    <th data-priority="1" width="5%">#</th>
-                    <th data-priority="3">Type</th>
-                    <th data-priority="4">Specialty</th>
-                    <th data-priority="6">Alignment</th>
-                    <th data-priority="2" width="12%">Image</th>
-                    <th data-priority="5" width="10%">Actions</th>
-                </tr>
+                    <tr>
+                        <th data-priority="1" width="5%">#</th>
+                        <th data-priority="3">Type</th>
+                        <th data-priority="4">Specialty</th>
+                        <th data-priority="6">Alignment</th>
+                        <th data-priority="2" width="12%">Image</th>
+                        <th data-priority="5" width="10%">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -101,10 +101,10 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
 </div>
 <?php echo view('builder/modal/add_banner'); ?>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $("select#SearchSpeciality").select2();
 
-        const Speciality = "<?=$Speciality?>";
+        const Speciality = "<?= $Speciality ?>";
         if (Speciality != '') {
             $("select#SearchSpeciality").val(Speciality).trigger('change');
         }
@@ -115,7 +115,10 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
             "processing": true,
             "serverSide": true,
             "responsive": true,
-            "lengthMenu": [[25, 50, 100, 500, 1000, -1], [25, 50, 100, 500, 1000, 'All']],
+            "lengthMenu": [
+                [25, 50, 100, 500, 1000, -1],
+                [25, 50, 100, 500, 1000, 'All']
+            ],
             "pageLength": 25,
             "autoWidth": true,
             "ajax": {
@@ -124,11 +127,44 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
             }
         });
     });
-
 </script>
 <script>
     function AddBanner() {
+        if (typeof resetBannerFormForAdd === 'function') {
+            resetBannerFormForAdd();
+        }
         $('#AddBannerModal').modal('show');
+    }
+
+    function EditBanner(id) {
+        if (typeof resetBannerFormForAdd === 'function') {
+            resetBannerFormForAdd();
+        }
+        if (typeof setBannerFormForUpdateMode === 'function') {
+            setBannerFormForUpdateMode();
+        }
+        const response = AjaxResponse("builder/get-banner-record", "id=" + id);
+        if (response.status === 'success' && response.record) {
+            const record = response.record;
+            $("#AddBannerModal form#AddBannerForm input#UID").val(record.UID || 0);
+            $("#AddBannerModal form#AddBannerForm select#type").val(record.Type || '');
+            $("#AddBannerModal form#AddBannerForm select#alignment").val(record.Alignment || '');
+            $("#AddBannerModal form#AddBannerForm select#speciality").val(record.Speciality || '').trigger('change');
+            $("#GeneralBannerModalTitle").text("Update General Banner");
+            $("#GeneralBannerSubmitBtn").text("Update Banner");
+            $("#GeneralBannerFileHint").text("Allowed formats: GIF, JPG, JPEG, PNG, WEBP (optional for update)");
+            const imageKey = "mysql|general_banners|" + String(record.UID || '');
+            const encodedImageKey = btoa(imageKey).replace(/=+$/, '');
+            const imageUrl = "<?= $path ?>load_image/" + encodedImageKey;
+            if (record.UID) {
+                $("#CurrentBannerImage").html('<img src="' + imageUrl + '" style="display:block; padding:2px; border:1px solid #145388 !important; border-radius:3px; width:150px;">');
+            } else {
+                $("#CurrentBannerImage").html('');
+            }
+            $('#AddBannerModal').modal('show');
+        } else {
+            $("#Response").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"><strong>Error!</strong> Unable to load banner record.</div>');
+        }
     }
 
     function DeleteBanner(id) {
@@ -136,12 +172,12 @@ if (isset($SessionFilters['Type']) && $SessionFilters['Type'] != '') {
             var response = AjaxResponse("builder/delete-banner", "id=" + id);
             if (response.status == 'success') {
                 $("#Response").html('<div class="alert alert-success mb-4" style="margin: 10px;" role="alert"> <strong>Deleted Successfully!</strong>  </div>')
-                setTimeout(function () {
+                setTimeout(function() {
                     location.reload();
                 }, 1000);
             } else {
                 $("#Response").html('<div class="alert alert-danger mb-4" style="margin: 10px;" role="alert"> <strong>Error! Not Deleted</strong>  </div>')
-                setTimeout(function () {
+                setTimeout(function() {
                     location.reload();
                 }, 1000);
             }

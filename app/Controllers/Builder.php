@@ -217,6 +217,7 @@ class Builder extends BaseController
                                     Actions
                                 </button>
                                 <div class="dropdown-menu">
+                                    <a style="cursor: pointer;" class="dropdown-item" onclick="EditBanner(' . htmlspecialchars($record['UID']) . ')">Edit</a>
                                     <a style="cursor: pointer;" class="dropdown-item" onclick="DeleteBanner(' . htmlspecialchars($record['UID']) . ')">Delete</a>
                                 </div>
                             </div>
@@ -241,6 +242,26 @@ class Builder extends BaseController
         $response = array();
         $response['status'] = 'success';
         $response['message'] = ' Deleted Successfully...!';
+        echo json_encode($response);
+    }
+
+    public function get_banner_record()
+    {
+        $Crud = new Crud();
+        $id = $this->request->getVar('id');
+
+        $record = $Crud->SingleRecord("general_banners", array("UID" => $id));
+        $response = array();
+
+        if (isset($record['UID']) && $record['UID'] > 0) {
+            $response['status'] = 'success';
+            $response['record'] = $record;
+            $response['message'] = 'Record Get Successfully...!';
+        } else {
+            $response['status'] = 'fail';
+            $response['message'] = 'Record Not Found...!';
+        }
+
         echo json_encode($response);
     }
 
@@ -617,20 +638,32 @@ class Builder extends BaseController
 
         $Crud = new Crud();
         $Main = new Main();
+        $response = array();
+        $id = (int)$this->request->getVar('UID');
 
         $Type = $this->request->getVar('type');
         $alignment = $this->request->getVar('alignment');
         $color = $this->request->getVar('color');
         $speciality = $this->request->getVar('speciality');
+        $existingRecord = array();
+        if ($id > 0) {
+            $existingRecord = $Crud->SingleRecord("general_banners", array("UID" => $id));
+            if (!isset($existingRecord['UID']) || $existingRecord['UID'] <= 0) {
+                $response['status'] = 'error';
+                $response['message'] = 'Banner record not found.';
+                echo json_encode($response);
+                exit;
+            }
+        }
+        $fileContent = (isset($existingRecord['Image']) ? $existingRecord['Image'] : '');
 
         if ($this->request->getFile('profile') && $this->request->getFile('profile')->isValid()) {
 
             $file = $this->request->getFile('profile');
-            $fileName = $file->getName();
             $fileExt = strtolower($file->getClientExtension());
             $allowedExt = ['gif', 'jpg', 'jpeg', 'png', 'webp'];
             if (!in_array($fileExt, $allowedExt)) {
-                $data = ['status' => 'error', 'msg' => 'Invalid file type. Only GIF, JPG, JPEG, WEBP, and PNG files are allowed.'];
+                $data = ['status' => 'error', 'message' => 'Invalid file type. Only GIF, JPG, JPEG, WEBP, and PNG files are allowed.'];
                 echo json_encode($data);
                 exit;
             }
@@ -645,9 +678,8 @@ class Builder extends BaseController
             } else {
                 $fileContent = '';
             }
-
-        } else {
-            $data = ['status' => 'error', 'msg' => 'No file selected or invalid extension.'];
+        } elseif ($id <= 0) {
+            $data = ['status' => 'error', 'message' => 'No file selected or invalid extension.'];
             echo json_encode($data);
             exit;
         }
@@ -657,13 +689,25 @@ class Builder extends BaseController
         $record['Color'] = $color;
         $record['Speciality'] = $speciality;
         $record['Image'] = $fileContent;
-        $RecordId = $Crud->AddRecord('general_banners', $record);
-        if (isset($RecordId) && $RecordId > 0) {
-            $response['status'] = 'success';
-            $response['message'] = 'General Banners Added Successfully...!';
+
+        if ($id > 0) {
+            $RecordId = $Crud->UpdateRecord("general_banners", $record, array("UID" => $id));
+            if (isset($RecordId)) {
+                $response['status'] = 'success';
+                $response['message'] = 'General Banner Updated Successfully...!';
+            } else {
+                $response['status'] = 'fail';
+                $response['message'] = 'Data Didnt Submitted Successfully...!';
+            }
         } else {
-            $response['status'] = 'fail';
-            $response['message'] = 'Data Didnt Submitted Successfully...!';
+            $RecordId = $Crud->AddRecord('general_banners', $record);
+            if (isset($RecordId) && $RecordId > 0) {
+                $response['status'] = 'success';
+                $response['message'] = 'General Banners Added Successfully...!';
+            } else {
+                $response['status'] = 'fail';
+                $response['message'] = 'Data Didnt Submitted Successfully...!';
+            }
         }
         echo json_encode($response);
 

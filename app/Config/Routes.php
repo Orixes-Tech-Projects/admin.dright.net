@@ -83,6 +83,7 @@ $routes->group('builder', static function ($routes) {
     $routes->post('delete-doctor', 'Builder::delete_doctor');
     $routes->post('delete-hospital', 'Builder::delete_hospital');
     $routes->post('delete-banner', 'Builder::delete_banner');
+    $routes->post('get-banner-record', 'Builder::get_banner_record');
     $routes->post('delete-images', 'Builder::delete_images');
     $routes->get('update-doctor/(:num)', 'Builder::index');
     $routes->get('specialities-gallery/(:num)', 'Builder::gallery');
