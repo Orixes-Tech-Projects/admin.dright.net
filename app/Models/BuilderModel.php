@@ -222,7 +222,29 @@ class BuilderModel extends Model
         if ($keyword != '') {
             $SQL .= ' AND public."profiles"."Name"  ILIKE \'%' . $keyword . '%\'   ';
         }
-        $SQL .= ' Order By public."profiles"."Name"  ASC';
+
+        // Dynamic ordering based on DataTables request
+        $orderClause = ' Order By public."profiles"."Name" ASC';
+        $columnMap = [
+            1 => 'public."profiles"."Name"',
+            2 => 'public."profiles"."ContactNo"',
+            3 => 'public."profiles"."SubDomain"',
+            4 => 'public."profiles"."City"',
+            5 => 'public."profiles"."Status"',
+            6 => 'public."profiles"."ExpireDate"',
+            7 => 'public."profiles"."Email"',
+            8 => 'public."profiles"."LastVisitDateTime"',
+        ];
+
+        if (isset($_POST['order'][0]['column'])) {
+            $colIdx = (int)$_POST['order'][0]['column'];
+            if (isset($columnMap[$colIdx])) {
+                $dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'desc') ? 'DESC' : 'ASC';
+                $orderClause = ' Order By ' . $columnMap[$colIdx] . ' ' . $dir;
+            }
+        }
+
+        $SQL .= $orderClause;
 
         return $SQL;
     }
