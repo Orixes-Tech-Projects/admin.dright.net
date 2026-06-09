@@ -190,6 +190,18 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
             "autoWidth": true,
             "orderMulti": false,
             "order": [[1, 'asc']],
+            "columns": [
+                {data: 0, orderable: false, searchable: false},
+                {data: 1, name: 'name'},
+                {data: 2, name: 'contact'},
+                {data: 3, name: 'subdomain'},
+                {data: 4, name: 'city'},
+                {data: 5, name: 'status'},
+                {data: 6, name: 'expire_date'},
+                {data: 7, name: 'email'},
+                {data: 8, name: 'last_visit'},
+                {data: 9, orderable: false, searchable: false}
+            ],
             "dom": '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lfB>rtip',
             "buttons": [
                 {
@@ -299,7 +311,6 @@ if (isset($SessionFilters['City']) && $SessionFilters['City'] != '') {
                 }
             ],
             "columnDefs": [
-                {"orderable": false, "targets": [0, -1]},
                 {"searchable": false, "targets": -1}
             ],
             "ajax": {

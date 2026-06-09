@@ -225,22 +225,53 @@ class BuilderModel extends Model
 
         // Dynamic ordering based on DataTables request
         $orderClause = ' Order By public."profiles"."Name" ASC';
-        $columnMap = [
-            1 => 'public."profiles"."Name"',
-            2 => 'public."profiles"."ContactNo"',
-            3 => 'public."profiles"."SubDomain"',
-            4 => 'public."profiles"."City"',
-            5 => 'public."profiles"."Status"',
-            6 => 'public."profiles"."ExpireDate"',
-            7 => 'public."profiles"."Email"',
-            8 => 'public."profiles"."LastVisitDateTime"',
+        $fieldMap = [
+            'name' => 'public."profiles"."Name"',
+            'contact' => 'public."profiles"."ContactNo"',
+            'subdomain' => 'public."profiles"."SubDomain"',
+            'city' => 'public."profiles"."City"',
+            'status' => 'public."profiles"."Status"',
+            'expire_date' => 'public."profiles"."ExpireDate"',
+            'email' => 'public."profiles"."Email"',
+            'last_visit' => 'public."profiles"."LastVisitDateTime"',
         ];
 
         if (isset($_POST['order'][0]['column'])) {
             $colIdx = (int)$_POST['order'][0]['column'];
-            if (isset($columnMap[$colIdx])) {
-                $dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'desc') ? 'DESC' : 'ASC';
-                $orderClause = ' Order By ' . $columnMap[$colIdx] . ' ' . $dir;
+            $dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'desc') ? 'DESC' : 'ASC';
+            $colName = '';
+            if (isset($_POST['columns'][$colIdx]['name'])) {
+                $colName = trim($_POST['columns'][$colIdx]['name']);
+            }
+
+            if ($colName !== '' && isset($fieldMap[$colName])) {
+                $orderClause = ' Order By ' . $fieldMap[$colName] . ' ' . $dir;
+            } else {
+                if ($ID == 'doctors') {
+                    $columnMap = [
+                        1 => 'public."profiles"."Name"',
+                        2 => 'public."profiles"."ContactNo"',
+                        3 => 'public."profiles"."SubDomain"',
+                        4 => 'public."profiles"."City"',
+                        5 => 'public."profiles"."Status"',
+                        6 => 'public."profiles"."ExpireDate"',
+                        7 => 'public."profiles"."Email"',
+                        8 => 'public."profiles"."LastVisitDateTime"',
+                    ];
+                } else {
+                    $columnMap = [
+                        1 => 'public."profiles"."Name"',
+                        2 => 'public."profiles"."SubDomain"',
+                        3 => 'public."profiles"."City"',
+                        4 => 'public."profiles"."Status"',
+                        5 => 'public."profiles"."ExpireDate"',
+                        6 => 'public."profiles"."Email"',
+                        7 => 'public."profiles"."LastVisitDateTime"',
+                    ];
+                }
+                if (isset($columnMap[$colIdx])) {
+                    $orderClause = ' Order By ' . $columnMap[$colIdx] . ' ' . $dir;
+                }
             }
         }
 
