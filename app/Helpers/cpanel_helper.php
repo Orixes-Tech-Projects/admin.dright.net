@@ -8,7 +8,7 @@ if (!function_exists('addSubdomain')) {
         function create_subdomain_cpanel($subdomain, $rootDomain, $dir)
         {
             $cpanelUser = 'dright';
-            $apiToken = '43L85J0NONQNFZGR7X8B2IKV2TZX41PJ';
+            $apiToken = '0UTN6TU37RWGSGQZ30879E8ILGMY7IQG';
             $cpanelHost = 'dright.net';
 
             $url = "https://$cpanelHost:2083/json-api/cpanel";
