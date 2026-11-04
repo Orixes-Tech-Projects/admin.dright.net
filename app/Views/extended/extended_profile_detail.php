@@ -77,6 +77,7 @@ $ExtendedModel = new \App\Models\ExtendedModel();
                                                                                     <option '.( ( $record["Description"] == 'ClinTa-Pharmacy' )? 'selected' : '' ).' value="ClinTa-Pharmacy">ClinTa Pharmacy</option>
                                                                                     <option '.( ( $record["Description"] == 'ClinTa-Extended' )? 'selected' : '' ).' value="ClinTa-Extended">ClinTa Extended</option>
                                                                                     <option '.( ( $record["Description"] == 'ClinTa-Laris' )? 'selected' : '' ).' value="ClinTa-Extended">ClinTa Laris</option>
+                                                                                    <option '.( ( $record["Description"] == 'ClinTa-Insite' )? 'selected' : '' ).' value="ClinTa-Insite">ClinTa Insite</option>
                                                                             </select>
                                                                         </div>
                                                                   </div>';
