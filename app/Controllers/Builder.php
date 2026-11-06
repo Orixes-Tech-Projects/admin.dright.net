@@ -593,25 +593,31 @@ class Builder extends BaseController
 
         $id = $this->request->getVar('id');
         $record = $BuilderModel->get_speciality_images_by_id($id);
-        if (count($record) === 0) {
 
-            $response['message'] = 'No Images Found';
-
-        } else {
+        // Remove image files only when they exist (missing files must not block delete)
+        if (!empty($record)) {
             foreach ($record as $r) {
-                @unlink("upload/specialities/" . $r['Value']);
+                if (empty($r['Value'])) {
+                    continue;
+                }
+                $imagePath = ROOT . "/upload/specialities/" . $r['Value'];
+                if (is_file($imagePath)) {
+                    @unlink($imagePath);
+                }
             }
-            $Crud->DeleteRecord('public."speciality_metas"', array("SpecialityUID" => $id));
-
         }
-        $Crud->DeleteRecord('specialities', array("UID" => $id));
-        $Main = new Main();
 
+        // Always remove metas + speciality, even when no images / files are missing
+        $Crud->DeleteRecord('speciality_metas', array("SpecialityUID" => $id));
+        $Crud->DeleteRecord('specialities', array("UID" => $id));
+
+        $Main = new Main();
         $msg = $_SESSION['FullName'] . ' Delete specialities Through Admin Dright';
         $logesegment = 'Specialities';
         $Main->adminlog($logesegment, $msg, $this->request->getIPAddress());
+
         $response['status'] = 'success';
-        $response['message'] .= ' And Specialities Deleted Successfully...!';
+        $response['message'] = 'Specialities Deleted Successfully...!';
         echo json_encode($response);
     }
 
