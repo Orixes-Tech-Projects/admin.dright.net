@@ -267,6 +267,16 @@ $routes->group('extended', static function ($routes) {
 
 });
 
+$routes->group('support', static function ($routes) {
+    $routes->get('/', 'Support::index');
+    $routes->post('datatable', 'Support::datatable');
+    $routes->post('form_submit', 'Support::form_submit');
+    $routes->post('get_by_uid', 'Support::get_by_uid');
+    $routes->post('delete', 'Support::delete');
+    $routes->post('clear_video', 'Support::clear_video');
+    $routes->post('update_status', 'Support::update_status');
+});
+
 
 $routes->group('clinta_members', static function ($routes) {
     $routes->get('/', 'ClintaMember::index');

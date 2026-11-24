@@ -75,7 +75,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                 ?>
                     <li>
                         <a href="#"
-                            data-menu-target="#plugins" <?= ($segment_a == 'extended' ? 'class="active"' : '') ?>>
+                            data-menu-target="#plugins" <?= ($segment_a == 'extended' || $segment_a == 'support' ? 'class="active"' : '') ?>>
                             <span class="menu-tab-icon">
                                 <i data-feather="gift"></i>
                             </span>
@@ -691,6 +691,16 @@ $doctor = $checknav->checkAccessKey('doctor');
                         <a href="<?= $path ?>extended/extended_default_lookup">
                             <span class="nav-link-icon" data-feather="sliders"></span>
                             <span>Default Lookups</span>
+                        </a>
+                    </li>
+                <?php } ?>
+                <?php
+                if ($checknav->checkAccessKey('extended_clinta_support_list')) {
+                ?>
+                    <li>
+                        <a href="<?= $path ?>support">
+                            <span class="nav-link-icon" data-feather="help-circle"></span>
+                            <span>ClinTa Support</span>
                         </a>
                     </li>
                 <?php } ?>
