@@ -555,28 +555,32 @@
         color: #fff;
     }
 
+    .clinta-support-page a.cs-badge-video,
     .clinta-support-page .cs-badge-video {
-        background: #ea580c;
-        color: #fff;
-        text-decoration: none;
+        background: #ea580c !important;
+        color: #fff !important;
+        text-decoration: none !important;
     }
 
+    .clinta-support-page a.cs-badge-video:hover,
     .clinta-support-page .cs-badge-video:hover {
-        background: #c2410c;
-        color: #fff;
-        text-decoration: none;
+        background: #c2410c !important;
+        color: #fff !important;
+        text-decoration: none !important;
     }
 
+    .clinta-support-page a.cs-badge-link,
     .clinta-support-page .cs-badge-link {
-        background: #2563eb;
-        color: #fff;
-        text-decoration: none;
+        background: #0e7490 !important;
+        color: #fff !important;
+        text-decoration: none !important;
     }
 
+    .clinta-support-page a.cs-badge-link:hover,
     .clinta-support-page .cs-badge-link:hover {
-        background: #1d4ed8;
-        color: #fff;
-        text-decoration: none;
+        background: #155e75 !important;
+        color: #fff !important;
+        text-decoration: none !important;
     }
 
     .clinta-support-page .cs-badge-none {
