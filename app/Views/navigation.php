@@ -700,7 +700,7 @@ $doctor = $checknav->checkAccessKey('doctor');
                     <li>
                         <a href="<?= $path ?>support">
                             <span class="nav-link-icon" data-feather="help-circle"></span>
-                            <span>ClinTa Support</span>
+                            <span>ClinTa Support Bot</span>
                         </a>
                     </li>
                 <?php } ?>

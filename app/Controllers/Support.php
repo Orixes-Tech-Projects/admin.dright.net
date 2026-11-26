@@ -112,12 +112,12 @@ class Support extends BaseController
                     . ' data-prev="' . htmlspecialchars($status) . '"'
                     . ' aria-label="Guide status"'
                     . ' onchange="ChangeSupportStatus(' . $uid . ', this)">'
-                    . '<option value="active"' . ($status === 'active' ? ' selected' : '') . '>Active</option>'
-                    . '<option value="lock"' . ($status === 'lock' ? ' selected' : '') . '>Lock</option>'
+                    . '<option value="active"' . ($status === 'active' ? ' selected' : '') . '>Published</option>'
+                    . '<option value="lock"' . ($status === 'lock' ? ' selected' : '') . '>Pending</option>'
                     . '</select>';
             } else {
                 $statusHtml = '<span class="cs-badge ' . ($status === 'active' ? 'cs-badge-status-active' : 'cs-badge-status-lock') . '">'
-                    . ($status === 'active' ? 'Active' : 'Lock')
+                    . ($status === 'active' ? 'Published' : 'Pending')
                     . '</span>';
             }
 
@@ -219,7 +219,7 @@ class Support extends BaseController
         $table = $SupportModel->tableName();
         if ($id === 0) {
             $record['Archive'] = 0;
-            $record['Status'] = 'active';
+            $record['Status'] = 'lock';
             $RecordId = $Crud->AddRecord($table, $record);
             if (isset($RecordId) && $RecordId > 0) {
                 $response['status'] = 'success';
@@ -367,7 +367,7 @@ class Support extends BaseController
 
         echo json_encode([
             'status' => 'success',
-            'message' => 'Status updated to ' . ($status === 'lock' ? 'Lock' : 'Active') . '.',
+            'message' => 'Status updated to ' . ($status === 'lock' ? 'Pending' : 'Published') . '.',
             'new_status' => $status,
         ]);
     }

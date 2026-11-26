@@ -947,7 +947,7 @@
                 <i class="ti-help-alt" aria-hidden="true"></i>
                 Extended knowledge base
             </div>
-            <h1 id="clinta-support-title">ClinTa Support</h1>
+            <h1 id="clinta-support-title">ClinTa Support Bot</h1>
         </div>
         <?php if (!empty($can_add)) { ?>
             <button type="button" onclick="AddSupportGuide()" class="btn btn-cs-primary" aria-label="Add new support guide">
@@ -1028,8 +1028,8 @@
                                 <label for="FilterStatus">Status</label>
                                 <select class="form-control" id="FilterStatus" name="status">
                                     <option value="">All statuses</option>
-                                    <option value="active">Active</option>
-                                    <option value="lock">Lock</option>
+                                    <option value="active">Published</option>
+                                    <option value="lock">Pending</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6 mb-2">
